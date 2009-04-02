@@ -28,7 +28,7 @@ def build_client(section):
 
     xmppclient = XMPPClient(j, config.CONF.get(section, 'pass'), host)
 
-    xmppclient.logTraffic = False
+    xmppclient.logTraffic = True
 
     # Stream handling protocols for memagent
     protocols = [protocol.MemAgentPresenceProtocol,
