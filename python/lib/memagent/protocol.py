@@ -98,16 +98,9 @@ class MemAgentPresenceProtocol(PresenceClientProtocol):
 
     def unsubscribedReceived(self, entity):
         log.msg("Unsubscribed received from %s" % (entity.userhost()))
-        self.unsubscribe(entity)
-        self.unsubscribed(entity)
 
     def subscribeReceived(self, entity):
         log.msg("Subscribe received from %s" % (entity.userhost()))
-        self.subscribe(entity)
-        self.subscribed(entity)
 
     def unsubscribeReceived(self, entity):
         log.msg("Unsubscribe received from %s" % (entity.userhost()))
-        self.unsubscribe(entity)
-        self.unsubscribed(entity)
-
