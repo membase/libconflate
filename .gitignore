@@ -2,3 +2,4 @@
 *.a
 *~
 *.pyc
+/python/twistd.pid
