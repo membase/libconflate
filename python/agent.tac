@@ -14,6 +14,7 @@ from wokkel.disco import DiscoHandler
 
 from memagent import config
 from memagent import protocol
+from memagent import adhoc
 
 application = service.Application("memagent")
 
@@ -41,9 +42,9 @@ def build_client(section):
     DiscoHandler().setHandlerParent(xmppclient)
     VersionHandler('memagent', config.VERSION).setHandlerParent(xmppclient)
     KeepAlive().setHandlerParent(xmppclient)
+    adhoc.BaseCommandHandler().setHandlerParent(xmppclient)
     xmppclient.setServiceParent(application)
 
     return xmppclient
-
 
 build_client('xmpp')
