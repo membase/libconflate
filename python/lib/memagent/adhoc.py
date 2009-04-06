@@ -51,6 +51,9 @@ class ServerListHandler(BaseHandler):
 
     def __call__(self, base, iq, cmd):
         log.msg("Handling a server list.")
+
+        log.msg(cmd.toXml())
+
         res = toResponse(iq, 'result')
         base.send(res)
 
