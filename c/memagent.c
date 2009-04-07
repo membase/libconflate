@@ -8,73 +8,73 @@
 int version_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
                     void * const userdata)
 {
-	xmpp_stanza_t *reply, *query, *name, *version, *text;
-	char *buf;
-	size_t len;
+    xmpp_stanza_t *reply, *query, *name, *version, *text;
+    char *buf;
+    size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
-	xmpp_ctx_t *ctx = handle->ctx;
+    xmpp_ctx_t *ctx = handle->ctx;
     char *ns;
 
-	printf("Received version request from %s\n", xmpp_stanza_get_attribute(stanza, "from"));
+    printf("Received version request from %s\n", xmpp_stanza_get_attribute(stanza, "from"));
 
-	reply = xmpp_stanza_new(ctx);
-	xmpp_stanza_set_name(reply, "iq");
-	xmpp_stanza_set_type(reply, "result");
-	xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-	xmpp_stanza_set_attribute(reply, "to", xmpp_stanza_get_attribute(stanza, "from"));
+    reply = xmpp_stanza_new(ctx);
+    xmpp_stanza_set_name(reply, "iq");
+    xmpp_stanza_set_type(reply, "result");
+    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    xmpp_stanza_set_attribute(reply, "to", xmpp_stanza_get_attribute(stanza, "from"));
 
-	query = xmpp_stanza_new(ctx);
-	xmpp_stanza_set_name(query, "query");
+    query = xmpp_stanza_new(ctx);
+    xmpp_stanza_set_name(query, "query");
     ns = xmpp_stanza_get_ns(xmpp_stanza_get_children(stanza));
     if (ns) {
         xmpp_stanza_set_ns(query, ns);
     }
 
-	name = xmpp_stanza_new(ctx);
-	xmpp_stanza_set_name(name, "name");
-	xmpp_stanza_add_child(query, name);
+    name = xmpp_stanza_new(ctx);
+    xmpp_stanza_set_name(name, "name");
+    xmpp_stanza_add_child(query, name);
 
-	text = xmpp_stanza_new(ctx);
-	xmpp_stanza_set_text(text, handle->conf->software);
-	xmpp_stanza_add_child(name, text);
+    text = xmpp_stanza_new(ctx);
+    xmpp_stanza_set_text(text, handle->conf->software);
+    xmpp_stanza_add_child(name, text);
 
-	version = xmpp_stanza_new(ctx);
-	xmpp_stanza_set_name(version, "version");
-	xmpp_stanza_add_child(query, version);
+    version = xmpp_stanza_new(ctx);
+    xmpp_stanza_set_name(version, "version");
+    xmpp_stanza_add_child(query, version);
 
-	text = xmpp_stanza_new(ctx);
-	xmpp_stanza_set_text(text, handle->conf->version);
-	xmpp_stanza_add_child(version, text);
+    text = xmpp_stanza_new(ctx);
+    xmpp_stanza_set_text(text, handle->conf->version);
+    xmpp_stanza_add_child(version, text);
 
-	xmpp_stanza_add_child(reply, query);
+    xmpp_stanza_add_child(reply, query);
 
-	xmpp_send(conn, reply);
-	xmpp_stanza_release(reply);
-	return 1;
+    xmpp_send(conn, reply);
+    xmpp_stanza_release(reply);
+    return 1;
 }
 
 xmpp_stanza_t* error_unknown_command(const char *cmd, xmpp_conn_t* const conn,
                                      xmpp_stanza_t * const stanza,
                                      void * const userdata)
 {
-	xmpp_stanza_t *reply, *error, *condition;
+    xmpp_stanza_t *reply, *error, *condition;
     agent_handle_t *handle = (agent_handle_t*) userdata;
-	xmpp_ctx_t *ctx = handle->ctx;
+    xmpp_ctx_t *ctx = handle->ctx;
 
     fprintf(stderr, "Unknown command:  %s\n", cmd);
 
-	reply = xmpp_stanza_new(ctx);
+    reply = xmpp_stanza_new(ctx);
     assert(reply);
-	xmpp_stanza_set_name(reply, "iq");
-	xmpp_stanza_set_type(reply, "error");
-	xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-	xmpp_stanza_set_attribute(reply, "to", xmpp_stanza_get_attribute(stanza, "from"));
+    xmpp_stanza_set_name(reply, "iq");
+    xmpp_stanza_set_type(reply, "error");
+    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    xmpp_stanza_set_attribute(reply, "to", xmpp_stanza_get_attribute(stanza, "from"));
 
     /* Error element */
-	error = xmpp_stanza_new(ctx);
+    error = xmpp_stanza_new(ctx);
     assert(error);
-	xmpp_stanza_set_name(error, "error");
-	xmpp_stanza_add_child(reply, error);
+    xmpp_stanza_set_name(error, "error");
+    xmpp_stanza_add_child(reply, error);
     xmpp_stanza_set_attribute(error, "code", "404");
     xmpp_stanza_set_attribute(error, "type", "modify");
 
@@ -94,18 +94,18 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
                                   void * const userdata)
 {
     xmpp_stanza_t *reply, *req;
-	char *buf;
-	size_t len;
+    char *buf;
+    size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
-	xmpp_ctx_t *ctx = handle->ctx;
+    xmpp_ctx_t *ctx = handle->ctx;
 
     fprintf(stderr, "Processing a serverlist.\n");
 
-	reply = xmpp_stanza_new(ctx);
-	xmpp_stanza_set_name(reply, "iq");
-	xmpp_stanza_set_type(reply, "result");
-	xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-	xmpp_stanza_set_attribute(reply, "to",
+    reply = xmpp_stanza_new(ctx);
+    xmpp_stanza_set_name(reply, "iq");
+    xmpp_stanza_set_type(reply, "result");
+    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    xmpp_stanza_set_attribute(reply, "to",
                               xmpp_stanza_get_attribute(stanza, "from"));
 
     return reply;
@@ -114,11 +114,11 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
 int command_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
                     void * const userdata)
 {
-	xmpp_stanza_t *reply, *req;
-	char *buf;
-	size_t len;
+    xmpp_stanza_t *reply, *req;
+    char *buf;
+    size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
-	xmpp_ctx_t *ctx = handle->ctx;
+    xmpp_ctx_t *ctx = handle->ctx;
     char *cmd;
 
     fprintf(stderr, "Received a command from %s\n",
@@ -159,7 +159,7 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
         xmpp_handler_add(conn, command_handler, "http://jabber.org/protocol/commands",
                          "iq", NULL, handle);
         /*
-        xmpp_handler_add(conn, message_handler, NULL, "message", NULL, ctx);
+          xmpp_handler_add(conn, message_handler, NULL, "message", NULL, ctx);
         */
 
         /* Send initial <presence/> so that we appear online to contacts */
