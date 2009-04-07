@@ -18,12 +18,14 @@ int version_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     printf("Received version request from %s\n", xmpp_stanza_get_attribute(stanza, "from"));
 
     reply = xmpp_stanza_new(ctx);
+    assert(reply);
     xmpp_stanza_set_name(reply, "iq");
     xmpp_stanza_set_type(reply, "result");
     xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
     xmpp_stanza_set_attribute(reply, "to", xmpp_stanza_get_attribute(stanza, "from"));
 
     query = xmpp_stanza_new(ctx);
+    assert(query);
     xmpp_stanza_set_name(query, "query");
     ns = xmpp_stanza_get_ns(xmpp_stanza_get_children(stanza));
     if (ns) {
@@ -31,18 +33,22 @@ int version_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     }
 
     name = xmpp_stanza_new(ctx);
+    assert(name);
     xmpp_stanza_set_name(name, "name");
     xmpp_stanza_add_child(query, name);
 
     text = xmpp_stanza_new(ctx);
+    assert(text);
     xmpp_stanza_set_text(text, handle->conf->software);
     xmpp_stanza_add_child(name, text);
 
     version = xmpp_stanza_new(ctx);
+    assert(version);
     xmpp_stanza_set_name(version, "version");
     xmpp_stanza_add_child(query, version);
 
     text = xmpp_stanza_new(ctx);
+    assert(text);
     xmpp_stanza_set_text(text, handle->conf->version);
     xmpp_stanza_add_child(version, text);
 
@@ -80,6 +86,7 @@ xmpp_stanza_t* error_unknown_command(const char *cmd, xmpp_conn_t* const conn,
 
     /* Error condition */
     condition = xmpp_stanza_new(ctx);
+    assert(condition);
     xmpp_stanza_set_name(condition, "item-not-found");
     xmpp_stanza_set_ns(condition, "urn:ietf:params:xml:ns:xmpp-stanzas");
     xmpp_stanza_add_child(error, condition);
@@ -102,6 +109,8 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     fprintf(stderr, "Processing a serverlist.\n");
 
     reply = xmpp_stanza_new(ctx);
+    assert(reply);
+
     xmpp_stanza_set_name(reply, "iq");
     xmpp_stanza_set_type(reply, "result");
     xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
@@ -164,6 +173,7 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
 
         /* Send initial <presence/> so that we appear online to contacts */
         pres = xmpp_stanza_new(handle->ctx);
+        assert(pres);
         xmpp_stanza_set_name(pres, "presence");
         xmpp_send(conn, pres);
         xmpp_stanza_release(pres);
@@ -209,8 +219,10 @@ bool start_agent(agent_config_t conf, agent_handle_t* handle) {
 
     handle->log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG);
     handle->ctx = xmpp_ctx_new(NULL, handle->log);
+    assert(handle->ctx);
 
     handle->conn = xmpp_conn_new(handle->ctx);
+    assert(handle->conn);
 
     xmpp_conn_set_jid(handle->conn, conf.jid);
     xmpp_conn_set_pass(handle->conn, conf.pass);
