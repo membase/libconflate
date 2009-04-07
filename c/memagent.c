@@ -12,7 +12,7 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                   const int error, xmpp_stream_error_t * const stream_error,
                   void * const userdata)
 {
-    xmpp_ctx_t *ctx = (xmpp_ctx_t *)userdata;
+    agent_handle_t *handle = (agent_handle_t *)userdata;
 
     if (status == XMPP_CONN_CONNECT) {
         xmpp_stanza_t* pres;
@@ -23,14 +23,14 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
         */
 
         /* Send initial <presence/> so that we appear online to contacts */
-        pres = xmpp_stanza_new(ctx);
+        pres = xmpp_stanza_new(handle->ctx);
         xmpp_stanza_set_name(pres, "presence");
         xmpp_send(conn, pres);
         xmpp_stanza_release(pres);
     }
     else {
         fprintf(stderr, "DEBUG: disconnected\n");
-        xmpp_stop(ctx);
+        xmpp_stop(handle->ctx);
     }
 }
 
@@ -45,7 +45,7 @@ bool start_agent(agent_config_t conf, agent_handle_t* handle) {
     xmpp_conn_set_jid(handle->conn, conf.jid);
     xmpp_conn_set_pass(handle->conn, conf.pass);
 
-    xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle->ctx);
+    xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
 
     if (pthread_create(&handle->thread, NULL, run_agent, handle) == 0) {
         return true;
