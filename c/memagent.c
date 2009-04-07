@@ -86,26 +86,24 @@ void run_agent(agent_handle_t *handle) {
     fprintf(stderr, "Bailing\n");
 }
 
+char* safe_strdup(const char* in) {
+    char *rv = NULL;
+    assert(in);
+    rv = strdup(in);
+    assert(rv);
+    return rv;
+}
+
 agent_config_t* dup_conf(agent_config_t c) {
     agent_config_t *rv = calloc(sizeof(agent_config_t), 1);
     assert(rv);
-    assert(c.jid);
-    assert(c.pass);
-    assert(c.software);
-    assert(c.version);
-    assert(c.save_path);
 
-    rv->jid = strdup(c.jid);
-    rv->pass = strdup(c.pass);
-    rv->software = strdup(c.software);
-    rv->version = strdup(c.version);
-    rv->save_path = strdup(c.save_path);
+    rv->jid = safe_strdup(c.jid);
+    rv->pass = safe_strdup(c.pass);
+    rv->software = safe_strdup(c.software);
+    rv->version = safe_strdup(c.version);
+    rv->save_path = safe_strdup(c.save_path);
 
-    assert(rv->jid);
-    assert(rv->pass);
-    assert(rv->software);
-    assert(rv->version);
-    assert(rv->save_path);
     return rv;
 }
 
