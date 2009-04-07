@@ -3,9 +3,6 @@
 
 #include "memagent.h"
 
-void run_agent(agent_handle_t *handle) {
-    /* Run forever */
-    xmpp_run(handle->ctx);
 }
 
 void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
@@ -34,6 +31,13 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
     }
 }
 
+void run_agent(agent_handle_t *handle) {
+    /* Run forever */
+    xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
+    xmpp_run(handle->ctx);
+    fprintf(stderr, "Bailing\n");
+}
+
 bool start_agent(agent_config_t conf, agent_handle_t* handle) {
     xmpp_initialize();
 
@@ -44,8 +48,6 @@ bool start_agent(agent_config_t conf, agent_handle_t* handle) {
 
     xmpp_conn_set_jid(handle->conn, conf.jid);
     xmpp_conn_set_pass(handle->conn, conf.pass);
-
-    xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
 
     if (pthread_create(&handle->thread, NULL, run_agent, handle) == 0) {
         return true;
