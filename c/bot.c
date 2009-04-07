@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
 
     conf.jid = argv[1];
     conf.pass = argv[2];
+    conf.software = "agent sample bot";
     conf.version = "1.0";
     conf.save_path = "/tmp/test.list";
 

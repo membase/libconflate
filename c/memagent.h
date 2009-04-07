@@ -11,6 +11,9 @@ typedef struct {
 
     char *jid;
     char *pass;
+
+    /* These two are for version replies */
+    char *software;
     char *version;
 
     char *save_path;
@@ -22,6 +25,8 @@ typedef struct {
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
     xmpp_log_t *log;
+
+    agent_config_t *conf;
 
     pthread_t thread;
 
