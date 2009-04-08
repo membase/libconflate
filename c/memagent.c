@@ -5,6 +5,14 @@
 
 #include "memagent.h"
 
+char* safe_strdup(const char* in) {
+    char *rv = NULL;
+    assert(in);
+    rv = strdup(in);
+    assert(rv);
+    return rv;
+}
+
 int version_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
                     void * const userdata)
 {
@@ -189,14 +197,6 @@ void run_agent(agent_handle_t *handle) {
     xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
     xmpp_run(handle->ctx);
     fprintf(stderr, "Bailing\n");
-}
-
-char* safe_strdup(const char* in) {
-    char *rv = NULL;
-    assert(in);
-    rv = strdup(in);
-    assert(rv);
-    return rv;
 }
 
 agent_config_t* dup_conf(agent_config_t c) {
