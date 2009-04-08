@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <assert.h>
 
@@ -364,8 +365,26 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
 void* run_agent(void *arg) {
     agent_handle_t* handle = (agent_handle_t*)arg;
     /* Run forever */
-    xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
-    xmpp_run(handle->ctx);
+    for (;;) {
+        handle->ctx = xmpp_ctx_new(NULL, handle->log);
+        assert(handle->ctx);
+
+        handle->conn = xmpp_conn_new(handle->ctx);
+        assert(handle->conn);
+
+        xmpp_conn_set_jid(handle->conn, handle->conf->jid);
+        xmpp_conn_set_pass(handle->conn, handle->conf->pass);
+
+        xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
+        xmpp_run(handle->ctx);
+        fprintf(stderr, "xmpp_run exited...\n");
+
+        xmpp_conn_release(handle->conn);
+        xmpp_ctx_free(handle->ctx);
+
+        sleep(5);
+        fprintf(stderr, "Reconnecting...\n");
+    }
     fprintf(stderr, "Bailing\n");
     return NULL;
 }
@@ -390,14 +409,6 @@ bool start_agent(agent_config_t conf, agent_handle_t* handle) {
     handle->conf = dup_conf(conf);
 
     handle->log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG);
-    handle->ctx = xmpp_ctx_new(NULL, handle->log);
-    assert(handle->ctx);
-
-    handle->conn = xmpp_conn_new(handle->ctx);
-    assert(handle->conn);
-
-    xmpp_conn_set_jid(handle->conn, conf.jid);
-    xmpp_conn_set_pass(handle->conn, conf.pass);
 
     if (pthread_create(&handle->thread, NULL, run_agent, handle) == 0) {
         return true;
