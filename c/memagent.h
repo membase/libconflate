@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
 
     char *name;
+    int binding;
 
     size_t server_allocation;
     size_t server_next;

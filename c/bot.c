@@ -13,7 +13,7 @@ void display_lists(memcached_server_list_t** lists)
     for (i = 0; lists[i]; i++) {
         int j = 0;
         memcached_server_list_t* list = lists[i];
-        printf("\tList:  ``%s''\n", list->name);
+        printf("\tList:  ``%s'' (bound to %d)\n", list->name, list->binding);
 
         for (j = 0; list->servers[j]; j++) {
             memcached_server_t* server = list->servers[j];

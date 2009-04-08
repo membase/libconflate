@@ -156,11 +156,12 @@ char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
     return rv;
 }
 
-memcached_server_list_t* create_server_list(const char *name)
+memcached_server_list_t* create_server_list(const char *name, int port)
 {
     memcached_server_list_t* rv = calloc(sizeof(memcached_server_list_t), 1);
     assert(rv);
     rv->name = safe_strdup(name);
+    rv->binding = port;
     rv->server_allocation = 8;
     rv->servers = calloc(sizeof(memcached_server_t*), rv->server_allocation);
     return rv;
@@ -246,7 +247,7 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
-    char **pools;
+    char **pools, **bindings;
     int i = 0, num_lists = 0;
     memcached_server_list_t** lists;
 
@@ -259,15 +260,18 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     assert(fields);
 
     pools = get_specific_form_values(fields, "-pools-");
+    bindings = get_specific_form_values(fields, "-bindings-");
 
     /* Count the number of lists */
-    for (num_lists = 0; pools[num_lists]; num_lists++);
+    for (num_lists = 0; pools[num_lists] && bindings[num_lists]; num_lists++);
 
     lists = calloc(sizeof(memcached_server_list_t*), num_lists+1);
 
-    for (i = 0; pools[i]; i++) {
+    for (i = 0; pools[i] && bindings[i]; i++) {
         int j = 0;
-        memcached_server_list_t* slist = create_server_list(pools[i]);
+        int port = strtol(bindings[i], NULL, 10);
+        memcached_server_list_t* slist = create_server_list(pools[i], port);
+
         char **urls = get_specific_form_values(fields, pools[i]);
         for (j = 0; urls[j]; j++) {
             append_server(slist, urls[j]);
@@ -278,6 +282,7 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     }
 
     free_form_values(pools);
+    free_form_values(bindings);
 
     handle->conf->new_serverlist(lists);
 
