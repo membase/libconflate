@@ -102,6 +102,45 @@ xmpp_stanza_t* error_unknown_command(const char *cmd, xmpp_conn_t* const conn,
     return reply;
 }
 
+char **get_form_values(xmpp_stanza_t *t) {
+    xmpp_stanza_t *current = NULL;
+    int i = 0, allocated = 8;
+    char **rv = calloc(allocated, sizeof(char*));
+    assert(rv);
+
+    current = xmpp_stanza_get_child_by_name(t, "value");
+    while (current) {
+        xmpp_stanza_t *val = xmpp_stanza_get_children(current);
+        char *v = xmpp_stanza_get_text(val);
+        fprintf(stderr, "Processing %s\n", v);
+
+        if (i + 1 >= allocated) {
+            int new_allocated = allocated << 1;
+            rv = realloc(rv, sizeof(char*) * new_allocated);
+            assert(rv);
+        }
+
+        rv[i++] = safe_strdup(v);
+
+        current = xmpp_stanza_get_next(current);
+    }
+
+    /* List terminator */
+    rv[i] = NULL;
+
+    return rv;
+}
+
+void free_form_values(char **v) {
+    int i = 0;
+
+    for (i = 0; v[i]; i++) {
+        free(v[i]);
+    }
+
+    free(v);
+}
+
 xmpp_stanza_t* process_serverlist(const char *cmd,
                                   const xmpp_stanza_t* cmd_stanza,
                                   xmpp_conn_t * const conn,
