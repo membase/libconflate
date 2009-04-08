@@ -154,15 +154,6 @@ char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
     return rv;
 }
 
-void print_server_list(memcached_server_list_t* list) {
-    int i = 0;
-
-    fprintf(stderr, "Server list named:  ``%s''\n", list->name);
-    for (i = 0; list->servers[i]; i++) {
-        fprintf(stderr, "\t%s:%d\n", list->servers[i]->host, list->servers[i]->port);
-    }
-}
-
 memcached_server_list_t* create_server_list(const char *name)
 {
     memcached_server_list_t* rv = calloc(sizeof(memcached_server_list_t), 1);
@@ -285,8 +276,10 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
 
     free_form_values(pools);
 
+    handle->conf->new_serverlist(lists);
+
     for (i = 0; lists[i]; i++) {
-        print_server_list(lists[i]);
+        free_server_list(lists[i]);
     }
 
     reply = xmpp_stanza_new(ctx);
@@ -383,6 +376,7 @@ agent_config_t* dup_conf(agent_config_t c) {
     rv->software = safe_strdup(c.software);
     rv->version = safe_strdup(c.version);
     rv->save_path = safe_strdup(c.save_path);
+    rv->new_serverlist = c.new_serverlist;
 
     return rv;
 }
