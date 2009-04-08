@@ -3,7 +3,7 @@ CPPFLAGS=-I$(HOME)/include
 LDFLAGS=-g -L. -L$(HOME)/lib
 
 bot: libmemagent.a bot.o
-	$(CC) -o $@ bot.o $(LDFLAGS) -lmemagent -lexpat -lstrophe -lresolv
+	$(CC) -o $@ bot.o $(LDFLAGS) -lmemagent -lstrophe -lexpat -lresolv -lpthread
 
 clean:
 	-rm bot *.o *.a
