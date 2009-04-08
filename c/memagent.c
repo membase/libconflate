@@ -375,7 +375,8 @@ void* run_agent(void *arg) {
         xmpp_conn_set_jid(handle->conn, handle->conf->jid);
         xmpp_conn_set_pass(handle->conn, handle->conf->pass);
 
-        xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
+        xmpp_connect_client(handle->conn, handle->conf->host, 0,
+                            conn_handler, handle);
         xmpp_run(handle->ctx);
         fprintf(stderr, "xmpp_run exited...\n");
 
@@ -395,6 +396,9 @@ agent_config_t* dup_conf(agent_config_t c) {
 
     rv->jid = safe_strdup(c.jid);
     rv->pass = safe_strdup(c.pass);
+    if (c.host) {
+        rv->host = safe_strdup(c.host);
+    }
     rv->software = safe_strdup(c.software);
     rv->version = safe_strdup(c.version);
     rv->save_path = safe_strdup(c.save_path);

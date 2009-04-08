@@ -28,6 +28,7 @@ typedef struct {
 
     char *jid;
     char *pass;
+    char *host;
 
     /* These two are for version replies */
     char *software;

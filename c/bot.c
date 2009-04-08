@@ -27,13 +27,14 @@ int main(int argc, char **argv) {
     agent_config_t conf;
     agent_handle_t handle;
 
-    if (argc != 3) {
-        fprintf(stderr, "Usage: bot <jid> <pass>\n");
+    if (argc < 3) {
+        fprintf(stderr, "Usage: bot <jid> <pass> [host]\n");
         exit(EX_USAGE);
     }
 
     conf.jid = argv[1];
     conf.pass = argv[2];
+    conf.host = (argc == 4 ? argv[3] : NULL);
     conf.software = "agent sample bot";
     conf.version = "1.0";
     conf.save_path = "/tmp/test.list";
