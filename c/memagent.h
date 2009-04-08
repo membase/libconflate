@@ -32,6 +32,27 @@ typedef struct {
 
 } agent_handle_t;
 
+typedef struct {
+
+    char *host;
+    int port;
+
+} memcached_server_t;
+
+typedef struct {
+
+    char *name;
+
+    size_t server_allocation;
+    size_t server_next;
+    memcached_server_t** servers;
+
+} memcached_server_list_t;
+
 bool start_agent(agent_config_t conf, agent_handle_t* handle);
+
+/* Server list stuff */
+void free_server(memcached_server_t* server);
+void free_server_list(memcached_server_list_t* server_list);
 
 #endif /* MEM_AGENT_H */

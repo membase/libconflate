@@ -154,20 +154,91 @@ char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
     return rv;
 }
 
-void print_field_values(xmpp_stanza_t *fields, const char *var) {
+void print_server_list(memcached_server_list_t* list) {
     int i = 0;
-    char **form_values = get_specific_form_values(fields, var);
 
-    fprintf(stderr, "Values for %s:\n", var);
-    if (form_values) {
-        for (i = 0; form_values[i]; i++) {
-            fprintf(stderr, "\tval[%d] = %s\n", i, form_values[i]);
+    fprintf(stderr, "Server list named:  ``%s''\n", list->name);
+    for (i = 0; list->servers[i]; i++) {
+        fprintf(stderr, "\t%s:%d\n", list->servers[i]->host, list->servers[i]->port);
+    }
+}
+
+memcached_server_list_t* create_server_list(const char *name)
+{
+    memcached_server_list_t* rv = calloc(sizeof(memcached_server_list_t), 1);
+    assert(rv);
+    rv->name = safe_strdup(name);
+    rv->server_allocation = 8;
+    rv->servers = calloc(sizeof(memcached_server_t*), rv->server_allocation);
+    return rv;
+}
+
+memcached_server_t* create_server_from_url(const char *url)
+{
+    char *u = safe_strdup(url);
+    char *pos = NULL, *cur = NULL;
+    memcached_server_t* rv = calloc(sizeof(memcached_server_t), 1);
+
+    assert(rv);
+
+    cur = strtok_r(u, ":", &pos);
+    rv->host = safe_strdup(cur);
+
+    cur = strtok_r(NULL, ":", &pos);
+    if (cur && strlen(cur) > 0) {
+        rv->port = strtol(cur, NULL, 10);
+        /* Default to the memcached port */
+        if (rv->port < 1 || rv->port > 65535) {
+            rv->port = 11211;
         }
-    } else {
-        fprintf(stderr, "\t[none]\n");
     }
 
-    free_form_values(form_values);
+    free(u);
+    return rv;
+}
+
+/* Returns the newly created server object */
+memcached_server_t* append_server(memcached_server_list_t *in, char* url)
+{
+    assert(in);
+    assert(url);
+
+    memcached_server_t* rv = create_server_from_url(url);
+
+    if (in->server_next >= in->server_allocation) {
+        in->server_allocation <<= 1;
+        in->servers = realloc(in->servers,
+                              in->server_allocation * sizeof(memcached_server_t*));
+        assert(in->servers);
+    }
+
+    in->servers[in->server_next++] = rv;
+    in->servers[in->server_next] = NULL;
+
+    return rv;
+}
+
+void free_server(memcached_server_t* server)
+{
+    assert(server);
+    assert(server->host);
+
+    free(server->host);
+    free(server);
+}
+
+void free_server_list(memcached_server_list_t* server_list)
+{
+    int i = 0;
+
+    assert(server_list);
+    assert(server_list->name);
+
+    free(server_list->name);
+    for (i = 0; server_list->servers[i]; i++) {
+        free_server(server_list->servers[i]);
+    }
+    free(server_list->servers);
 }
 
 xmpp_stanza_t* process_serverlist(const char *cmd,
@@ -182,7 +253,8 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     agent_handle_t *handle = (agent_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     char **pools;
-    int i = 0;
+    int i = 0, num_lists = 0;
+    memcached_server_list_t** lists;
 
     fprintf(stderr, "Processing a serverlist.\n");
 
@@ -194,12 +266,28 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
 
     pools = get_specific_form_values(fields, "-pools-");
 
+    /* Count the number of lists */
+    for (num_lists = 0; pools[num_lists]; num_lists++);
+
+    lists = calloc(sizeof(memcached_server_list_t*), num_lists+1);
+
     for (i = 0; pools[i]; i++) {
-        fprintf(stderr, "Fetching %s\n", pools[i]);
-        print_field_values(fields, pools[i]);
+        int j = 0;
+        memcached_server_list_t* slist = create_server_list(pools[i]);
+        char **urls = get_specific_form_values(fields, pools[i]);
+        for (j = 0; urls[j]; j++) {
+            append_server(slist, urls[j]);
+        }
+        free_form_values(urls);
+
+        lists[--num_lists] = slist;
     }
 
     free_form_values(pools);
+
+    for (i = 0; lists[i]; i++) {
+        print_server_list(lists[i]);
+    }
 
     reply = xmpp_stanza_new(ctx);
     assert(reply);
