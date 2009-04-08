@@ -277,11 +277,13 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
     }
 }
 
-void run_agent(agent_handle_t *handle) {
+void* run_agent(void *arg) {
+    agent_handle_t* handle = (agent_handle_t*)arg;
     /* Run forever */
     xmpp_connect_client(handle->conn, NULL, 0, conn_handler, handle);
     xmpp_run(handle->ctx);
     fprintf(stderr, "Bailing\n");
+    return NULL;
 }
 
 agent_config_t* dup_conf(agent_config_t c) {
