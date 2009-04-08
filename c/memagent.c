@@ -111,6 +111,7 @@ char **get_form_values(xmpp_stanza_t *t) {
     current = xmpp_stanza_get_child_by_name(t, "value");
     while (current) {
         xmpp_stanza_t *val = xmpp_stanza_get_children(current);
+        /* xmpp_stanza_get_children allocates */
         char *v = xmpp_stanza_get_text(val);
 
         if (i + 1 >= allocated) {
@@ -119,7 +120,7 @@ char **get_form_values(xmpp_stanza_t *t) {
             assert(rv);
         }
 
-        rv[i++] = safe_strdup(v);
+        rv[i++] = v;
 
         current = xmpp_stanza_get_next(current);
     }
@@ -230,6 +231,7 @@ void free_server_list(memcached_server_list_t* server_list)
         free_server(server_list->servers[i]);
     }
     free(server_list->servers);
+    free(server_list);
 }
 
 xmpp_stanza_t* process_serverlist(const char *cmd,
@@ -281,6 +283,7 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     for (i = 0; lists[i]; i++) {
         free_server_list(lists[i]);
     }
+    free(lists);
 
     reply = xmpp_stanza_new(ctx);
     assert(reply);
