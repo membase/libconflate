@@ -142,18 +142,33 @@ void free_form_values(char **v) {
 }
 
 xmpp_stanza_t* process_serverlist(const char *cmd,
-                                  const xmpp_stanza_t* cmd_stanza,
+                                  xmpp_stanza_t* cmd_stanza,
                                   xmpp_conn_t * const conn,
                                   xmpp_stanza_t * const stanza,
                                   void * const userdata)
 {
-    xmpp_stanza_t *reply, *req;
+    xmpp_stanza_t *reply, *req, *x, *fields;
     char *buf;
     size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
 
     fprintf(stderr, "Processing a serverlist.\n");
+
+    x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
+    assert(x);
+
+    fields = xmpp_stanza_get_child_by_name(x, "field");
+    assert(fields);
+    fprintf(stderr, "Stanza:  %s\n",
+            xmpp_stanza_get_attribute(fields, "var"));
+
+    char **form_values = get_form_values(fields);
+    int i = 0;
+    for (i = 0; form_values[i]; i++) {
+        fprintf(stderr, "\tval[%d] = %s\n", i, form_values[i]);
+    }
+    free_form_values(form_values);
 
     reply = xmpp_stanza_new(ctx);
     assert(reply);
