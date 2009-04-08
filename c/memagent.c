@@ -112,7 +112,6 @@ char **get_form_values(xmpp_stanza_t *t) {
     while (current) {
         xmpp_stanza_t *val = xmpp_stanza_get_children(current);
         char *v = xmpp_stanza_get_text(val);
-        fprintf(stderr, "Processing %s\n", v);
 
         if (i + 1 >= allocated) {
             int new_allocated = allocated << 1;
@@ -141,6 +140,36 @@ void free_form_values(char **v) {
     free(v);
 }
 
+char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
+    char **rv = NULL;
+
+    while (field && strcmp(xmpp_stanza_get_attribute(field, "var"), var) != 0) {
+        field = xmpp_stanza_get_next(field);
+    }
+
+    if (field) {
+        rv = get_form_values(field);
+    }
+
+    return rv;
+}
+
+void print_field_values(xmpp_stanza_t *fields, const char *var) {
+    int i = 0;
+    char **form_values = get_specific_form_values(fields, var);
+
+    fprintf(stderr, "Values for %s:\n", var);
+    if (form_values) {
+        for (i = 0; form_values[i]; i++) {
+            fprintf(stderr, "\tval[%d] = %s\n", i, form_values[i]);
+        }
+    } else {
+        fprintf(stderr, "\t[none]\n");
+    }
+
+    free_form_values(form_values);
+}
+
 xmpp_stanza_t* process_serverlist(const char *cmd,
                                   xmpp_stanza_t* cmd_stanza,
                                   xmpp_conn_t * const conn,
@@ -152,6 +181,8 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
+    char **pools;
+    int i = 0;
 
     fprintf(stderr, "Processing a serverlist.\n");
 
@@ -160,15 +191,15 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
 
     fields = xmpp_stanza_get_child_by_name(x, "field");
     assert(fields);
-    fprintf(stderr, "Stanza:  %s\n",
-            xmpp_stanza_get_attribute(fields, "var"));
 
-    char **form_values = get_form_values(fields);
-    int i = 0;
-    for (i = 0; form_values[i]; i++) {
-        fprintf(stderr, "\tval[%d] = %s\n", i, form_values[i]);
+    pools = get_specific_form_values(fields, "-pools-");
+
+    for (i = 0; pools[i]; i++) {
+        fprintf(stderr, "Fetching %s\n", pools[i]);
+        print_field_values(fields, pools[i]);
     }
-    free_form_values(form_values);
+
+    free_form_values(pools);
 
     reply = xmpp_stanza_new(ctx);
     assert(reply);
