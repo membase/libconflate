@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     conf.host = (argc == 4 ? argv[3] : NULL);
     conf.software = "agent sample bot";
     conf.version = "1.0";
-    conf.save_path = "/tmp/test.list";
+    conf.save_path = "/tmp/memagent.db";
 
     conf.new_serverlist = display_lists;
 

@@ -199,6 +199,10 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     free_form_values(pools);
     free_form_values(bindings);
 
+    /* Persist the server lists */
+    save_server_lists(lists, handle->conf->save_path);
+
+    /* Send the server lists to the callback */
     handle->conf->new_serverlist(lists);
 
     for (i = 0; lists[i]; i++) {
@@ -292,6 +296,18 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
 
 static void* run_agent(void *arg) {
     agent_handle_t* handle = (agent_handle_t*)arg;
+
+    /* Before connecting and all that, load up the server lists */
+    memcached_server_list_t** lists = load_server_lists(handle->conf->save_path);
+    if (lists) {
+        int i = 0;
+        handle->conf->new_serverlist(lists);
+        for (i = 0; lists[i]; i++) {
+            free_server_list(lists[i]);
+        }
+        free(lists);
+    }
+
     /* Run forever */
     for (;;) {
         handle->ctx = xmpp_ctx_new(NULL, handle->log);

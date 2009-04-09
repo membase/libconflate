@@ -64,4 +64,8 @@ memcached_server_t* append_server(memcached_server_list_t *in, char* url);
 /* Misc */
 char* safe_strdup(const char*);
 
+/* Persistence */
+memcached_server_list_t** load_server_lists(const char *filename);
+bool save_server_lists(memcached_server_list_t** lists, const char *filename);
+
 #endif /* MEM_AGENT_H */
