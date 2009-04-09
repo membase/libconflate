@@ -11,9 +11,15 @@
 #define HAS_SERVERS 2
 
 #define CREATE_LISTS "create table lists " \
-    "(id integer, name varchar(32), binding integer)"
+    "(id integer primary key, name varchar(32), binding integer)"
 #define CREATE_SERVERS "create table servers " \
-    "(id integer, list_id integer, host varchar(64), port integer)"
+    "(id integer primary key, list_id integer, host varchar(64), port integer)"
+
+#define INS_LIST "insert into lists (name, binding) values (?, ?)"
+#define INS_SERVER "insert into servers (list_id, host, port) values (?, ?, ?)"
+
+/* safety-net */
+#define MAX_STEPS 1024
 
 memcached_server_list_t** load_server_lists(const char *filename)
 {
@@ -105,8 +111,10 @@ static bool initialize_db(sqlite3 *db)
 
 bool save_server_lists(memcached_server_list_t** lists, const char *filename)
 {
-    int err = 0;
+    int err = 0, i = 0, steps_run = 0;
     sqlite3 *db;
+    sqlite3_stmt *ins_list = NULL, *ins_server = NULL;
+    char* unused;
 
     if ((err = sqlite3_open(filename, &db)) != SQLITE_OK) {
         goto broken;
@@ -117,10 +125,87 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
         goto broken;
     }
 
+    if (!db_do(db, "begin transaction")) {
+        goto broken;
+    }
+
+    /* Cleanup the existing stuff */
+
+    if (!db_do(db, "delete from servers")) {
+        goto broken;
+    }
+
+    if (!db_do(db, "delete from lists")) {
+        goto broken;
+    }
+
+    /* Add new list */
+    if (sqlite3_prepare(db, INS_LIST, strlen(INS_LIST),
+                        &ins_list, &unused) != SQLITE_OK) {
+        goto broken;
+    }
+    /* Add new server */
+    if (sqlite3_prepare(db, INS_SERVER, strlen(INS_SERVER),
+                        &ins_server, &unused) != SQLITE_OK) {
+        goto broken;
+    }
+
+    /* OK, Add them all in */
+    for (i = 0; lists[i]; i++) {
+        memcached_server_list_t* list = lists[i];
+        int j = 0, rc = 0;
+        sqlite_int64 list_id;
+
+        sqlite3_clear_bindings(ins_list);
+        sqlite3_clear_bindings(ins_server);
+
+        sqlite3_bind_text(ins_list, 1, list->name, strlen(list->name),
+                          SQLITE_TRANSIENT);
+        sqlite3_bind_int(ins_list, 2, list->binding);
+
+        while ((rc = sqlite3_step(ins_list)) != SQLITE_DONE) {
+            steps_run++;
+            assert(steps_run < MAX_STEPS);
+            fprintf(stderr, "list step result:  %d\n", rc);
+        }
+
+        list_id = sqlite3_last_insert_rowid(db);
+
+        for (j = 0; list->servers[j]; j++) {
+            memcached_server_t* server = list->servers[j];
+
+            sqlite3_bind_int64(ins_server, 1, list_id);
+            sqlite3_bind_text(ins_server, 2, server->host, strlen(server->host),
+                              SQLITE_TRANSIENT);
+            sqlite3_bind_int(ins_server, 3, server->port);
+
+            while ((rc = sqlite3_step(ins_server)) != SQLITE_DONE) {
+                steps_run++;
+                assert(steps_run < MAX_STEPS);
+                fprintf(stderr, "server step result:  %d\n", rc);
+            }
+
+            sqlite3_reset(ins_server);
+        }
+
+        sqlite3_reset(ins_list);
+    }
+
+    if (!db_do(db, "commit")) {
+        goto broken;
+    }
+
     return true;
 
  broken:
     sqlite3_close(db);
     fprintf(stderr, "DB error:  %s\n", sqlite3_errmsg(db));
+
+    if (ins_list) {
+        sqlite3_finalize(ins_list);
+    }
+    if (ins_server) {
+        sqlite3_finalize(ins_server);
+    }
     return false;
 }
