@@ -114,7 +114,7 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
     int err = 0, i = 0, steps_run = 0;
     sqlite3 *db;
     sqlite3_stmt *ins_list = NULL, *ins_server = NULL;
-    char* unused;
+    const char* unused;
 
     if ((err = sqlite3_open(filename, &db)) != SQLITE_OK) {
         goto broken;
