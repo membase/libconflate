@@ -6,8 +6,9 @@
 
 #include "memagent.h"
 
-int version_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-                    void * const userdata)
+static int version_handler(xmpp_conn_t * const conn,
+                           xmpp_stanza_t * const stanza,
+                           void * const userdata)
 {
     xmpp_stanza_t *reply, *query, *name, *version, *text;
     char *buf;
@@ -60,9 +61,10 @@ int version_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     return 1;
 }
 
-xmpp_stanza_t* error_unknown_command(const char *cmd, xmpp_conn_t* const conn,
-                                     xmpp_stanza_t * const stanza,
-                                     void * const userdata)
+static xmpp_stanza_t* error_unknown_command(const char *cmd,
+                                            xmpp_conn_t* const conn,
+                                            xmpp_stanza_t * const stanza,
+                                            void * const userdata)
 {
     xmpp_stanza_t *reply, *error, *condition;
     agent_handle_t *handle = (agent_handle_t*) userdata;
@@ -95,7 +97,7 @@ xmpp_stanza_t* error_unknown_command(const char *cmd, xmpp_conn_t* const conn,
     return reply;
 }
 
-char **get_form_values(xmpp_stanza_t *t) {
+static char **get_form_values(xmpp_stanza_t *t) {
     xmpp_stanza_t *current = NULL;
     int i = 0, allocated = 8;
     char **rv = calloc(allocated, sizeof(char*));
@@ -124,7 +126,7 @@ char **get_form_values(xmpp_stanza_t *t) {
     return rv;
 }
 
-void free_form_values(char **v) {
+static void free_form_values(char **v) {
     int i = 0;
 
     for (i = 0; v[i]; i++) {
@@ -134,7 +136,7 @@ void free_form_values(char **v) {
     free(v);
 }
 
-char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
+static char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
     char **rv = NULL;
 
     while (field && strcmp(xmpp_stanza_get_attribute(field, "var"), var) != 0) {
@@ -149,11 +151,11 @@ char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
 }
 
 
-xmpp_stanza_t* process_serverlist(const char *cmd,
-                                  xmpp_stanza_t* cmd_stanza,
-                                  xmpp_conn_t * const conn,
-                                  xmpp_stanza_t * const stanza,
-                                  void * const userdata)
+static xmpp_stanza_t* process_serverlist(const char *cmd,
+                                         xmpp_stanza_t* cmd_stanza,
+                                         xmpp_conn_t * const conn,
+                                         xmpp_stanza_t * const stanza,
+                                         void * const userdata)
 {
     xmpp_stanza_t *reply, *req, *x, *fields;
     char *buf;
@@ -216,8 +218,9 @@ xmpp_stanza_t* process_serverlist(const char *cmd,
     return reply;
 }
 
-int command_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
-                    void * const userdata)
+static int command_handler(xmpp_conn_t * const conn,
+                           xmpp_stanza_t * const stanza,
+                           void * const userdata)
 {
     xmpp_stanza_t *reply, *req;
     char *buf;
@@ -251,15 +254,15 @@ int command_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     return 1;
 }
 
-int keepalive_handler(xmpp_conn_t * const conn, void * const userdata)
+static int keepalive_handler(xmpp_conn_t * const conn, void * const userdata)
 {
     xmpp_send_raw(conn, " ", 1);
     return 1;
 }
 
-void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
-                  const int error, xmpp_stream_error_t * const stream_error,
-                  void * const userdata)
+static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
+                         const int error, xmpp_stream_error_t * const stream_error,
+                         void * const userdata)
 {
     agent_handle_t *handle = (agent_handle_t *)userdata;
 
@@ -287,7 +290,7 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
     }
 }
 
-void* run_agent(void *arg) {
+static void* run_agent(void *arg) {
     agent_handle_t* handle = (agent_handle_t*)arg;
     /* Run forever */
     for (;;) {
@@ -315,7 +318,7 @@ void* run_agent(void *arg) {
     return NULL;
 }
 
-agent_config_t* dup_conf(agent_config_t c) {
+static agent_config_t* dup_conf(agent_config_t c) {
     agent_config_t *rv = calloc(sizeof(agent_config_t), 1);
     assert(rv);
 

@@ -56,11 +56,9 @@ typedef struct {
 bool start_agent(agent_config_t conf, agent_handle_t* handle);
 
 /* Server list stuff */
-void free_server(memcached_server_t* server);
 void free_server_list(memcached_server_list_t* server_list);
 
 memcached_server_list_t* create_server_list(const char *name, int port);
-memcached_server_t* create_server_from_url(const char *url);
 memcached_server_t* append_server(memcached_server_list_t *in, char* url);
 
 /* Misc */

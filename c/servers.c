@@ -17,7 +17,7 @@ memcached_server_list_t* create_server_list(const char *name, int port)
     return rv;
 }
 
-memcached_server_t* create_server_from_url(const char *url)
+static memcached_server_t* create_server_from_url(const char *url)
 {
     char *u = safe_strdup(url);
     char *pos = NULL, *cur = NULL;
@@ -62,7 +62,7 @@ memcached_server_t* append_server(memcached_server_list_t *in, char* url)
     return rv;
 }
 
-void free_server(memcached_server_t* server)
+static void free_server(memcached_server_t* server)
 {
     assert(server);
     assert(server->host);
