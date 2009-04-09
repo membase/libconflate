@@ -47,6 +47,20 @@ static char* get_table_name(int flag) {
     }
 }
 
+static bool db_do(sqlite3 *db, const char* query)
+{
+    char* errmsg = NULL;
+    bool rv = true;
+
+    if (sqlite3_exec(db, query, NULL, NULL, &errmsg) != SQLITE_OK) {
+        fprintf(stderr, "DB Error:  %s\n%s\n", errmsg, query);
+        sqlite3_free(errmsg);
+        rv = false;
+    }
+
+    return rv;
+}
+
 static bool maybe_create_table(sqlite3 *db, int flag, int flags, const char* query)
 {
     assert(db);
@@ -58,13 +72,11 @@ static bool maybe_create_table(sqlite3 *db, int flag, int flags, const char* que
     if (flag & flags) {
         fprintf(stderr, "Table %s already exists\n", table_name);
     } else {
-        char* errmsg = NULL;
-        if (sqlite3_exec(db, query, NULL, NULL, &errmsg) != SQLITE_OK) {
-            fprintf(stderr, "DB error creating %s:  %s\n", table_name, errmsg);
-            sqlite3_free(errmsg);
-            rv = false;
-        } else {
+        if (db_do(db, query)) {
             fprintf(stderr, "Created table: %s\n", table_name);
+        } else {
+            fprintf(stderr, "DB error creating %s\n", table_name);
+            rv = false;
         }
     }
 
