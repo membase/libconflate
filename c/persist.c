@@ -111,43 +111,44 @@ static bool initialize_db(sqlite3 *db)
 
 bool save_server_lists(memcached_server_list_t** lists, const char *filename)
 {
+    bool rv = false;
     int err = 0, i = 0, steps_run = 0;
     sqlite3 *db;
     sqlite3_stmt *ins_list = NULL, *ins_server = NULL;
     const char* unused;
 
     if ((err = sqlite3_open(filename, &db)) != SQLITE_OK) {
-        goto broken;
+        goto finished;
     }
 
     if (!initialize_db(db)) {
         fprintf(stderr, "Error initializing tables.\n");
-        goto broken;
+        goto finished;
     }
 
     if (!db_do(db, "begin transaction")) {
-        goto broken;
+        goto finished;
     }
 
     /* Cleanup the existing stuff */
 
     if (!db_do(db, "delete from servers")) {
-        goto broken;
+        goto finished;
     }
 
     if (!db_do(db, "delete from lists")) {
-        goto broken;
+        goto finished;
     }
 
     /* Add new list */
     if (sqlite3_prepare_v2(db, INS_LIST, strlen(INS_LIST),
                            &ins_list, &unused) != SQLITE_OK) {
-        goto broken;
+        goto finished;
     }
     /* Add new server */
     if (sqlite3_prepare_v2(db, INS_SERVER, strlen(INS_SERVER),
                            &ins_server, &unused) != SQLITE_OK) {
-        goto broken;
+        goto finished;
     }
 
     /* OK, Add them all in */
@@ -192,14 +193,15 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
     }
 
     if (!db_do(db, "commit")) {
-        goto broken;
+        goto finished;
     }
 
-    return true;
+    rv = true;
 
- broken:
-    sqlite3_close(db);
-    fprintf(stderr, "DB error:  %s\n", sqlite3_errmsg(db));
+ finished:
+    if (sqlite3_errcode(db) != SQLITE_OK) {
+        fprintf(stderr, "DB error %d:  %s\n", sqlite3_errcode(db), sqlite3_errmsg(db));
+    }
 
     if (ins_list) {
         sqlite3_finalize(ins_list);
@@ -207,5 +209,7 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
     if (ins_server) {
         sqlite3_finalize(ins_server);
     }
-    return false;
+    sqlite3_close(db);
+
+    return rv;
 }
