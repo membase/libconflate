@@ -140,13 +140,13 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
     }
 
     /* Add new list */
-    if (sqlite3_prepare(db, INS_LIST, strlen(INS_LIST),
-                        &ins_list, &unused) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, INS_LIST, strlen(INS_LIST),
+                           &ins_list, &unused) != SQLITE_OK) {
         goto broken;
     }
     /* Add new server */
-    if (sqlite3_prepare(db, INS_SERVER, strlen(INS_SERVER),
-                        &ins_server, &unused) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, INS_SERVER, strlen(INS_SERVER),
+                           &ins_server, &unused) != SQLITE_OK) {
         goto broken;
     }
 
