@@ -338,6 +338,12 @@ int command_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
     return 1;
 }
 
+int keepalive_handler(xmpp_conn_t * const conn, void * const userdata)
+{
+    xmpp_send_raw(conn, " ", 1);
+    return 1;
+}
+
 void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                   const int error, xmpp_stream_error_t * const stream_error,
                   void * const userdata)
@@ -350,6 +356,7 @@ void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
         xmpp_handler_add(conn, version_handler, "jabber:iq:version", "iq", NULL, handle);
         xmpp_handler_add(conn, command_handler, "http://jabber.org/protocol/commands",
                          "iq", NULL, handle);
+        xmpp_timed_handler_add(conn, keepalive_handler, 60000, handle);
         /*
           xmpp_handler_add(conn, message_handler, NULL, "message", NULL, ctx);
         */
