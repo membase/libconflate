@@ -6,14 +6,6 @@
 
 #include "memagent.h"
 
-char* safe_strdup(const char* in) {
-    char *rv = NULL;
-    assert(in);
-    rv = strdup(in);
-    assert(rv);
-    return rv;
-}
-
 int version_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza,
                     void * const userdata)
 {
