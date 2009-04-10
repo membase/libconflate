@@ -11,8 +11,6 @@ static int version_handler(xmpp_conn_t * const conn,
                            void * const userdata)
 {
     xmpp_stanza_t *reply, *query, *name, *version, *text;
-    char *buf;
-    size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     char *ns;
@@ -157,9 +155,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
                                          xmpp_stanza_t * const stanza,
                                          void * const userdata)
 {
-    xmpp_stanza_t *reply, *req, *x, *fields;
-    char *buf;
-    size_t len;
+    xmpp_stanza_t *reply, *x, *fields;
     agent_handle_t *handle = (agent_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     char **pools, **bindings;
@@ -227,10 +223,7 @@ static int command_handler(xmpp_conn_t * const conn,
                            void * const userdata)
 {
     xmpp_stanza_t *reply, *req;
-    char *buf;
-    size_t len;
     agent_handle_t *handle = (agent_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
     char *cmd;
 
     fprintf(stderr, "Received a command from %s\n",

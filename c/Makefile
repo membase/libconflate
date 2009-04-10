@@ -1,4 +1,4 @@
-CFLAGS=-g --std=gnu99
+CFLAGS=-g --std=gnu99 -Wall -Werror
 CPPFLAGS=-I$(HOME)/include
 LDFLAGS=-g -L. -L$(HOME)/lib
 

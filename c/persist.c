@@ -105,6 +105,8 @@ static bool initialize_db(sqlite3 *db)
         rv &= maybe_create_table(db, HAS_LISTS, found_tables, CREATE_LISTS);
         rv &= maybe_create_table(db, HAS_SERVERS, found_tables, CREATE_SERVERS);
     }
+
+    return rv;
 }
 
 bool save_server_lists(memcached_server_list_t** lists, const char *filename)
@@ -261,7 +263,6 @@ static int append_server_from_db(void* arg, int n, char **vals, char **cols)
 
 memcached_server_list_t** load_server_lists(const char *filename)
 {
-    int i = 0, nrecs = 0;
     char* errmsg = NULL;
     sqlite3 *db = NULL;
     struct slist lists = { .allocated = 0, .next = 0, .servers = NULL };
