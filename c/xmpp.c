@@ -226,12 +226,11 @@ struct stat_context {
 };
 
 static void stat_adder(void* opaque,
-                       const char* key, size_t klen,
-                       const char* val, size_t vlen)
+                       const char* key, const char* val)
 {
     struct stat_context* scontext = (struct stat_context*)opaque;
 
-    if (klen == 0) {
+    if (!key) {
         xmpp_send(scontext->conn, scontext->reply);
         xmpp_stanza_release(scontext->reply);
     } else {
@@ -242,9 +241,6 @@ static void stat_adder(void* opaque,
         assert(field);
         assert(value);
         assert(text);
-
-        assert(strlen(key) == klen);
-        assert(strlen(val) == vlen);
 
         xmpp_stanza_set_name(field, "field");
         xmpp_stanza_set_attribute(field, "var", key);

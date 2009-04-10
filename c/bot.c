@@ -25,9 +25,9 @@ void display_lists(memcached_server_list_t** lists)
 
 void do_stats(void* opaque, agent_add_stat add_stat)
 {
-    add_stat(opaque, "stat1", 5, "val1", 4);
-    add_stat(opaque, "stat2", 5, "val2", 4);
-    add_stat(opaque, NULL, 0, NULL, 0);
+    add_stat(opaque, "stat1", "val1");
+    add_stat(opaque, "stat2", "val2");
+    add_stat(opaque, NULL, NULL);
 }
 
 int main(int argc, char **argv) {

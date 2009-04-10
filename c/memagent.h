@@ -25,9 +25,7 @@ typedef struct {
 
 } memcached_server_list_t;
 
-typedef void (*agent_add_stat)(void* opaque,
-                               const char *k, size_t klen,
-                               const char *v, size_t vlen);
+typedef void (*agent_add_stat)(void* opaque, const char *k, const char *v);
 
 typedef struct {
 
