@@ -39,9 +39,9 @@ typedef struct {
 
     char *save_path;
 
-    void *opaque;
+    void *userdata;
     void (*new_serverlist)(void*, memcached_server_list_t**);
-    void (*get_stats)(void*, agent_add_stat);
+    void (*get_stats)(void*, void*, agent_add_stat);
 
 } agent_config_t;
 

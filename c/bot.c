@@ -5,12 +5,12 @@
 
 #include "memagent.h"
 
-void display_lists(void* opaque, memcached_server_list_t** lists)
+void display_lists(void* userdata, memcached_server_list_t** lists)
 {
     int i = 0;
 
-    printf("Hey.  I received a new list of server lists (opaque: %s):\n",
-           (char*)opaque);
+    printf("Hey.  I received a new list of server lists (userdata: %s):\n",
+           (char*)userdata);
 
     for (i = 0; lists[i]; i++) {
         int j = 0;
@@ -24,7 +24,7 @@ void display_lists(void* opaque, memcached_server_list_t** lists)
     }
 }
 
-void do_stats(void* opaque, agent_add_stat add_stat)
+void do_stats(void* userdata, void* opaque, agent_add_stat add_stat)
 {
     add_stat(opaque, "stat1", "val1");
     add_stat(opaque, "stat2", "val2");
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     conf.version = "1.0";
     conf.save_path = "/tmp/memagent.db";
 
-    conf.opaque = "some opaque";
+    conf.userdata = "something awesome";
     conf.new_serverlist = display_lists;
     conf.get_stats = do_stats;
 
