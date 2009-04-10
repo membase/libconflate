@@ -10,6 +10,10 @@ bot: libmemagent.a bot.o
 clean:
 	-rm bot *.o *.a
 
+install: libmemagent.a
+	cp libmemagent.a $(HOME)/lib
+	cp memagent.h $(HOME)/include
+
 libmemagent.a: $(LOBJS)
 	$(AR) rcs $@ $(LOBJS)
 	ranlib $@
