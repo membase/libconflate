@@ -18,6 +18,9 @@
 #define INS_LIST "insert into lists (name, binding) values (?, ?)"
 #define INS_SERVER "insert into servers (list_id, host, port) values (?, ?, ?)"
 
+#define LOAD_SERVERS "select l.name, l.binding, s.host, s.port " \
+    "from lists l join servers s on (l.id = s.list_id)"
+
 /* safety-net */
 #define MAX_STEPS 1024
 
@@ -209,7 +212,79 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
     return rv;
 }
 
+struct slist {
+    int allocated;
+    int next;
+    memcached_server_list_t** servers;
+};
+
+static int append_server_from_db(void* arg, int n, char **vals, char **cols)
+{
+    int i = 0;
+    struct slist* lists = (struct slist*)arg;
+    memcached_server_list_t* list = NULL;
+    char buf[512] = { 0 };
+
+    assert(lists);
+
+    for (i = 0; lists->servers && lists->servers[i] && !list; i++) {
+        if (strcmp(lists->servers[i]->name, vals[0]) == 0) {
+            list = lists->servers[i];
+        }
+    }
+
+    /* If such a list doesn't already exist, one will be assigned to you */
+    if (!list) {
+        list = create_server_list(vals[0], strtol(vals[1], NULL, 10));
+
+        if (lists->next >= lists->allocated) {
+            lists->allocated = lists->allocated ? lists->allocated : 8;
+            lists->servers = realloc(lists->servers,
+                                     lists->allocated * sizeof(memcached_server_list_t*));
+            assert(lists->servers);
+        }
+
+        lists->servers[lists->next++] = list;
+        lists->servers[lists->next] = NULL;
+    }
+
+    assert(strlen(vals[2]) + 16 < sizeof(buf));
+
+    i = snprintf(buf, sizeof(buf) - 1, "%s:%ld",
+                 vals[2], strtol(vals[3], NULL, 10));
+    buf[i] = 0;
+
+    append_server(list, buf);
+
+    return SQLITE_OK;
+}
+
 memcached_server_list_t** load_server_lists(const char *filename)
 {
-    return NULL;
+    int i = 0, nrecs = 0;
+    char* errmsg = NULL;
+    sqlite3 *db = NULL;
+    struct slist lists = { .allocated = 0, .next = 0, .servers = NULL };
+
+    if (sqlite3_open(filename, &db) != SQLITE_OK) {
+        goto finished;
+    }
+
+    if (sqlite3_exec(db, LOAD_SERVERS, &append_server_from_db, &lists, &errmsg) != SQLITE_OK) {
+        goto finished;
+    }
+
+ finished:
+    if (sqlite3_errcode(db) != SQLITE_OK) {
+        fprintf(stderr, "DB error %d:  %s\n", sqlite3_errcode(db), sqlite3_errmsg(db));
+        if (errmsg) {
+            fprintf(stderr, "  %s\n", errmsg);
+            sqlite3_free(errmsg);
+        }
+        lists.servers = NULL;
+    }
+
+    sqlite3_close(db);
+
+    return lists.servers;
 }
