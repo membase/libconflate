@@ -13,3 +13,7 @@ clean:
 libmemagent.a: $(LOBJS)
 	$(AR) rcs $@ $(LOBJS)
 	ranlib $@
+
+$(LOBJS): Makefile
+
+bot.o: Makefile bot.c
