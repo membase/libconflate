@@ -21,11 +21,6 @@
 /* safety-net */
 #define MAX_STEPS 1024
 
-memcached_server_list_t** load_server_lists(const char *filename)
-{
-    return NULL;
-}
-
 static int set_table_mask(void* arg, int n, char **vals, char **cols)
 {
     int* out = (int*)arg;
@@ -212,4 +207,9 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
     sqlite3_close(db);
 
     return rv;
+}
+
+memcached_server_list_t** load_server_lists(const char *filename)
+{
+    return NULL;
 }
