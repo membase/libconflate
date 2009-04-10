@@ -18,6 +18,6 @@ libmemagent.a: $(LOBJS)
 	$(AR) rcs $@ $(LOBJS)
 	ranlib $@
 
-$(LOBJS): Makefile
+$(LOBJS): Makefile memagent.h
 
 bot.o: Makefile bot.c memagent.h
