@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sysexits.h>
 
 #include "memagent.h"
@@ -25,7 +26,6 @@ void display_lists(memcached_server_list_t** lists)
 int main(int argc, char **argv) {
 
     agent_config_t conf;
-    agent_handle_t handle;
 
     if (argc < 3) {
         fprintf(stderr, "Usage: bot <jid> <pass> [host]\n");
@@ -41,11 +41,10 @@ int main(int argc, char **argv) {
 
     conf.new_serverlist = display_lists;
 
-    if(start_agent(conf, &handle)) {
-        /* Doesn't much matter, but wait here. */
-        pthread_join(handle.thread, NULL);
-    } else {
+    if(!start_agent(conf)) {
         fprintf(stderr, "Couldn't initialize the agent.\n");
+        exit(1);
     }
 
+    pause();
 }

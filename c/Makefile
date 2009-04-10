@@ -16,4 +16,4 @@ libmemagent.a: $(LOBJS)
 
 $(LOBJS): Makefile
 
-bot.o: Makefile bot.c
+bot.o: Makefile bot.c memagent.h

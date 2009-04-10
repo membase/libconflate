@@ -53,7 +53,7 @@ typedef struct {
 
 } agent_handle_t;
 
-bool start_agent(agent_config_t conf, agent_handle_t* handle);
+bool start_agent(agent_config_t conf);
 
 /* Server list stuff */
 void free_server_list(memcached_server_list_t* server_list);

@@ -344,7 +344,10 @@ static agent_config_t* dup_conf(agent_config_t c) {
     return rv;
 }
 
-bool start_agent(agent_config_t conf, agent_handle_t* handle) {
+bool start_agent(agent_config_t conf) {
+    agent_handle_t *handle = calloc(1, sizeof(agent_handle_t));
+    assert(handle);
+
     xmpp_initialize();
 
     handle->conf = dup_conf(conf);
