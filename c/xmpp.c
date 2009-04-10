@@ -358,6 +358,63 @@ static int keepalive_handler(xmpp_conn_t * const conn, void * const userdata)
     return 1;
 }
 
+static void add_disco_item(xmpp_ctx_t* ctx, xmpp_stanza_t* reply,
+                           const char* jid, char* node, char* name)
+{
+    xmpp_stanza_t* item = xmpp_stanza_new(ctx);
+    assert(item);
+    assert(ctx);
+    assert(reply);
+    assert(jid);
+    assert(node);
+    assert(name);
+
+    xmpp_stanza_set_name(item, "item");
+    xmpp_stanza_set_attribute(item, "jid", jid);
+    xmpp_stanza_set_attribute(item, "node", node);
+    xmpp_stanza_set_attribute(item, "name", name);
+
+    xmpp_stanza_add_child(reply, item);
+}
+
+static int disco_items_handler(xmpp_conn_t * const conn,
+                               xmpp_stanza_t * const stanza,
+                               void * const userdata)
+{
+    xmpp_stanza_t *reply, *query;
+    const char* myjid = xmpp_conn_get_jid(conn);
+    agent_handle_t *handle = (agent_handle_t*) userdata;
+
+    assert(conn);
+    assert(myjid);
+    assert(stanza);
+    assert(userdata);
+
+    reply = xmpp_stanza_new(handle->ctx);
+    assert(reply);
+    xmpp_stanza_set_name(reply, "iq");
+    xmpp_stanza_set_type(reply, "result");
+    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    xmpp_stanza_set_attribute(reply, "to",
+                              xmpp_stanza_get_attribute(stanza, "from"));
+    xmpp_stanza_set_attribute(reply, "from", myjid);
+
+    query = xmpp_stanza_new(handle->ctx);
+    assert(query);
+    xmpp_stanza_set_name(query, "query");
+    xmpp_stanza_set_attribute(query, "xmlns", XMPP_NS_DISCO_ITEMS);
+    xmpp_stanza_set_attribute(query, "node", "http://jabber.org/protocol/commands");
+    xmpp_stanza_add_child(reply, query);
+
+    add_disco_item(handle->ctx, query, myjid,
+                   "client_stats", "Get the client stats");
+
+    xmpp_send(conn, reply);
+    xmpp_stanza_release(reply);
+
+    return 1;
+}
+
 static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                          const int error, xmpp_stream_error_t * const stream_error,
                          void * const userdata)
@@ -370,10 +427,9 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
         xmpp_handler_add(conn, version_handler, "jabber:iq:version", "iq", NULL, handle);
         xmpp_handler_add(conn, command_handler, "http://jabber.org/protocol/commands",
                          "iq", NULL, handle);
+        xmpp_handler_add(conn, disco_items_handler,
+                         "http://jabber.org/protocol/disco#items", "iq", NULL, handle);
         xmpp_timed_handler_add(conn, keepalive_handler, 60000, handle);
-        /*
-          xmpp_handler_add(conn, message_handler, NULL, "message", NULL, ctx);
-        */
 
         /* Send initial <presence/> so that we appear online to contacts */
         pres = xmpp_stanza_new(handle->ctx);
