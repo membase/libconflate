@@ -323,16 +323,14 @@ static int command_handler(xmpp_conn_t * const conn,
                            xmpp_stanza_t * const stanza,
                            void * const userdata)
 {
-    xmpp_stanza_t *reply, *req;
+    xmpp_stanza_t *reply = NULL, *req = NULL;
     agent_handle_t *handle = (agent_handle_t*) userdata;
-    char *cmd;
-
-    fprintf(stderr, "Received a command from %s\n",
-            xmpp_stanza_get_attribute(stanza, "from"));
+    char *cmd = NULL;
 
     /* Figure out what the command is */
-    req = xmpp_stanza_get_children(stanza);
+    req = xmpp_stanza_get_child_by_name(stanza, "command");
     assert(req);
+    assert(strcmp(xmpp_stanza_get_name(req), "command") == 0);
     cmd = xmpp_stanza_get_attribute(req, "node");
     assert(cmd);
 
