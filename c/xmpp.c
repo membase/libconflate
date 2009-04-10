@@ -199,7 +199,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     save_server_lists(lists, handle->conf->save_path);
 
     /* Send the server lists to the callback */
-    handle->conf->new_serverlist(lists);
+    handle->conf->new_serverlist(handle->conf->opaque, lists);
 
     for (i = 0; lists[i]; i++) {
         free_server_list(lists[i]);
@@ -397,7 +397,7 @@ static void* run_agent(void *arg) {
     memcached_server_list_t** lists = load_server_lists(handle->conf->save_path);
     if (lists) {
         int i = 0;
-        handle->conf->new_serverlist(lists);
+        handle->conf->new_serverlist(handle->conf->opaque, lists);
         for (i = 0; lists[i]; i++) {
             free_server_list(lists[i]);
         }
@@ -442,6 +442,7 @@ static agent_config_t* dup_conf(agent_config_t c) {
     rv->software = safe_strdup(c.software);
     rv->version = safe_strdup(c.version);
     rv->save_path = safe_strdup(c.save_path);
+    rv->opaque = c.opaque;
     rv->new_serverlist = c.new_serverlist;
     rv->get_stats = c.get_stats;
 
