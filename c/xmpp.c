@@ -218,6 +218,111 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     return reply;
 }
 
+struct stat_context {
+    xmpp_conn_t*   conn;
+    xmpp_ctx_t*    ctx;
+    xmpp_stanza_t* reply;
+    xmpp_stanza_t* container;
+};
+
+static void stat_adder(void* opaque,
+                       const char* key, size_t klen,
+                       const char* val, size_t vlen)
+{
+    struct stat_context* scontext = (struct stat_context*)opaque;
+
+    if (klen == 0) {
+        xmpp_send(scontext->conn, scontext->reply);
+        xmpp_stanza_release(scontext->reply);
+    } else {
+        xmpp_stanza_t* field = xmpp_stanza_new(scontext->ctx);
+        xmpp_stanza_t* value = xmpp_stanza_new(scontext->ctx);
+        xmpp_stanza_t* text = xmpp_stanza_new(scontext->ctx);
+
+        assert(field);
+        assert(value);
+        assert(text);
+
+        assert(strlen(key) == klen);
+        assert(strlen(val) == vlen);
+
+        xmpp_stanza_set_name(field, "field");
+        xmpp_stanza_set_attribute(field, "var", key);
+        xmpp_stanza_add_child(scontext->container, field);
+
+        xmpp_stanza_set_name(value, "value");
+        xmpp_stanza_add_child(field, value);
+
+        xmpp_stanza_set_text(text, val);
+        xmpp_stanza_add_child(value, text);
+    }
+}
+
+static void copy_attr(xmpp_ctx_t *ctx,
+                      xmpp_stanza_t* src, xmpp_stanza_t* dest,
+                      const char* attr)
+{
+    assert(src);
+    assert(dest);
+    assert(attr);
+
+    char *val = xmpp_stanza_get_attribute(src, attr);
+    if (val) {
+        xmpp_stanza_set_attribute(dest, attr, val);
+        xmpp_free(ctx, val);
+    }
+}
+
+static xmpp_stanza_t* process_stats(const char *cmd,
+                                    xmpp_stanza_t* cmd_stanza,
+                                    xmpp_conn_t * const conn,
+                                    xmpp_stanza_t * const stanza,
+                                    void * const userdata)
+{
+    xmpp_stanza_t *cmd_res = NULL, *x = NULL;
+    agent_handle_t *handle = (agent_handle_t*) userdata;
+    xmpp_ctx_t *ctx = handle->ctx;
+    struct stat_context scontext = { .conn = conn,
+                                     .ctx = ctx,
+                                     .reply = xmpp_stanza_new(ctx),
+                                     .container = xmpp_stanza_new(ctx) };
+
+    assert(scontext.reply);
+    assert(scontext.container);
+
+    xmpp_stanza_set_name(scontext.reply, "iq");
+    xmpp_stanza_set_type(scontext.reply, "result");
+    xmpp_stanza_set_id(scontext.reply, xmpp_stanza_get_id(stanza));
+    xmpp_stanza_set_attribute(scontext.reply, "to",
+                              xmpp_stanza_get_attribute(stanza, "from"));
+
+    /* Command wrapper for response */
+    cmd_res = xmpp_stanza_new(ctx);
+    assert(cmd_res);
+    xmpp_stanza_set_name(cmd_res, "command");
+    copy_attr(ctx, cmd_stanza, cmd_res, "xmlns");
+    copy_attr(ctx, cmd_stanza, cmd_res, "node");
+    copy_attr(ctx, cmd_stanza, cmd_res, "sessionid");
+    xmpp_stanza_set_attribute(cmd_res, "status", "completed");
+    xmpp_stanza_add_child(scontext.reply, cmd_res);
+
+    /* X data in the command response */
+    x = xmpp_stanza_new(ctx);
+    assert(x);
+    xmpp_stanza_set_name(x, "x");
+    xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
+    xmpp_stanza_set_type(x, "result");
+    xmpp_stanza_add_child(cmd_res, x);
+
+    /* And finally init the item */
+    xmpp_stanza_set_name(scontext.container, "item");
+    xmpp_stanza_add_child(x, scontext.container);
+
+    handle->conf->get_stats(&scontext, stat_adder);
+
+    return NULL;
+}
+
 static int command_handler(xmpp_conn_t * const conn,
                            xmpp_stanza_t * const stanza,
                            void * const userdata)
@@ -239,6 +344,8 @@ static int command_handler(xmpp_conn_t * const conn,
 
     if (strcmp(cmd, "serverlist") == 0) {
         reply = process_serverlist(cmd, req, conn, stanza, handle);
+    } else if (strcmp(cmd, "client_stats") == 0) {
+        reply = process_stats(cmd, req, conn, stanza, handle);
     } else {
         reply = error_unknown_command(cmd, conn, stanza, handle);
     }
