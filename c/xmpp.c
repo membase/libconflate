@@ -340,6 +340,7 @@ static agent_config_t* dup_conf(agent_config_t c) {
     rv->version = safe_strdup(c.version);
     rv->save_path = safe_strdup(c.save_path);
     rv->new_serverlist = c.new_serverlist;
+    rv->get_stats = c.get_stats;
 
     return rv;
 }

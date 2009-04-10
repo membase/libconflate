@@ -25,6 +25,10 @@ typedef struct {
 
 } memcached_server_list_t;
 
+typedef void (*agent_add_stat)(void* opaque,
+                               const char *k, size_t klen,
+                               const char *v, size_t vlen);
+
 typedef struct {
 
     char *jid;
@@ -38,6 +42,7 @@ typedef struct {
     char *save_path;
 
     void (*new_serverlist)(memcached_server_list_t**);
+    void (*get_stats)(void*, agent_add_stat);
 
 } agent_config_t;
 

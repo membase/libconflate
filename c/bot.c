@@ -23,6 +23,13 @@ void display_lists(memcached_server_list_t** lists)
     }
 }
 
+void do_stats(void* opaque, agent_add_stat add_stat)
+{
+    add_stat(opaque, "stat1", 5, "val1", 4);
+    add_stat(opaque, "stat2", 5, "val2", 4);
+    add_stat(opaque, NULL, 0, NULL, 0);
+}
+
 int main(int argc, char **argv) {
 
     agent_config_t conf;
@@ -40,6 +47,7 @@ int main(int argc, char **argv) {
     conf.save_path = "/tmp/memagent.db";
 
     conf.new_serverlist = display_lists;
+    conf.get_stats = do_stats;
 
     if(!start_agent(conf)) {
         fprintf(stderr, "Couldn't initialize the agent.\n");
