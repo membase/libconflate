@@ -357,13 +357,13 @@ static int keepalive_handler(xmpp_conn_t * const conn, void * const userdata)
     return 1;
 }
 
-static void add_disco_item(xmpp_ctx_t* ctx, xmpp_stanza_t* reply,
+static void add_disco_item(xmpp_ctx_t* ctx, xmpp_stanza_t* query,
                            const char* jid, char* node, char* name)
 {
     xmpp_stanza_t* item = xmpp_stanza_new(ctx);
     assert(item);
     assert(ctx);
-    assert(reply);
+    assert(query);
     assert(jid);
     assert(node);
     assert(name);
@@ -373,7 +373,7 @@ static void add_disco_item(xmpp_ctx_t* ctx, xmpp_stanza_t* reply,
     xmpp_stanza_set_attribute(item, "node", node);
     xmpp_stanza_set_attribute(item, "name", name);
 
-    xmpp_stanza_add_child(reply, item);
+    xmpp_stanza_add_child(query, item);
 }
 
 static int disco_items_handler(xmpp_conn_t * const conn,
