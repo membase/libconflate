@@ -265,7 +265,6 @@ static void copy_attr(xmpp_ctx_t *ctx,
     char *val = xmpp_stanza_get_attribute(src, attr);
     if (val) {
         xmpp_stanza_set_attribute(dest, attr, val);
-        xmpp_free(ctx, val);
     }
 }
 
