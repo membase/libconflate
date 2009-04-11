@@ -185,7 +185,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
 
         char **urls = get_specific_form_values(fields, pools[i]);
         for (j = 0; urls[j]; j++) {
-            append_server(slist, urls[j]);
+            append_server_url(slist, urls[j]);
         }
         free_form_values(urls);
 

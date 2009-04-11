@@ -63,7 +63,11 @@ bool start_agent(agent_config_t conf);
 void free_server_list(memcached_server_list_t* server_list);
 
 memcached_server_list_t* create_server_list(const char *name, int port);
-memcached_server_t* append_server(memcached_server_list_t *in, char* url);
+memcached_server_list_t* copy_server_list(const memcached_server_list_t* orig);
+
+memcached_server_t* append_server_url(memcached_server_list_t *in, char* url);
+memcached_server_t* append_server(memcached_server_list_t *in, memcached_server_t* s);
+memcached_server_t* copy_server(memcached_server_t* in);
 
 /* Misc */
 char* safe_strdup(const char*);

@@ -17,7 +17,21 @@ memcached_server_list_t* create_server_list(const char *name, int port)
     return rv;
 }
 
-static memcached_server_t* create_server_from_url(const char *url)
+memcached_server_list_t* copy_server_list(const memcached_server_list_t* orig)
+{
+    assert(orig != NULL);
+    memcached_server_list_t* rv = calloc(sizeof(memcached_server_list_t), 1);
+    assert(rv);
+    rv->name = safe_strdup(orig->name);
+    rv->binding = orig->binding;
+    rv->server_allocation = orig->server_allocation;
+    rv->servers = calloc(sizeof(memcached_server_t*), rv->server_allocation);
+    for (int i = 0; i < orig->server_next; i++)
+      append_server(rv, copy_server(orig->servers[i]));
+    return rv;
+}
+
+static memcached_server_t* create_server_from_url(const char* url)
 {
     char *u = safe_strdup(url);
     char *pos = NULL, *cur = NULL;
@@ -41,13 +55,31 @@ static memcached_server_t* create_server_from_url(const char *url)
     return rv;
 }
 
+memcached_server_t* copy_server(memcached_server_t* in)
+{
+    assert(in);
+    memcached_server_t* rv = calloc(sizeof(memcached_server_t), 1);
+    assert(rv);
+    rv->host = safe_strdup(in->host);
+    rv->port = in->port;
+    return rv;
+}
+
 /* Returns the newly created server object */
-memcached_server_t* append_server(memcached_server_list_t *in, char* url)
+memcached_server_t* append_server_url(memcached_server_list_t* in, char* url)
 {
     assert(in);
     assert(url);
 
     memcached_server_t* rv = create_server_from_url(url);
+
+    return append_server(in, rv);
+}
+
+memcached_server_t* append_server(memcached_server_list_t* in, memcached_server_t* s)
+{
+    assert(in);
+    assert(s);
 
     if (in->server_next >= in->server_allocation) {
         in->server_allocation <<= 1;
@@ -56,10 +88,10 @@ memcached_server_t* append_server(memcached_server_list_t *in, char* url)
         assert(in->servers);
     }
 
-    in->servers[in->server_next++] = rv;
+    in->servers[in->server_next++] = s;
     in->servers[in->server_next] = NULL;
 
-    return rv;
+    return s;
 }
 
 static void free_server(memcached_server_t* server)

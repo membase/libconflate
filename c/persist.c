@@ -256,7 +256,7 @@ static int append_server_from_db(void* arg, int n, char **vals, char **cols)
                  vals[2], strtol(vals[3], NULL, 10));
     buf[i] = 0;
 
-    append_server(list, buf);
+    append_server_url(list, buf);
 
     return SQLITE_OK;
 }
