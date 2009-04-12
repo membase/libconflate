@@ -414,6 +414,14 @@ static int disco_items_handler(xmpp_conn_t * const conn,
     return 1;
 }
 
+static int message_handler(xmpp_conn_t * const conn,
+                           xmpp_stanza_t * const stanza,
+                           void * const userdata)
+{
+    fprintf(stderr, "Got a message...\n");
+    return 1;
+}
+
 static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
                          const int error, xmpp_stream_error_t * const stream_error,
                          void * const userdata)
@@ -428,6 +436,7 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
                          "iq", NULL, handle);
         xmpp_handler_add(conn, disco_items_handler,
                          "http://jabber.org/protocol/disco#items", "iq", NULL, handle);
+        xmpp_handler_add(conn, message_handler, NULL, "message", NULL, handle);
         xmpp_timed_handler_add(conn, keepalive_handler, 60000, handle);
 
         /* Send initial <presence/> so that we appear online to contacts */
