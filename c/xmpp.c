@@ -421,7 +421,7 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
     agent_handle_t *handle = (agent_handle_t *)userdata;
 
     if (status == XMPP_CONN_CONNECT) {
-        xmpp_stanza_t* pres;
+        xmpp_stanza_t* pres = NULL, *priority = NULL, *pri_text = NULL;
         fprintf(stderr, "DEBUG: connected\n");
         xmpp_handler_add(conn, version_handler, "jabber:iq:version", "iq", NULL, handle);
         xmpp_handler_add(conn, command_handler, "http://jabber.org/protocol/commands",
@@ -434,6 +434,17 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
         pres = xmpp_stanza_new(handle->ctx);
         assert(pres);
         xmpp_stanza_set_name(pres, "presence");
+
+        priority = xmpp_stanza_new(handle->ctx);
+        assert(priority);
+        xmpp_stanza_set_name(priority, "priority");
+        xmpp_stanza_add_child(pres, priority);
+
+        pri_text = xmpp_stanza_new(handle->ctx);
+        assert(pri_text);
+        xmpp_stanza_set_text(pri_text, "5");
+        xmpp_stanza_add_child(priority, pri_text);
+
         xmpp_send(conn, pres);
         xmpp_stanza_release(pres);
     }
