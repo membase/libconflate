@@ -7,25 +7,18 @@
 
 #include <strophe.h>
 
-typedef struct {
-
-    char *host;
-    int port;
-
-} memcached_server_t;
-
-typedef struct {
-
-    char *name;
-    int binding;
-
-    size_t server_allocation;
-    size_t server_next;
-    memcached_server_t** servers;
-
-} memcached_server_list_t;
-
 typedef void (*agent_add_stat)(void* opaque, const char *k, const char *v);
+
+typedef struct kvpair {
+    char*  key;
+    char** values;
+
+    /* For internal use */
+    int    allocated_values;
+    int    used_values;
+
+    struct kvpair* next;
+} kvpair_t;
 
 typedef struct {
 
@@ -40,7 +33,7 @@ typedef struct {
     char *save_path;
 
     void *userdata;
-    void (*new_serverlist)(void*, memcached_server_list_t**);
+    void (*new_config)(void*, kvpair_t*);
     void (*get_stats)(void*, void*, agent_add_stat);
 
 } agent_config_t;
@@ -57,23 +50,20 @@ typedef struct {
 
 } agent_handle_t;
 
+/* Key/value pair management */
+
+kvpair_t* mk_kvpair(const char* k, char** v);
+void add_kvpair_value(kvpair_t* kvpair, const char* value);
+void free_kvpair(kvpair_t* pair);
+
 bool start_agent(agent_config_t conf);
-
-/* Server list stuff */
-void free_server_list(memcached_server_list_t* server_list);
-
-memcached_server_list_t* create_server_list(const char *name, int port);
-memcached_server_list_t* copy_server_list(const memcached_server_list_t* orig);
-
-memcached_server_t* append_server_url(memcached_server_list_t *in, char* url);
-memcached_server_t* append_server(memcached_server_list_t *in, memcached_server_t* s);
-memcached_server_t* copy_server(memcached_server_t* in);
 
 /* Misc */
 char* safe_strdup(const char*);
+void free_string_list(char **);
 
 /* Persistence */
-memcached_server_list_t** load_server_lists(const char *filename);
-bool save_server_lists(memcached_server_list_t** lists, const char *filename);
+kvpair_t* load_server_lists(const char *filename);
+bool save_server_lists(kvpair_t* pairs, const char *filename);
 
 #endif /* MEM_AGENT_H */

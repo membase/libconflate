@@ -124,16 +124,6 @@ static char **get_form_values(xmpp_stanza_t *t) {
     return rv;
 }
 
-static void free_form_values(char **v) {
-    int i = 0;
-
-    for (i = 0; v[i]; i++) {
-        free(v[i]);
-    }
-
-    free(v);
-}
-
 static char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
     char **rv = NULL;
 
@@ -148,7 +138,6 @@ static char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
     return rv;
 }
 
-
 static xmpp_stanza_t* process_serverlist(const char *cmd,
                                          xmpp_stanza_t* cmd_stanza,
                                          xmpp_conn_t * const conn,
@@ -158,9 +147,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     xmpp_stanza_t *reply, *x, *fields;
     agent_handle_t *handle = (agent_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
-    char **pools, **bindings;
-    int i = 0, num_lists = 0;
-    memcached_server_list_t** lists;
+    kvpair_t* conf = NULL;
 
     fprintf(stderr, "Processing a serverlist.\n");
 
@@ -170,41 +157,26 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     fields = xmpp_stanza_get_child_by_name(x, "field");
     assert(fields);
 
-    pools = get_specific_form_values(fields, "-pools-");
-    bindings = get_specific_form_values(fields, "-bindings-");
-
-    /* Count the number of lists */
-    for (num_lists = 0; pools[num_lists] && bindings[num_lists]; num_lists++);
-
-    lists = calloc(sizeof(memcached_server_list_t*), num_lists+1);
-
-    for (i = 0; pools[i] && bindings[i]; i++) {
-        int j = 0;
-        int port = strtol(bindings[i], NULL, 10);
-        memcached_server_list_t* slist = create_server_list(pools[i], port);
-
-        char **urls = get_specific_form_values(fields, pools[i]);
-        for (j = 0; urls[j]; j++) {
-            append_server_url(slist, urls[j]);
+    /* walk the field peers and grab their values and stuff */
+    while (fields) {
+        if (xmpp_stanza_is_tag(fields)) {
+            char* k = xmpp_stanza_get_attribute(fields, "var");
+            char **vals = get_specific_form_values(fields, k);
+            kvpair_t* thispair = mk_kvpair(k, vals);
+            free_string_list(vals);
+            thispair->next = conf;
+            conf = thispair;
         }
-        free_form_values(urls);
-
-        lists[--num_lists] = slist;
+        fields = xmpp_stanza_get_next(fields);
     }
-
-    free_form_values(pools);
-    free_form_values(bindings);
 
     /* Persist the server lists */
-    save_server_lists(lists, handle->conf->save_path);
+    save_server_lists(conf, handle->conf->save_path);
 
     /* Send the server lists to the callback */
-    handle->conf->new_serverlist(handle->conf->userdata, lists);
+    handle->conf->new_config(handle->conf->userdata, conf);
 
-    for (i = 0; lists[i]; i++) {
-        free_server_list(lists[i]);
-    }
-    free(lists);
+    free_kvpair(conf);
 
     reply = xmpp_stanza_new(ctx);
     assert(reply);
@@ -467,14 +439,10 @@ static void* run_agent(void *arg) {
     agent_handle_t* handle = (agent_handle_t*)arg;
 
     /* Before connecting and all that, load up the server lists */
-    memcached_server_list_t** lists = load_server_lists(handle->conf->save_path);
-    if (lists) {
-        int i = 0;
-        handle->conf->new_serverlist(handle->conf->userdata, lists);
-        for (i = 0; lists[i]; i++) {
-            free_server_list(lists[i]);
-        }
-        free(lists);
+    kvpair_t* conf = load_server_lists(handle->conf->save_path);
+    if (conf) {
+        handle->conf->new_config(handle->conf->userdata, conf);
+        free_kvpair(conf);
     }
 
     /* Run forever */
@@ -516,7 +484,7 @@ static agent_config_t* dup_conf(agent_config_t c) {
     rv->version = safe_strdup(c.version);
     rv->save_path = safe_strdup(c.save_path);
     rv->userdata = c.userdata;
-    rv->new_serverlist = c.new_serverlist;
+    rv->new_config = c.new_config;
     rv->get_stats = c.get_stats;
 
     return rv;

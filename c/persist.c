@@ -7,19 +7,19 @@
 
 #include "memagent.h"
 
-#define HAS_LISTS   1
-#define HAS_SERVERS 2
+#define HAS_KEYS   1
+#define HAS_VALUES 2
 
-#define CREATE_LISTS "create table lists " \
-    "(id integer primary key, name varchar(32), binding integer)"
-#define CREATE_SERVERS "create table servers " \
-    "(id integer primary key, list_id integer, host varchar(64), port integer)"
+#define CREATE_KEYS "create table keys " \
+    "(id integer primary key, name varchar(32))"
+#define CREATE_VALUES "create table vals " \
+    "(key_id integer, value varchar(64))"
 
-#define INS_LIST "insert into lists (name, binding) values (?, ?)"
-#define INS_SERVER "insert into servers (list_id, host, port) values (?, ?, ?)"
+#define INS_KEYS "insert into keys (name) values (?)"
+#define INS_VALS "insert into vals (key_id, value) values (?, ?)"
 
-#define LOAD_SERVERS "select l.name, l.binding, s.host, s.port " \
-    "from lists l join servers s on (l.id = s.list_id)"
+#define LOAD_SERVERS "select k.name, v.value " \
+    "from keys k join vals v on (k.id = v.key_id)"
 
 /* safety-net */
 #define MAX_STEPS 1024
@@ -29,10 +29,10 @@ static int set_table_mask(void* arg, int n, char **vals, char **cols)
     int* out = (int*)arg;
     assert(n == 1);
 
-    if (strcmp(vals[0], "lists") == 0) {
-        *out |= HAS_LISTS;
-    } else if(strcmp(vals[0], "servers") == 0) {
-        *out |= HAS_SERVERS;
+    if (strcmp(vals[0], "keys") == 0) {
+        *out |= HAS_KEYS;
+    } else if(strcmp(vals[0], "vals") == 0) {
+        *out |= HAS_VALUES;
     } else {
         fprintf(stderr, "Warning:  Unknown table:  %s\n", vals[0]);
     }
@@ -42,10 +42,10 @@ static int set_table_mask(void* arg, int n, char **vals, char **cols)
 
 static char* get_table_name(int flag) {
     switch (flag) {
-    case HAS_LISTS:
-        return "lists";
-    case HAS_SERVERS:
-        return "servers";
+    case HAS_KEYS:
+        return "keys";
+    case HAS_VALUES:
+        return "vals";
     default:
         assert(false);
     }
@@ -102,19 +102,19 @@ static bool initialize_db(sqlite3 *db)
         fprintf(stderr, "DB error:  %s\n", errmsg);
         sqlite3_free(errmsg);
     } else {
-        rv &= maybe_create_table(db, HAS_LISTS, found_tables, CREATE_LISTS);
-        rv &= maybe_create_table(db, HAS_SERVERS, found_tables, CREATE_SERVERS);
+        rv &= maybe_create_table(db, HAS_KEYS, found_tables, CREATE_KEYS);
+        rv &= maybe_create_table(db, HAS_VALUES, found_tables, CREATE_VALUES);
     }
 
     return rv;
 }
 
-bool save_server_lists(memcached_server_list_t** lists, const char *filename)
+bool save_server_lists(kvpair_t* kvpair, const char *filename)
 {
     bool rv = false;
-    int err = 0, i = 0, steps_run = 0;
+    int err = 0, steps_run = 0;
     sqlite3 *db;
-    sqlite3_stmt *ins_list = NULL, *ins_server = NULL;
+    sqlite3_stmt *ins_keys = NULL, *ins_vals = NULL;
     const char* unused;
 
     if ((err = sqlite3_open(filename, &db)) != SQLITE_OK) {
@@ -132,64 +132,62 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
 
     /* Cleanup the existing stuff */
 
-    if (!db_do(db, "delete from servers")) {
+    if (!db_do(db, "delete from keys")) {
         goto finished;
     }
 
-    if (!db_do(db, "delete from lists")) {
+    if (!db_do(db, "delete from vals")) {
         goto finished;
     }
 
     /* Add new list */
-    if (sqlite3_prepare_v2(db, INS_LIST, strlen(INS_LIST),
-                           &ins_list, &unused) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, INS_KEYS, strlen(INS_KEYS),
+                           &ins_keys, &unused) != SQLITE_OK) {
         goto finished;
     }
     /* Add new server */
-    if (sqlite3_prepare_v2(db, INS_SERVER, strlen(INS_SERVER),
-                           &ins_server, &unused) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, INS_VALS, strlen(INS_VALS),
+                           &ins_vals, &unused) != SQLITE_OK) {
         goto finished;
     }
 
     /* OK, Add them all in */
-    for (i = 0; lists[i]; i++) {
-        memcached_server_list_t* list = lists[i];
+    while (kvpair) {
         int j = 0, rc = 0;
-        sqlite_int64 list_id;
+        sqlite_int64 key_id;
 
-        sqlite3_clear_bindings(ins_list);
-        sqlite3_clear_bindings(ins_server);
+        sqlite3_clear_bindings(ins_keys);
+        sqlite3_clear_bindings(ins_vals);
 
-        sqlite3_bind_text(ins_list, 1, list->name, strlen(list->name),
+        sqlite3_bind_text(ins_keys, 1, kvpair->key, strlen(kvpair->key),
                           SQLITE_TRANSIENT);
-        sqlite3_bind_int(ins_list, 2, list->binding);
 
-        while ((rc = sqlite3_step(ins_list)) != SQLITE_DONE) {
+        while ((rc = sqlite3_step(ins_keys)) != SQLITE_DONE) {
             steps_run++;
             assert(steps_run < MAX_STEPS);
             fprintf(stderr, "list step result:  %d\n", rc);
         }
 
-        list_id = sqlite3_last_insert_rowid(db);
+        key_id = sqlite3_last_insert_rowid(db);
 
-        for (j = 0; list->servers[j]; j++) {
-            memcached_server_t* server = list->servers[j];
+        for (j = 0; kvpair->values[j]; j++) {
+            char* val = kvpair->values[j];
 
-            sqlite3_bind_int64(ins_server, 1, list_id);
-            sqlite3_bind_text(ins_server, 2, server->host, strlen(server->host),
-                              SQLITE_TRANSIENT);
-            sqlite3_bind_int(ins_server, 3, server->port);
+            sqlite3_bind_int64(ins_vals, 1, key_id);
+            sqlite3_bind_text(ins_vals, 2, val, strlen(val), SQLITE_TRANSIENT);
 
-            while ((rc = sqlite3_step(ins_server)) != SQLITE_DONE) {
+            while ((rc = sqlite3_step(ins_vals)) != SQLITE_DONE) {
                 steps_run++;
                 assert(steps_run < MAX_STEPS);
                 fprintf(stderr, "server step result:  %d\n", rc);
             }
 
-            sqlite3_reset(ins_server);
+            sqlite3_reset(ins_vals);
         }
 
-        sqlite3_reset(ins_list);
+        sqlite3_reset(ins_keys);
+
+        kvpair = kvpair -> next;
     }
 
     if (!db_do(db, "commit")) {
@@ -203,75 +201,50 @@ bool save_server_lists(memcached_server_list_t** lists, const char *filename)
         fprintf(stderr, "DB error %d:  %s\n", sqlite3_errcode(db), sqlite3_errmsg(db));
     }
 
-    if (ins_list) {
-        sqlite3_finalize(ins_list);
+    if (ins_keys) {
+        sqlite3_finalize(ins_keys);
     }
-    if (ins_server) {
-        sqlite3_finalize(ins_server);
+    if (ins_vals) {
+        sqlite3_finalize(ins_vals);
     }
     sqlite3_close(db);
 
     return rv;
 }
 
-struct slist {
-    int allocated;
-    int next;
-    memcached_server_list_t** servers;
-};
-
-static int append_server_from_db(void* arg, int n, char **vals, char **cols)
+static int append_kvpair_from_db(void* arg, int n, char **vals, char **cols)
 {
-    int i = 0;
-    struct slist* lists = (struct slist*)arg;
-    memcached_server_list_t* list = NULL;
-    char buf[512] = { 0 };
+    kvpair_t** pairs = (kvpair_t**)arg;
+    kvpair_t* pair = *pairs;
 
-    assert(lists);
-
-    for (i = 0; lists->servers && lists->servers[i] && !list; i++) {
-        if (strcmp(lists->servers[i]->name, vals[0]) == 0) {
-            list = lists->servers[i];
-        }
+    /* Search for the pair with the name we're looking for */
+    while (pair && strcmp(pair->key, vals[0]) != 0) {
+        pair = pair->next;
     }
 
     /* If such a list doesn't already exist, one will be assigned to you */
-    if (!list) {
-        list = create_server_list(vals[0], strtol(vals[1], NULL, 10));
-
-        if (lists->next >= lists->allocated) {
-            lists->allocated = lists->allocated ? lists->allocated : 8;
-            lists->servers = realloc(lists->servers,
-                                     lists->allocated * sizeof(memcached_server_list_t*));
-            assert(lists->servers);
-        }
-
-        lists->servers[lists->next++] = list;
-        lists->servers[lists->next] = NULL;
+    if (!pair) {
+        pair = mk_kvpair(vals[0], NULL);
+        pair->next = *pairs;
+        *pairs = pair;
     }
 
-    assert(strlen(vals[2]) + 16 < sizeof(buf));
-
-    i = snprintf(buf, sizeof(buf) - 1, "%s:%ld",
-                 vals[2], strtol(vals[3], NULL, 10));
-    buf[i] = 0;
-
-    append_server_url(list, buf);
+    add_kvpair_value(pair, vals[1]);
 
     return SQLITE_OK;
 }
 
-memcached_server_list_t** load_server_lists(const char *filename)
+kvpair_t* load_server_lists(const char *filename)
 {
     char* errmsg = NULL;
     sqlite3 *db = NULL;
-    struct slist lists = { .allocated = 0, .next = 0, .servers = NULL };
+    kvpair_t* pairs = NULL;
 
     if (sqlite3_open(filename, &db) != SQLITE_OK) {
         goto finished;
     }
 
-    if (sqlite3_exec(db, LOAD_SERVERS, &append_server_from_db, &lists, &errmsg) != SQLITE_OK) {
+    if (sqlite3_exec(db, LOAD_SERVERS, &append_kvpair_from_db, &pairs, &errmsg) != SQLITE_OK) {
         goto finished;
     }
 
@@ -282,10 +255,9 @@ memcached_server_list_t** load_server_lists(const char *filename)
             fprintf(stderr, "  %s\n", errmsg);
             sqlite3_free(errmsg);
         }
-        lists.servers = NULL;
     }
 
     sqlite3_close(db);
 
-    return lists.servers;
+    return pairs;
 }

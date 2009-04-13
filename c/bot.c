@@ -5,22 +5,20 @@
 
 #include "memagent.h"
 
-void display_lists(void* userdata, memcached_server_list_t** lists)
+void display_config(void* userdata, kvpair_t* conf)
 {
-    int i = 0;
-
-    printf("Hey.  I received a new list of server lists (userdata: %s):\n",
+    printf("Hey.  I received a new config (userdata: %s):\n",
            (char*)userdata);
 
-    for (i = 0; lists[i]; i++) {
-        int j = 0;
-        memcached_server_list_t* list = lists[i];
-        printf("\tList:  ``%s'' (bound to %d)\n", list->name, list->binding);
+    while (conf) {
+        int i = 0;
+        printf("\t%s\n", conf->key);
 
-        for (j = 0; list->servers[j]; j++) {
-            memcached_server_t* server = list->servers[j];
-            printf("\t\t%s:%d\n", server->host, server->port);
+        for (i = 0; conf->values[i]; i++) {
+            printf("\t\t%s\n", conf->values[i]);
         }
+
+        conf = conf->next;
     }
 }
 
@@ -48,7 +46,7 @@ int main(int argc, char **argv) {
     conf.save_path = "/tmp/memagent.db";
 
     conf.userdata = "something awesome";
-    conf.new_serverlist = display_lists;
+    conf.new_config = display_config;
     conf.get_stats = do_stats;
 
     if(!start_agent(conf)) {
