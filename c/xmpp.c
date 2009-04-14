@@ -6,6 +6,12 @@
 
 #include "memagent.h"
 
+static void add_and_release(xmpp_stanza_t* parent, xmpp_stanza_t* child)
+{
+    xmpp_stanza_add_child(parent, child);
+    xmpp_stanza_release(child);
+}
+
 static int version_handler(xmpp_conn_t * const conn,
                            xmpp_stanza_t * const stanza,
                            void * const userdata)
@@ -35,29 +41,24 @@ static int version_handler(xmpp_conn_t * const conn,
     name = xmpp_stanza_new(ctx);
     assert(name);
     xmpp_stanza_set_name(name, "name");
-    xmpp_stanza_add_child(query, name);
-    xmpp_stanza_release(name);
+    add_and_release(query, name);
 
     text = xmpp_stanza_new(ctx);
     assert(text);
     xmpp_stanza_set_text(text, handle->conf->software);
-    xmpp_stanza_add_child(name, text);
-    xmpp_stanza_release(text);
+    add_and_release(name, text);
 
     version = xmpp_stanza_new(ctx);
     assert(version);
     xmpp_stanza_set_name(version, "version");
-    xmpp_stanza_add_child(query, version);
-    xmpp_stanza_release(version);
+    add_and_release(query, version);
 
     text = xmpp_stanza_new(ctx);
     assert(text);
     xmpp_stanza_set_text(text, handle->conf->version);
-    xmpp_stanza_add_child(version, text);
-    xmpp_stanza_release(text);
+    add_and_release(version, text);
 
-    xmpp_stanza_add_child(reply, query);
-    xmpp_stanza_release(query);
+    add_and_release(reply, query);
 
     xmpp_send(conn, reply);
     xmpp_stanza_release(reply);
@@ -86,8 +87,7 @@ static xmpp_stanza_t* error_unknown_command(const char *cmd,
     error = xmpp_stanza_new(ctx);
     assert(error);
     xmpp_stanza_set_name(error, "error");
-    xmpp_stanza_add_child(reply, error);
-    xmpp_stanza_release(error);
+    add_and_release(reply, error);
     xmpp_stanza_set_attribute(error, "code", "404");
     xmpp_stanza_set_attribute(error, "type", "modify");
 
@@ -96,8 +96,7 @@ static xmpp_stanza_t* error_unknown_command(const char *cmd,
     assert(condition);
     xmpp_stanza_set_name(condition, "item-not-found");
     xmpp_stanza_set_ns(condition, "urn:ietf:params:xml:ns:xmpp-stanzas");
-    xmpp_stanza_add_child(error, condition);
-    xmpp_stanza_release(condition);
+    add_and_release(error, condition);
 
     return reply;
 }
@@ -221,16 +220,13 @@ static void stat_adder(void* opaque,
 
         xmpp_stanza_set_name(field, "field");
         xmpp_stanza_set_attribute(field, "var", key);
-        xmpp_stanza_add_child(scontext->container, field);
-        xmpp_stanza_release(field);
+        add_and_release(scontext->container, field);
 
         xmpp_stanza_set_name(value, "value");
-        xmpp_stanza_add_child(field, value);
-        xmpp_stanza_release(value);
+        add_and_release(field, value);
 
         xmpp_stanza_set_text(text, val);
-        xmpp_stanza_add_child(value, text);
-        xmpp_stanza_release(text);
+        add_and_release(value, text);
     } else {
         scontext->complete = true;
     }
@@ -282,8 +278,7 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     copy_attr(ctx, cmd_stanza, cmd_res, "node");
     copy_attr(ctx, cmd_stanza, cmd_res, "sessionid");
     xmpp_stanza_set_attribute(cmd_res, "status", "completed");
-    xmpp_stanza_add_child(scontext.reply, cmd_res);
-    xmpp_stanza_release(cmd_res);
+    add_and_release(scontext.reply, cmd_res);
 
     /* X data in the command response */
     x = xmpp_stanza_new(ctx);
@@ -291,13 +286,11 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     xmpp_stanza_set_name(x, "x");
     xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
     xmpp_stanza_set_type(x, "result");
-    xmpp_stanza_add_child(cmd_res, x);
-    xmpp_stanza_release(x);
+    add_and_release(cmd_res, x);
 
     /* And finally init the item */
     xmpp_stanza_set_name(scontext.container, "item");
-    xmpp_stanza_add_child(x, scontext.container);
-    xmpp_stanza_release(scontext.container);
+    add_and_release(x, scontext.container);
 
     handle->conf->get_stats(handle->conf->userdata, &scontext, stat_adder);
 
@@ -361,8 +354,7 @@ static void add_disco_item(xmpp_ctx_t* ctx, xmpp_stanza_t* query,
     xmpp_stanza_set_attribute(item, "node", node);
     xmpp_stanza_set_attribute(item, "name", name);
 
-    xmpp_stanza_add_child(query, item);
-    xmpp_stanza_release(item);
+    add_and_release(query, item);
 }
 
 static int disco_items_handler(xmpp_conn_t * const conn,
@@ -392,8 +384,7 @@ static int disco_items_handler(xmpp_conn_t * const conn,
     xmpp_stanza_set_name(query, "query");
     xmpp_stanza_set_attribute(query, "xmlns", XMPP_NS_DISCO_ITEMS);
     xmpp_stanza_set_attribute(query, "node", "http://jabber.org/protocol/commands");
-    xmpp_stanza_add_child(reply, query);
-    xmpp_stanza_release(query);
+    add_and_release(reply, query);
 
     add_disco_item(handle->ctx, query, myjid,
                    "client_stats", "Get the client stats");
@@ -437,14 +428,12 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
         priority = xmpp_stanza_new(handle->ctx);
         assert(priority);
         xmpp_stanza_set_name(priority, "priority");
-        xmpp_stanza_add_child(pres, priority);
-        xmpp_stanza_release(priority);
+        add_and_release(pres, priority);
 
         pri_text = xmpp_stanza_new(handle->ctx);
         assert(pri_text);
         xmpp_stanza_set_text(pri_text, "5");
-        xmpp_stanza_add_child(priority, pri_text);
-        xmpp_stanza_release(pri_text);
+        add_and_release(priority, pri_text);
 
         xmpp_send(conn, pres);
         xmpp_stanza_release(pres);
