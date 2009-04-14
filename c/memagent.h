@@ -63,7 +63,7 @@ char* safe_strdup(const char*);
 void free_string_list(char **);
 
 /* Persistence */
-kvpair_t* load_server_lists(const char *filename);
-bool save_server_lists(kvpair_t* pairs, const char *filename);
+kvpair_t* load_kvpairs(const char *filename);
+bool save_kvpairs(kvpair_t* pairs, const char *filename);
 
 #endif /* MEM_AGENT_H */

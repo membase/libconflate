@@ -170,10 +170,10 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
         fields = xmpp_stanza_get_next(fields);
     }
 
-    /* Persist the server lists */
-    save_server_lists(conf, handle->conf->save_path);
+    /* Persist the config lists */
+    save_kvpairs(conf, handle->conf->save_path);
 
-    /* Send the server lists to the callback */
+    /* Send the config to the callback */
     handle->conf->new_config(handle->conf->userdata, conf);
 
     free_kvpair(conf);
@@ -438,8 +438,8 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
 static void* run_agent(void *arg) {
     agent_handle_t* handle = (agent_handle_t*)arg;
 
-    /* Before connecting and all that, load up the server lists */
-    kvpair_t* conf = load_server_lists(handle->conf->save_path);
+    /* Before connecting and all that, load the stored config */
+    kvpair_t* conf = load_kvpairs(handle->conf->save_path);
     if (conf) {
         handle->conf->new_config(handle->conf->userdata, conf);
         free_kvpair(conf);

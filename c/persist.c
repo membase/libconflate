@@ -18,7 +18,7 @@
 #define INS_KEYS "insert into keys (name) values (?)"
 #define INS_VALS "insert into vals (key_id, value) values (?, ?)"
 
-#define LOAD_SERVERS "select k.name, v.value " \
+#define LOAD_KVPAIRS "select k.name, v.value " \
     "from keys k join vals v on (k.id = v.key_id)"
 
 /* safety-net */
@@ -109,7 +109,7 @@ static bool initialize_db(sqlite3 *db)
     return rv;
 }
 
-bool save_server_lists(kvpair_t* kvpair, const char *filename)
+bool save_kvpairs(kvpair_t* kvpair, const char *filename)
 {
     bool rv = false;
     int err = 0, steps_run = 0;
@@ -140,12 +140,12 @@ bool save_server_lists(kvpair_t* kvpair, const char *filename)
         goto finished;
     }
 
-    /* Add new list */
+    /* Add the keys */
     if (sqlite3_prepare_v2(db, INS_KEYS, strlen(INS_KEYS),
                            &ins_keys, &unused) != SQLITE_OK) {
         goto finished;
     }
-    /* Add new server */
+    /* Add the values */
     if (sqlite3_prepare_v2(db, INS_VALS, strlen(INS_VALS),
                            &ins_vals, &unused) != SQLITE_OK) {
         goto finished;
@@ -165,7 +165,7 @@ bool save_server_lists(kvpair_t* kvpair, const char *filename)
         while ((rc = sqlite3_step(ins_keys)) != SQLITE_DONE) {
             steps_run++;
             assert(steps_run < MAX_STEPS);
-            fprintf(stderr, "list step result:  %d\n", rc);
+            fprintf(stderr, "keys step result:  %d\n", rc);
         }
 
         key_id = sqlite3_last_insert_rowid(db);
@@ -179,7 +179,7 @@ bool save_server_lists(kvpair_t* kvpair, const char *filename)
             while ((rc = sqlite3_step(ins_vals)) != SQLITE_DONE) {
                 steps_run++;
                 assert(steps_run < MAX_STEPS);
-                fprintf(stderr, "server step result:  %d\n", rc);
+                fprintf(stderr, "vals step result:  %d\n", rc);
             }
 
             sqlite3_reset(ins_vals);
@@ -234,7 +234,7 @@ static int append_kvpair_from_db(void* arg, int n, char **vals, char **cols)
     return SQLITE_OK;
 }
 
-kvpair_t* load_server_lists(const char *filename)
+kvpair_t* load_kvpairs(const char *filename)
 {
     char* errmsg = NULL;
     sqlite3 *db = NULL;
@@ -244,7 +244,7 @@ kvpair_t* load_server_lists(const char *filename)
         goto finished;
     }
 
-    if (sqlite3_exec(db, LOAD_SERVERS, &append_kvpair_from_db, &pairs, &errmsg) != SQLITE_OK) {
+    if (sqlite3_exec(db, LOAD_KVPAIRS, &append_kvpair_from_db, &pairs, &errmsg) != SQLITE_OK) {
         goto finished;
     }
 
