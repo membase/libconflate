@@ -195,6 +195,7 @@ struct stat_context {
     xmpp_ctx_t*    ctx;
     xmpp_stanza_t* reply;
     xmpp_stanza_t* container;
+    bool           complete;
 };
 
 static void stat_adder(void* opaque,
@@ -202,10 +203,7 @@ static void stat_adder(void* opaque,
 {
     struct stat_context* scontext = (struct stat_context*)opaque;
 
-    if (!key) {
-        xmpp_send(scontext->conn, scontext->reply);
-        xmpp_stanza_release(scontext->reply);
-    } else {
+    if (key) {
         xmpp_stanza_t* field = xmpp_stanza_new(scontext->ctx);
         xmpp_stanza_t* value = xmpp_stanza_new(scontext->ctx);
         xmpp_stanza_t* text = xmpp_stanza_new(scontext->ctx);
@@ -223,6 +221,8 @@ static void stat_adder(void* opaque,
 
         xmpp_stanza_set_text(text, val);
         xmpp_stanza_add_child(value, text);
+    } else {
+        scontext->complete = true;
     }
 }
 
@@ -252,7 +252,8 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     struct stat_context scontext = { .conn = conn,
                                      .ctx = ctx,
                                      .reply = xmpp_stanza_new(ctx),
-                                     .container = xmpp_stanza_new(ctx) };
+                                     .container = xmpp_stanza_new(ctx),
+                                     .complete = false};
 
     assert(scontext.reply);
     assert(scontext.container);
@@ -287,7 +288,9 @@ static xmpp_stanza_t* process_stats(const char *cmd,
 
     handle->conf->get_stats(handle->conf->userdata, &scontext, stat_adder);
 
-    return NULL;
+    assert(scontext.complete);
+
+    return scontext.reply;
 }
 
 static int command_handler(xmpp_conn_t * const conn,
