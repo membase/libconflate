@@ -4,3 +4,4 @@
 *.pyc
 /python/twistd.pid
 /c/bot
+/c/docs
