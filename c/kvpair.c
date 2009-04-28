@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "memagent.h"
+#include "conflate.h"
 
 kvpair_t* mk_kvpair(const char* k, char** v)
 {

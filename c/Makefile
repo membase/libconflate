@@ -4,20 +4,20 @@ LDFLAGS=-g -L. -L$(HOME)/lib
 
 LOBJS=kvpair.o util.o persist.o xmpp.o
 
-bot: libmemagent.a bot.o
-	$(CC) -o $@ bot.o $(LDFLAGS) -lmemagent -lsqlite3 -lstrophe -lexpat -lresolv -lpthread
+bot: libconflate.a bot.o
+	$(CC) -o $@ bot.o $(LDFLAGS) -lconflate -lsqlite3 -lstrophe -lexpat -lresolv -lpthread
 
 clean:
 	-rm bot *.o *.a
 
-install: libmemagent.a
-	cp libmemagent.a $(HOME)/lib
-	cp memagent.h $(HOME)/include
+install: libconflate.a
+	cp libconflate.a $(HOME)/lib
+	cp conflate.h $(HOME)/include
 
-libmemagent.a: $(LOBJS)
+libconflate.a: $(LOBJS)
 	$(AR) rcs $@ $(LOBJS)
 	ranlib $@
 
-$(LOBJS): Makefile memagent.h
+$(LOBJS): Makefile conflate.h
 
-bot.o: Makefile bot.c memagent.h
+bot.o: Makefile bot.c conflate.h

@@ -5,7 +5,7 @@
 
 #include <sqlite3.h>
 
-#include "memagent.h"
+#include "conflate.h"
 
 #define HAS_KEYS   1
 #define HAS_VALUES 2

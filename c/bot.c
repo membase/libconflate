@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sysexits.h>
 
-#include "memagent.h"
+#include "conflate.h"
 
 void display_config(void* userdata, kvpair_t* conf)
 {
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     conf.host = (argc == 4 ? argv[3] : NULL);
     conf.software = "agent sample bot";
     conf.version = "1.0";
-    conf.save_path = "/tmp/memagent.db";
+    conf.save_path = "/tmp/conflate.db";
 
     conf.userdata = "something awesome";
     conf.new_config = display_config;

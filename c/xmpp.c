@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "memagent.h"
+#include "conflate.h"
 
 static void add_and_release(xmpp_stanza_t* parent, xmpp_stanza_t* child)
 {
