@@ -123,7 +123,8 @@ typedef struct {
 
 /* Key/value pair management */
 
-kvpair_t* mk_kvpair(const char* k, char** v);
+kvpair_t* mk_kvpair(const char* k, char** v)
+    __attribute__ ((warn_unused_result, nonnull (1)));
 void add_kvpair_value(kvpair_t* kvpair, const char* value);
 void free_kvpair(kvpair_t* pair);
 
@@ -137,7 +138,7 @@ void free_kvpair(kvpair_t* pair);
  *
  * @return true if libconflate was able to properly initialize itself
  */
-bool start_conflate(conflate_config_t conf);
+bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result));
 
 /**
  * @}
@@ -157,14 +158,16 @@ void free_string_list(char **);
  *
  * @return NULL if the config could not be loaded for any reason.
  */
-kvpair_t* load_kvpairs(const char *filename);
+kvpair_t* load_kvpairs(const char *filename)
+    __attribute__ ((warn_unused_result, nonnull(1)));
 
 /**
  * Save a config at the given path.
  *
  * @return false if the configuration could not be saved for any reason
  */
-bool save_kvpairs(kvpair_t* pairs, const char *filename);
+bool save_kvpairs(kvpair_t* pairs, const char *filename)
+    __attribute__ ((warn_unused_result, nonnull(1, 2)));
 
 /**
  * @}
