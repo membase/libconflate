@@ -1,5 +1,5 @@
-#ifndef MEM_AGENT_H
-#define MEM_AGENT_H 1
+#ifndef CONFLATE_H
+#define CONFLATE_H 1
 
 #include <stdbool.h>
 #include <sys/types.h>
@@ -13,13 +13,13 @@
  */
 
 /**
- * Callback for agent stats.
+ * Callback for conflate stats.
  *
  * The opaque argument will be passed to the client and must be passed
  * back in as-is.  The key and value parameters represent the stat
  * name and value that should be reported.
  */
-typedef void (*agent_add_stat)(void* opaque, const char *k, const char *v);
+typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
 
 /**
  * A linked list of keys each which may have zero or more values.
@@ -46,7 +46,7 @@ typedef struct kvpair {
 } kvpair_t;
 
 /**
- * Configuration for an agent.
+ * Configuration for a conflatee.
  */
 typedef struct {
 
@@ -63,13 +63,13 @@ typedef struct {
     char *host;
 
     /**
-     * Name of the software using this agent.
+     * Name of the software using libconflate.
      *
      * For example:  awesomeproxy
      */
     char *software;
     /**
-     * Version number of the software running this agent.
+     * Version number of the software running libconflate.
      *
      * For example:  1.3.3-8-gee0c3d5
      */
@@ -95,15 +95,15 @@ typedef struct {
      */
     void (*new_config)(void*, kvpair_t*);
     /**
-     * Callback issued when the agent wants to report stats.
+     * Callback issued when libconflate wants to report stats.
      *
-     * The client is expected to call the agent_add_stat callback once
-     * for every stat it wishes to report along with the given opaque,
-     * followed by one invocation with two NULLs.
+     * The client is expected to call the conflate_add_stat callback
+     * once for every stat it wishes to report along with the given
+     * opaque, followed by one invocation with two NULLs.
      */
-    void (*get_stats)(void*, void*, agent_add_stat);
+    void (*get_stats)(void*, void*, conflate_add_stat);
 
-} agent_config_t;
+} conflate_config_t;
 
 /**
  * @}
@@ -115,11 +115,11 @@ typedef struct {
     xmpp_conn_t *conn;
     xmpp_log_t *log;
 
-    agent_config_t *conf;
+    conflate_config_t *conf;
 
     pthread_t thread;
 
-} agent_handle_t;
+} conflate_handle_t;
 
 /* Key/value pair management */
 
@@ -133,11 +133,11 @@ void free_kvpair(kvpair_t* pair);
  */
 
 /**
- * The main entry point for starting a configuration agent.
+ * The main entry point for starting a conflate agent.
  *
- * @return true if the agent was able to properly initialize itself
+ * @return true if libconflate was able to properly initialize itself
  */
-bool start_agent(agent_config_t conf);
+bool start_conflate(conflate_config_t conf);
 
 /**
  * @}
@@ -170,4 +170,4 @@ bool save_kvpairs(kvpair_t* pairs, const char *filename);
  * @}
  */
 
-#endif /* MEM_AGENT_H */
+#endif /* CONFLATE_H */

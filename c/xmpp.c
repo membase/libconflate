@@ -17,7 +17,7 @@ static int version_handler(xmpp_conn_t * const conn,
                            void * const userdata)
 {
     xmpp_stanza_t *reply, *query, *name, *version, *text;
-    agent_handle_t *handle = (agent_handle_t*) userdata;
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     char *ns;
 
@@ -71,7 +71,7 @@ static xmpp_stanza_t* error_unknown_command(const char *cmd,
                                             void * const userdata)
 {
     xmpp_stanza_t *reply, *error, *condition;
-    agent_handle_t *handle = (agent_handle_t*) userdata;
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
 
     fprintf(stderr, "Unknown command:  %s\n", cmd);
@@ -151,7 +151,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
                                          void * const userdata)
 {
     xmpp_stanza_t *reply, *x, *fields;
-    agent_handle_t *handle = (agent_handle_t*) userdata;
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     kvpair_t* conf = NULL;
 
@@ -253,7 +253,7 @@ static xmpp_stanza_t* process_stats(const char *cmd,
                                     void * const userdata)
 {
     xmpp_stanza_t *cmd_res = NULL, *x = NULL;
-    agent_handle_t *handle = (agent_handle_t*) userdata;
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     struct stat_context scontext = { .conn = conn,
                                      .ctx = ctx,
@@ -304,7 +304,7 @@ static int command_handler(xmpp_conn_t * const conn,
                            void * const userdata)
 {
     xmpp_stanza_t *reply = NULL, *req = NULL;
-    agent_handle_t *handle = (agent_handle_t*) userdata;
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
     char *cmd = NULL;
 
     /* Figure out what the command is */
@@ -363,7 +363,7 @@ static int disco_items_handler(xmpp_conn_t * const conn,
 {
     xmpp_stanza_t *reply, *query;
     const char* myjid = xmpp_conn_get_jid(conn);
-    agent_handle_t *handle = (agent_handle_t*) userdata;
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
 
     assert(conn);
     assert(myjid);
@@ -407,7 +407,7 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
                          const int error, xmpp_stream_error_t * const stream_error,
                          void * const userdata)
 {
-    agent_handle_t *handle = (agent_handle_t *)userdata;
+    conflate_handle_t *handle = (conflate_handle_t *)userdata;
 
     if (status == XMPP_CONN_CONNECT) {
         xmpp_stanza_t* pres = NULL, *priority = NULL, *pri_text = NULL;
@@ -444,8 +444,8 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
     }
 }
 
-static void* run_agent(void *arg) {
-    agent_handle_t* handle = (agent_handle_t*)arg;
+static void* run_conflate(void *arg) {
+    conflate_handle_t* handle = (conflate_handle_t*)arg;
 
     /* Before connecting and all that, load the stored config */
     kvpair_t* conf = load_kvpairs(handle->conf->save_path);
@@ -480,8 +480,8 @@ static void* run_agent(void *arg) {
     return NULL;
 }
 
-static agent_config_t* dup_conf(agent_config_t c) {
-    agent_config_t *rv = calloc(sizeof(agent_config_t), 1);
+static conflate_config_t* dup_conf(conflate_config_t c) {
+    conflate_config_t *rv = calloc(sizeof(conflate_config_t), 1);
     assert(rv);
 
     rv->jid = safe_strdup(c.jid);
@@ -499,8 +499,8 @@ static agent_config_t* dup_conf(agent_config_t c) {
     return rv;
 }
 
-bool start_agent(agent_config_t conf) {
-    agent_handle_t *handle = calloc(1, sizeof(agent_handle_t));
+bool start_conflate(conflate_config_t conf) {
+    conflate_handle_t *handle = calloc(1, sizeof(conflate_handle_t));
     assert(handle);
 
     xmpp_initialize();
@@ -509,7 +509,7 @@ bool start_agent(agent_config_t conf) {
 
     handle->log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG);
 
-    if (pthread_create(&handle->thread, NULL, run_agent, handle) == 0) {
+    if (pthread_create(&handle->thread, NULL, run_conflate, handle) == 0) {
         return true;
     } else {
         perror("pthread_create");

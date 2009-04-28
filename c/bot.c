@@ -22,7 +22,7 @@ void display_config(void* userdata, kvpair_t* conf)
     }
 }
 
-void do_stats(void* userdata, void* opaque, agent_add_stat add_stat)
+void do_stats(void* userdata, void* opaque, conflate_add_stat add_stat)
 {
     add_stat(opaque, "stat1", "val1");
     add_stat(opaque, "stat2", "val2");
@@ -31,7 +31,7 @@ void do_stats(void* userdata, void* opaque, agent_add_stat add_stat)
 
 int main(int argc, char **argv) {
 
-    agent_config_t conf;
+    conflate_config_t conf;
 
     if (argc < 3) {
         fprintf(stderr, "Usage: bot <jid> <pass> [host]\n");
@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     conf.jid = argv[1];
     conf.pass = argv[2];
     conf.host = (argc == 4 ? argv[3] : NULL);
-    conf.software = "agent sample bot";
+    conf.software = "conflate sample bot";
     conf.version = "1.0";
     conf.save_path = "/tmp/conflate.db";
 
@@ -49,8 +49,8 @@ int main(int argc, char **argv) {
     conf.new_config = display_config;
     conf.get_stats = do_stats;
 
-    if(!start_agent(conf)) {
-        fprintf(stderr, "Couldn't initialize the agent.\n");
+    if(!start_conflate(conf)) {
+        fprintf(stderr, "Couldn't initialize libconflate.\n");
         exit(1);
     }
 
