@@ -177,7 +177,10 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     }
 
     /* Persist the config lists */
-    save_kvpairs(conf, handle->conf->save_path);
+    if (!save_kvpairs(conf, handle->conf->save_path)) {
+        fprintf(stderr, "Can not safe config to %s\n",
+                handle->conf->save_path);
+    }
 
     /* Send the config to the callback */
     handle->conf->new_config(handle->conf->userdata, conf);
