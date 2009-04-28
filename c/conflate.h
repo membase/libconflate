@@ -9,17 +9,12 @@
 
 /**
  * \defgroup Core
- * @{
  */
 
 /**
- * Callback for conflate stats.
- *
- * The opaque argument will be passed to the client and must be passed
- * back in as-is.  The key and value parameters represent the stat
- * name and value that should be reported.
+ * \defgroup kvpairs
+ * @{
  */
-typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
 
 /**
  * A linked list of keys each which may have zero or more values.
@@ -44,6 +39,52 @@ typedef struct kvpair {
      */
     struct kvpair* next;
 } kvpair_t;
+
+/**
+ * Create a kvpair_t.
+ *
+ * When building out a kvpair chain, one would presumably set the
+ * `next' param to the first item in your existing chain.
+ *
+ * @param k the key for this kvpair
+ * @param v (optional) the list of values for this key.
+ * @return a newly allocated kvpair_t
+ */
+kvpair_t* mk_kvpair(const char* k, char** v)
+    __attribute__ ((warn_unused_result, nonnull (1)));
+
+/**
+ * Add a value to a kvpair_t.
+ *
+ * @param kvpair the current kvpair that needs a new value
+ * @param value the new value
+ */
+void add_kvpair_value(kvpair_t* kvpair, const char* value)
+    __attribute__ ((nonnull (1, 2)));
+
+/**
+ * Free a chain of kvpairs.
+ */
+void free_kvpair(kvpair_t* pair)
+    __attribute__ ((nonnull (1)));
+
+/**
+ * @}
+ */
+
+/**
+ * \defgroup Core
+ * @{
+ */
+
+/**
+ * Callback for conflate stats.
+ *
+ * The opaque argument will be passed to the client and must be passed
+ * back in as-is.  The key and value parameters represent the stat
+ * name and value that should be reported.
+ */
+typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
 
 /**
  * Configuration for a conflatee.
@@ -120,13 +161,6 @@ typedef struct {
     pthread_t thread;
 
 } conflate_handle_t;
-
-/* Key/value pair management */
-
-kvpair_t* mk_kvpair(const char* k, char** v)
-    __attribute__ ((warn_unused_result, nonnull (1)));
-void add_kvpair_value(kvpair_t* kvpair, const char* value);
-void free_kvpair(kvpair_t* pair);
 
 /**
  * \defgroup Core
