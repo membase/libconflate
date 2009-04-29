@@ -47,6 +47,7 @@ AC_SEARCH_LIBS(XML_ParserCreate, expat)
 
 AC_SEARCH_LIBS(pthread_create, pthread,
                                [], AC_MSG_ERROR([Can't enable pthreads.]))
+PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 AC_HEADER_STDBOOL
 
