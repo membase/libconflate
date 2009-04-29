@@ -1,11 +1,11 @@
 lib_LIBRARIES = libconflate.a
 pkginclude_HEADERS = conflate.h
-noinst_PROGRAMS = bot
+noinst_PROGRAMS = examples/bot
 
 BUILT_SOURCES=
 
-bot_SOURCES = bot.c
-bot_LDADD = -lconflate
+examples_bot_SOURCES = examples/bot.c
+examples_bot_LDADD = -lconflate
 
 libconflate_a_SOURCES = conflate.h kvpair.c util.c persist.c xmpp.c
 

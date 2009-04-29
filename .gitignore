@@ -3,5 +3,5 @@
 *~
 *.pyc
 /python/twistd.pid
-/c/bot
+/c/examples/bot
 /c/docs
