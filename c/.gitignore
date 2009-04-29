@@ -18,3 +18,4 @@ depcomp
 install-sh
 missing
 stamp-h1
+tests/check_kvpair

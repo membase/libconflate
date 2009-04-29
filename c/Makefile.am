@@ -4,6 +4,8 @@ noinst_PROGRAMS = examples/bot
 
 BUILT_SOURCES=
 
+SUBDIRS= . tests
+
 examples_bot_SOURCES = examples/bot.c
 examples_bot_LDADD = -lconflate
 
