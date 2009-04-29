@@ -15,6 +15,10 @@ kvpair_t* mk_kvpair(const char* k, char** v)
         for (i = 0; v[i]; i++) {
             add_kvpair_value(rv, v[i]);
         }
+    } else {
+        rv->allocated_values = 4;
+        rv->values = calloc(4, sizeof(char*));
+        assert(rv->values);
     }
 
     return rv;
