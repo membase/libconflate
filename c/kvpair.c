@@ -54,3 +54,14 @@ void free_kvpair(kvpair_t* pair)
     free_string_list(pair->values);
     free(pair);
 }
+
+kvpair_t* find_kvpair(const kvpair_t* pair, const char* key)
+{
+    assert(key);
+
+    while (pair && strcmp(pair->key, key) != 0) {
+        pair = pair->next;
+    }
+
+    return pair;
+}

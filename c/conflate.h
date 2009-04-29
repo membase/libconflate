@@ -63,6 +63,17 @@ void add_kvpair_value(kvpair_t* kvpair, const char* value)
     __attribute__ ((nonnull (1, 2)));
 
 /**
+ * Find a kvpair with the given key.
+ *
+ * @param pair start of a pair chain
+ * @param key the desired key
+ *
+ * @return the pair with the given key, or NULL if no such pair is found
+ */
+kvpair_t* find_kvpair(const kvpair_t* pair, const char* key)
+    __attribute__ ((warn_unused_result, nonnull (2)));
+
+/**
  * Free a chain of kvpairs.
  */
 void free_kvpair(kvpair_t* pair)
