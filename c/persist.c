@@ -215,12 +215,7 @@ bool save_kvpairs(kvpair_t* kvpair, const char *filename)
 static int append_kvpair_from_db(void* arg, int n, char **vals, char **cols)
 {
     kvpair_t** pairs = (kvpair_t**)arg;
-    kvpair_t* pair = *pairs;
-
-    /* Search for the pair with the name we're looking for */
-    while (pair && strcmp(pair->key, vals[0]) != 0) {
-        pair = pair->next;
-    }
+    kvpair_t* pair = find_kvpair(*pairs, vals[0]);
 
     /* If such a list doesn't already exist, one will be assigned to you */
     if (!pair) {
