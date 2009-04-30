@@ -1,14 +1,8 @@
-There are two different agents in here, a C version for embedding into
-a C application and a python version for testing or maybe embedding
-into a twisted app.
-
-# C Version
-
-## Building
+# Building
 
 First, you need to build and install libstrophe:
 
-### Libstrophe
+## Libstrophe
 
     git clone git://github.com/dustin/libstrophe.git
     cd libstrophe
@@ -24,7 +18,7 @@ And then install it:
     cp *.h ~/include
     cp *.a ~/lib
 
-### The Library and Example Bot
+## The Library and Example Bot
 
 Now you're ready to build the library and example application.
 
@@ -32,7 +26,7 @@ Now you're ready to build the library and example application.
     cd memagent
     make
 
-## Trying the Example
+# Trying the Example
 
 There's a bit of infrastructure required to see it all work, but the
 example (bot.c) is ready to talk to your xmpp server and handle
