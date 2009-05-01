@@ -68,7 +68,8 @@ static int version_handler(xmpp_conn_t * const conn,
 static xmpp_stanza_t* error_unknown_command(const char *cmd,
                                             xmpp_conn_t* const conn,
                                             xmpp_stanza_t * const stanza,
-                                            void * const userdata)
+                                            void * const userdata,
+                                            bool direct)
 {
     xmpp_stanza_t *reply, *error, *condition;
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
@@ -148,9 +149,10 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
                                          xmpp_stanza_t* cmd_stanza,
                                          xmpp_conn_t * const conn,
                                          xmpp_stanza_t * const stanza,
-                                         void * const userdata)
+                                         void * const userdata,
+                                         bool direct)
 {
-    xmpp_stanza_t *reply, *x, *fields;
+    xmpp_stanza_t *reply = NULL, *x = NULL, *fields = NULL;
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     kvpair_t* conf = NULL;
@@ -187,14 +189,16 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
 
     free_kvpair(conf);
 
-    reply = xmpp_stanza_new(ctx);
-    assert(reply);
+    if (direct) {
+        reply = xmpp_stanza_new(ctx);
+        assert(reply);
 
-    xmpp_stanza_set_name(reply, "iq");
-    xmpp_stanza_set_type(reply, "result");
-    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-    xmpp_stanza_set_attribute(reply, "to",
-                              xmpp_stanza_get_attribute(stanza, "from"));
+        xmpp_stanza_set_name(reply, "iq");
+        xmpp_stanza_set_type(reply, "result");
+        xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+        xmpp_stanza_set_attribute(reply, "to",
+                                  xmpp_stanza_get_attribute(stanza, "from"));
+    }
 
     return reply;
 }
@@ -253,7 +257,8 @@ static xmpp_stanza_t* process_stats(const char *cmd,
                                     xmpp_stanza_t* cmd_stanza,
                                     xmpp_conn_t * const conn,
                                     xmpp_stanza_t * const stanza,
-                                    void * const userdata)
+                                    void * const userdata,
+                                    bool direct)
 {
     xmpp_stanza_t *cmd_res = NULL, *x = NULL;
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
@@ -302,6 +307,27 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     return scontext.reply;
 }
 
+xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
+                                xmpp_stanza_t * const stanza,
+                                void * const userdata,
+                                const char* cmd,
+                                xmpp_stanza_t *req,
+                                bool direct)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+    xmpp_stanza_t *reply = NULL;
+
+    if (strcmp(cmd, "serverlist") == 0) {
+        reply = process_serverlist(cmd, req, conn, stanza, handle, direct);
+    } else if (strcmp(cmd, "client_stats") == 0) {
+        reply = process_stats(cmd, req, conn, stanza, handle, direct);
+    } else {
+        reply = error_unknown_command(cmd, conn, stanza, handle, direct);
+    }
+
+    return reply;
+}
+
 static int command_handler(xmpp_conn_t * const conn,
                            xmpp_stanza_t * const stanza,
                            void * const userdata)
@@ -319,13 +345,7 @@ static int command_handler(xmpp_conn_t * const conn,
 
     fprintf(stderr, "Command:  %s\n", cmd);
 
-    if (strcmp(cmd, "serverlist") == 0) {
-        reply = process_serverlist(cmd, req, conn, stanza, handle);
-    } else if (strcmp(cmd, "client_stats") == 0) {
-        reply = process_stats(cmd, req, conn, stanza, handle);
-    } else {
-        reply = error_unknown_command(cmd, conn, stanza, handle);
-    }
+    reply = command_dispatch(conn, stanza, userdata, cmd, req, true);
 
     if (reply) {
         xmpp_send(conn, reply);
@@ -402,7 +422,32 @@ static int message_handler(xmpp_conn_t * const conn,
                            xmpp_stanza_t * const stanza,
                            void * const userdata)
 {
-    fprintf(stderr, "Got a message...\n");
+    xmpp_stanza_t* event = NULL, *items = NULL, *item = NULL,
+        *command = NULL, *reply = NULL;
+    fprintf(stderr, "Got a message from %s\n",
+            xmpp_stanza_get_attribute(stanza, "from"));
+
+    event = xmpp_stanza_get_child_by_name(stanza, "event");
+    assert(event);
+    items = xmpp_stanza_get_child_by_name(event, "items");
+    assert(items);
+    item = xmpp_stanza_get_child_by_name(items, "item");
+    assert(item);
+
+    command = xmpp_stanza_get_child_by_name(item, "command");
+    assert(command);
+
+    fprintf(stderr, "Pubsub command:  %s\n",
+            xmpp_stanza_get_attribute(command, "command"));
+
+    reply = command_dispatch(conn, stanza, userdata,
+                             xmpp_stanza_get_attribute(command, "command"),
+                             command, false);
+
+    if (reply) {
+        xmpp_stanza_release(reply);
+    }
+
     return 1;
 }
 
