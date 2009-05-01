@@ -263,6 +263,10 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     xmpp_stanza_t *cmd_res = NULL, *x = NULL;
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
+
+    /* Only direct stat requests are handled. */
+    assert(direct);
+
     struct stat_context scontext = { .conn = conn,
                                      .ctx = ctx,
                                      .reply = xmpp_stanza_new(ctx),
