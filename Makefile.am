@@ -6,6 +6,7 @@ BUILT_SOURCES=
 
 SUBDIRS= . tests
 
+examples_bot_DEPENDENCIES = libconflate.a
 examples_bot_SOURCES = examples/bot.c
 examples_bot_LDADD = -L. -lconflate
 
