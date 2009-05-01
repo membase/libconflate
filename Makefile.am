@@ -7,7 +7,7 @@ BUILT_SOURCES=
 SUBDIRS= . tests
 
 examples_bot_SOURCES = examples/bot.c
-examples_bot_LDADD = -lconflate
+examples_bot_LDADD = -L. -lconflate
 
 libconflate_a_SOURCES = conflate.h kvpair.c util.c persist.c xmpp.c
 
