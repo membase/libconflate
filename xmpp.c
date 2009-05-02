@@ -436,20 +436,23 @@ static int message_handler(xmpp_conn_t * const conn,
     items = xmpp_stanza_get_child_by_name(event, "items");
     assert(items);
     item = xmpp_stanza_get_child_by_name(items, "item");
-    assert(item);
 
-    command = xmpp_stanza_get_child_by_name(item, "command");
-    assert(command);
+    if (item) {
+        command = xmpp_stanza_get_child_by_name(item, "command");
+        assert(command);
 
-    fprintf(stderr, "Pubsub command:  %s\n",
-            xmpp_stanza_get_attribute(command, "command"));
+        fprintf(stderr, "Pubsub command:  %s\n",
+                xmpp_stanza_get_attribute(command, "command"));
 
-    reply = command_dispatch(conn, stanza, userdata,
-                             xmpp_stanza_get_attribute(command, "command"),
-                             command, false);
+        reply = command_dispatch(conn, stanza, userdata,
+                                 xmpp_stanza_get_attribute(command, "command"),
+                                 command, false);
 
-    if (reply) {
-        xmpp_stanza_release(reply);
+        if (reply) {
+            xmpp_stanza_release(reply);
+        }
+    } else {
+        fprintf(stderr, "Received pubsub event with no items.\n");
     }
 
     return 1;
