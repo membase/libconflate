@@ -260,7 +260,7 @@ static xmpp_stanza_t* process_stats(const char *cmd,
                                     void * const userdata,
                                     bool direct)
 {
-    xmpp_stanza_t *cmd_res = NULL, *x = NULL;
+    xmpp_stanza_t *cmd_res = NULL;
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
 
@@ -293,16 +293,10 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     add_and_release(scontext.reply, cmd_res);
 
     /* X data in the command response */
-    x = xmpp_stanza_new(ctx);
-    assert(x);
-    xmpp_stanza_set_name(x, "x");
-    xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
-    xmpp_stanza_set_type(x, "result");
-    add_and_release(cmd_res, x);
-
-    /* And finally init the item */
-    xmpp_stanza_set_name(scontext.container, "item");
-    add_and_release(x, scontext.container);
+    xmpp_stanza_set_name(scontext.container, "x");
+    xmpp_stanza_set_attribute(scontext.container, "xmlns", "jabber:x:data");
+    xmpp_stanza_set_type(scontext.container, "result");
+    add_and_release(cmd_res, scontext.container);
 
     handle->conf->get_stats(handle->conf->userdata, &scontext, stat_adder);
 
