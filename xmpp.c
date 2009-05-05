@@ -12,6 +12,54 @@ static void add_and_release(xmpp_stanza_t* parent, xmpp_stanza_t* child)
     xmpp_stanza_release(child);
 }
 
+/* Copy an attribute from one stanza to another iff it exists in the
+   src. */
+static void copy_attr(xmpp_ctx_t *ctx,
+                      xmpp_stanza_t* src, xmpp_stanza_t* dest,
+                      const char* attr)
+{
+    assert(src);
+    assert(dest);
+    assert(attr);
+
+    char *val = xmpp_stanza_get_attribute(src, attr);
+    if (val) {
+        xmpp_stanza_set_attribute(dest, attr, val);
+    }
+}
+
+/* Create an IQ response */
+static xmpp_stanza_t* create_reply(xmpp_ctx_t* ctx, xmpp_stanza_t* stanza)
+{
+    xmpp_stanza_t* reply = xmpp_stanza_new(ctx);
+
+    assert(reply);
+
+    xmpp_stanza_set_name(reply, "iq");
+    xmpp_stanza_set_type(reply, "result");
+    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    xmpp_stanza_set_attribute(reply, "to",
+                              xmpp_stanza_get_attribute(stanza, "from"));
+
+    return reply;
+}
+
+/* Create an XMPP command response */
+static xmpp_stanza_t* create_cmd_response(xmpp_ctx_t* ctx,
+                                          xmpp_stanza_t* cmd_stanza)
+{
+    xmpp_stanza_t* cmd_res = xmpp_stanza_new(ctx);
+    assert(cmd_res);
+
+    xmpp_stanza_set_name(cmd_res, "command");
+    copy_attr(ctx, cmd_stanza, cmd_res, "xmlns");
+    copy_attr(ctx, cmd_stanza, cmd_res, "node");
+    copy_attr(ctx, cmd_stanza, cmd_res, "sessionid");
+    xmpp_stanza_set_attribute(cmd_res, "status", "completed");
+
+    return cmd_res;
+}
+
 static int version_handler(xmpp_conn_t * const conn,
                            xmpp_stanza_t * const stanza,
                            void * const userdata)
@@ -190,14 +238,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     free_kvpair(conf);
 
     if (direct) {
-        reply = xmpp_stanza_new(ctx);
-        assert(reply);
-
-        xmpp_stanza_set_name(reply, "iq");
-        xmpp_stanza_set_type(reply, "result");
-        xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-        xmpp_stanza_set_attribute(reply, "to",
-                                  xmpp_stanza_get_attribute(stanza, "from"));
+        reply = create_reply(ctx, stanza);
     }
 
     return reply;
@@ -239,20 +280,6 @@ static void stat_adder(void* opaque,
     }
 }
 
-static void copy_attr(xmpp_ctx_t *ctx,
-                      xmpp_stanza_t* src, xmpp_stanza_t* dest,
-                      const char* attr)
-{
-    assert(src);
-    assert(dest);
-    assert(attr);
-
-    char *val = xmpp_stanza_get_attribute(src, attr);
-    if (val) {
-        xmpp_stanza_set_attribute(dest, attr, val);
-    }
-}
-
 static xmpp_stanza_t* process_stats(const char *cmd,
                                     xmpp_stanza_t* cmd_stanza,
                                     xmpp_conn_t * const conn,
@@ -269,27 +296,15 @@ static xmpp_stanza_t* process_stats(const char *cmd,
 
     struct stat_context scontext = { .conn = conn,
                                      .ctx = ctx,
-                                     .reply = xmpp_stanza_new(ctx),
+                                     .reply = NULL,
                                      .container = xmpp_stanza_new(ctx),
                                      .complete = false};
 
-    assert(scontext.reply);
     assert(scontext.container);
 
-    xmpp_stanza_set_name(scontext.reply, "iq");
-    xmpp_stanza_set_type(scontext.reply, "result");
-    xmpp_stanza_set_id(scontext.reply, xmpp_stanza_get_id(stanza));
-    xmpp_stanza_set_attribute(scontext.reply, "to",
-                              xmpp_stanza_get_attribute(stanza, "from"));
+    scontext.reply = create_reply(ctx, stanza);
+    cmd_res = create_cmd_response(ctx, cmd_stanza);
 
-    /* Command wrapper for response */
-    cmd_res = xmpp_stanza_new(ctx);
-    assert(cmd_res);
-    xmpp_stanza_set_name(cmd_res, "command");
-    copy_attr(ctx, cmd_stanza, cmd_res, "xmlns");
-    copy_attr(ctx, cmd_stanza, cmd_res, "node");
-    copy_attr(ctx, cmd_stanza, cmd_res, "sessionid");
-    xmpp_stanza_set_attribute(cmd_res, "status", "completed");
     add_and_release(scontext.reply, cmd_res);
 
     /* X data in the command response */
@@ -320,27 +335,13 @@ static xmpp_stanza_t* process_reset_stats(const char *cmd,
 
     handle->conf->reset_stats(handle->conf->userdata);
 
-    xmpp_stanza_t *reply = xmpp_stanza_new(ctx),
-        *cmd_res = xmpp_stanza_new(ctx);
+    xmpp_stanza_t* cmd_res = xmpp_stanza_new(ctx);
 
-    assert(reply);
     assert(cmd_res);
 
-    xmpp_stanza_set_name(reply, "iq");
-    xmpp_stanza_set_type(reply, "result");
-    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-    xmpp_stanza_set_attribute(reply, "to",
-                              xmpp_stanza_get_attribute(stanza, "from"));
+    xmpp_stanza_t* reply = create_reply(ctx, stanza);
 
-    /* Command wrapper for response */
-    cmd_res = xmpp_stanza_new(ctx);
-    assert(cmd_res);
-    xmpp_stanza_set_name(cmd_res, "command");
-    copy_attr(ctx, cmd_stanza, cmd_res, "xmlns");
-    copy_attr(ctx, cmd_stanza, cmd_res, "node");
-    copy_attr(ctx, cmd_stanza, cmd_res, "sessionid");
-    xmpp_stanza_set_attribute(cmd_res, "status", "completed");
-    add_and_release(reply, cmd_res);
+    add_and_release(reply, create_cmd_response(ctx, cmd_stanza));
 
     return reply;
 }
