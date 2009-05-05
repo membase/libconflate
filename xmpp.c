@@ -574,7 +574,7 @@ static void* run_conflate(void *arg) {
     return NULL;
 }
 
-static conflate_config_t* dup_conf(conflate_config_t c) {
+conflate_config_t* dup_conf(conflate_config_t c) {
     conflate_config_t *rv = calloc(sizeof(conflate_config_t), 1);
     assert(rv);
 

@@ -25,3 +25,4 @@ install-sh
 missing
 stamp-h1
 tests/check_kvpair
+tests/check_xmpp
