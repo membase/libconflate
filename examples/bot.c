@@ -29,6 +29,11 @@ void do_stats(void* userdata, void* opaque, conflate_add_stat add_stat)
     add_stat(opaque, NULL, NULL);
 }
 
+void do_reset_stats(void* userdata)
+{
+    printf("Resetting stats...\n");
+}
+
 int main(int argc, char **argv) {
 
     conflate_config_t conf;
@@ -48,6 +53,7 @@ int main(int argc, char **argv) {
     conf.userdata = "something awesome";
     conf.new_config = display_config;
     conf.get_stats = do_stats;
+    conf.reset_stats = do_reset_stats;
 
     if(!start_conflate(conf)) {
         fprintf(stderr, "Couldn't initialize libconflate.\n");

@@ -155,6 +155,11 @@ typedef struct {
      */
     void (*get_stats)(void*, void*, conflate_add_stat);
 
+    /**
+     * Callback issued when libconflate wants to reset stats.
+     */
+    void (*reset_stats)(void*);
+
 } conflate_config_t;
 
 /**

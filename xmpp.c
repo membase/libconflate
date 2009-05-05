@@ -305,6 +305,46 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     return scontext.reply;
 }
 
+static xmpp_stanza_t* process_reset_stats(const char *cmd,
+                                          xmpp_stanza_t* cmd_stanza,
+                                          xmpp_conn_t * const conn,
+                                          xmpp_stanza_t * const stanza,
+                                          void * const userdata,
+                                          bool direct)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+    xmpp_ctx_t *ctx = handle->ctx;
+
+    /* Only direct stat requests are handled. */
+    assert(direct);
+
+    handle->conf->reset_stats(handle->conf->userdata);
+
+    xmpp_stanza_t *reply = xmpp_stanza_new(ctx),
+        *cmd_res = xmpp_stanza_new(ctx);
+
+    assert(reply);
+    assert(cmd_res);
+
+    xmpp_stanza_set_name(reply, "iq");
+    xmpp_stanza_set_type(reply, "result");
+    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    xmpp_stanza_set_attribute(reply, "to",
+                              xmpp_stanza_get_attribute(stanza, "from"));
+
+    /* Command wrapper for response */
+    cmd_res = xmpp_stanza_new(ctx);
+    assert(cmd_res);
+    xmpp_stanza_set_name(cmd_res, "command");
+    copy_attr(ctx, cmd_stanza, cmd_res, "xmlns");
+    copy_attr(ctx, cmd_stanza, cmd_res, "node");
+    copy_attr(ctx, cmd_stanza, cmd_res, "sessionid");
+    xmpp_stanza_set_attribute(cmd_res, "status", "completed");
+    add_and_release(reply, cmd_res);
+
+    return reply;
+}
+
 xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
                                 xmpp_stanza_t * const stanza,
                                 void * const userdata,
@@ -319,6 +359,8 @@ xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
         reply = process_serverlist(cmd, req, conn, stanza, handle, direct);
     } else if (strcmp(cmd, "client_stats") == 0) {
         reply = process_stats(cmd, req, conn, stanza, handle, direct);
+    } else if (strcmp(cmd, "reset_stats") == 0) {
+        reply = process_reset_stats(cmd, req, conn, stanza, handle, direct);
     } else {
         reply = error_unknown_command(cmd, conn, stanza, handle, direct);
     }
@@ -544,6 +586,7 @@ static conflate_config_t* dup_conf(conflate_config_t c) {
     rv->userdata = c.userdata;
     rv->new_config = c.new_config;
     rv->get_stats = c.get_stats;
+    rv->reset_stats = c.reset_stats;
 
     return rv;
 }
