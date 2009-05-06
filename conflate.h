@@ -91,9 +91,11 @@ void free_kvpair(kvpair_t* pair)
 /**
  * Callback for conflate stats.
  *
- * The opaque argument will be passed to the client and must be passed
- * back in as-is.  The key and value parameters represent the stat
+ * The key and value parameters represent the stat
  * name and value that should be reported.
+ *
+ * The opaque argument will be passed to the client and must be passed
+ * back in as-is.
  */
 typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
 
