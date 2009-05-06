@@ -124,7 +124,7 @@ START_TEST (test_find_missing_item)
 }
 END_TEST
 
-Suite* kvpair_suite (void)
+static Suite* kvpair_suite (void)
 {
     Suite *s = suite_create ("kvpair");
 

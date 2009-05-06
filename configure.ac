@@ -59,5 +59,11 @@ AC_CHECK_HEADER(strophe.h,
 
 AC_C_CONST
 
+dnl Turn up the warnings.
+if test "$GCC" = "yes"
+then
+        CFLAGS="$CFLAGS -Wall -Werror -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls"
+fi
+
 AC_CONFIG_FILES(Makefile tests/Makefile)
 AC_OUTPUT

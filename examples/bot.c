@@ -5,7 +5,7 @@
 
 #include "conflate.h"
 
-void display_config(void* userdata, kvpair_t* conf)
+static void display_config(void* userdata, kvpair_t* conf)
 {
     printf("Hey.  I received a new config (userdata: %s):\n",
            (char*)userdata);
@@ -22,14 +22,14 @@ void display_config(void* userdata, kvpair_t* conf)
     }
 }
 
-void do_stats(void* userdata, void* opaque, conflate_add_stat add_stat)
+static void do_stats(void* userdata, void* opaque, conflate_add_stat add_stat)
 {
     add_stat(opaque, "stat1", "val1");
     add_stat(opaque, "stat2", "val2");
     add_stat(opaque, NULL, NULL);
 }
 
-void do_reset_stats(void* userdata)
+static void do_reset_stats(void* userdata)
 {
     printf("Resetting stats...\n");
 }

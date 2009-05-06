@@ -70,7 +70,7 @@ void add_kvpair_value(kvpair_t* kvpair, const char* value)
  *
  * @return the pair with the given key, or NULL if no such pair is found
  */
-kvpair_t* find_kvpair(const kvpair_t* pair, const char* key)
+kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
     __attribute__ ((warn_unused_result, nonnull (2)));
 
 /**
@@ -226,6 +226,11 @@ bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result))
 /* Misc */
 char* safe_strdup(const char*);
 void free_string_list(char **);
+
+/**
+ * Create a copy of a config.
+ */
+conflate_config_t* dup_conf(conflate_config_t c);
 
 /**
  * \defgroup Persistence

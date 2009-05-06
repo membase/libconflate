@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 #include "conflate.h"
@@ -55,7 +56,7 @@ void free_kvpair(kvpair_t* pair)
     free(pair);
 }
 
-kvpair_t* find_kvpair(const kvpair_t* pair, const char* key)
+kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
 {
     assert(key);
 

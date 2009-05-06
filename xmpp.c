@@ -346,12 +346,12 @@ static xmpp_stanza_t* process_reset_stats(const char *cmd,
     return reply;
 }
 
-xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
-                                xmpp_stanza_t * const stanza,
-                                void * const userdata,
-                                const char* cmd,
-                                xmpp_stanza_t *req,
-                                bool direct)
+static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
+                                       xmpp_stanza_t * const stanza,
+                                       void * const userdata,
+                                       const char* cmd,
+                                       xmpp_stanza_t *req,
+                                       bool direct)
 {
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_stanza_t *reply = NULL;
@@ -374,7 +374,6 @@ static int command_handler(xmpp_conn_t * const conn,
                            void * const userdata)
 {
     xmpp_stanza_t *reply = NULL, *req = NULL;
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
     char *cmd = NULL;
 
     /* Figure out what the command is */

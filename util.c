@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include "conflate.h"
+
 char* safe_strdup(const char* in) {
     char *rv = NULL;
     assert(in);

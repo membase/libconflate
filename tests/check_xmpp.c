@@ -6,8 +6,6 @@
 
 #include <conflate.h>
 
-conflate_config_t* dup_conf(conflate_config_t c);
-
 static void conf_cb(void* userdata, kvpair_t* conf)
 {
 }
@@ -34,7 +32,7 @@ static void init_config(conflate_config_t* conf)
     conf->software = "test";
     conf->version = "1.x";
     conf->save_path = "/tmp/something.db";
-    conf->userdata = init_config;
+    conf->userdata = "some user data";
     conf->new_config = conf_cb;
     conf->get_stats = stats_cb;
     conf->reset_stats = reset_stats_cb;
@@ -109,7 +107,7 @@ START_TEST (test_dup_with_host)
 }
 END_TEST
 
-Suite* xmpp_suite (void)
+static Suite* xmpp_suite (void)
 {
     Suite *s = suite_create ("xmpp");
 
