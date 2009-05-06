@@ -355,6 +355,99 @@ static xmpp_stanza_t* process_reset_stats(const char *cmd,
     return reply;
 }
 
+struct ping_context {
+    xmpp_conn_t*   conn;
+    xmpp_ctx_t*    ctx;
+    xmpp_stanza_t* reply;
+    xmpp_stanza_t* container;
+    bool           complete;
+};
+
+static void ping_adder(void *opaque, const char *set, const kvpair_t *pair)
+{
+    struct ping_context *pcontext = (struct ping_context*)opaque;
+
+    if (set) {
+        xmpp_stanza_t *item = xmpp_stanza_new(pcontext->ctx);
+        assert(item);
+
+        xmpp_stanza_set_name(item, "item");
+        add_and_release(pcontext->container, item);
+
+        while (pair) {
+            int i = 0;
+            xmpp_stanza_t* field = xmpp_stanza_new(pcontext->ctx);
+            assert(field);
+
+            xmpp_stanza_set_name(field, "field");
+            xmpp_stanza_set_attribute(field, "var", pair->key);
+            add_and_release(item, field);
+
+            for (i = 0; pair->values[i]; i++) {
+                xmpp_stanza_t* value = xmpp_stanza_new(pcontext->ctx);
+                xmpp_stanza_t* text = xmpp_stanza_new(pcontext->ctx);
+                assert(value);
+                assert(text);
+
+                xmpp_stanza_set_name(value, "value");
+                add_and_release(field, value);
+
+                xmpp_stanza_set_text(text, pair->values[i]);
+                add_and_release(value, text);
+            }
+        }
+    } else {
+        pcontext->complete = true;
+    }
+}
+
+static xmpp_stanza_t* process_ping_test(const char *cmd,
+                                        xmpp_stanza_t* cmd_stanza,
+                                        xmpp_conn_t * const conn,
+                                        xmpp_stanza_t * const stanza,
+                                        void * const userdata,
+                                        bool direct)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+    xmpp_ctx_t *ctx = handle->ctx;
+    struct ping_context pcontext = { .conn = conn,
+                                     .ctx = ctx,
+                                     .reply = NULL,
+                                     .container = xmpp_stanza_new(ctx),
+                                     .complete = false};
+
+    assert(pcontext.container);
+
+    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
+    assert(x);
+
+    xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
+    assert(fields);
+
+    kvpair_t *form = grok_form(fields);
+
+    pcontext.reply = create_reply(ctx, stanza);
+    xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
+
+    add_and_release(pcontext.reply, cmd_res);
+
+    /* X data in the command response */
+    xmpp_stanza_set_name(pcontext.container, "x");
+    xmpp_stanza_set_attribute(pcontext.container, "xmlns", "jabber:x:data");
+    xmpp_stanza_set_type(pcontext.container, "result");
+    add_and_release(cmd_res, pcontext.container);
+
+    handle->conf->ping_test(handle->conf->userdata, &pcontext,
+                            form, ping_adder);
+
+    free_kvpair(form);
+
+    assert(pcontext.complete);
+
+    return pcontext.reply;
+}
+
+
 static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
                                        xmpp_stanza_t * const stanza,
                                        void * const userdata,
@@ -371,6 +464,8 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
         reply = process_stats(cmd, req, conn, stanza, handle, direct);
     } else if (strcmp(cmd, "reset_stats") == 0) {
         reply = process_reset_stats(cmd, req, conn, stanza, handle, direct);
+    } else if (strcmp(cmd, "ping_test") == 0) {
+        reply = process_ping_test(cmd, req, conn, stanza, handle, direct);
     } else {
         reply = error_unknown_command(cmd, conn, stanza, handle, direct);
     }

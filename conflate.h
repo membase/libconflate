@@ -187,7 +187,7 @@ typedef struct {
      * @param cb callback to issue at the end of each test result
      */
     void (*ping_test)(void* userdata, void* opaque,
-                      char** servers, conflate_add_ping_report cb);
+                      kvpair_t *form, conflate_add_ping_report cb);
 
 } conflate_config_t;
 

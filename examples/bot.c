@@ -34,7 +34,7 @@ static void do_reset_stats(void* userdata)
     printf("Resetting stats...\n");
 }
 
-static void do_ping_test(void* userdata, void* opaque, char** servers,
+static void do_ping_test(void* userdata, void* opaque, kvpair_t *form,
                          conflate_add_ping_report cb)
 {
     printf("Doing a ping test...\n");

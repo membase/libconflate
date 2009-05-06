@@ -20,7 +20,7 @@ static void reset_stats_cb(void* userdata)
 }
 
 static void ping_test_cb(void* userdata, void* opaque,
-                         char** servers, conflate_add_ping_report cb)
+                         kvpair_t *conf, conflate_add_ping_report cb)
 {
 }
 
