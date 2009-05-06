@@ -193,6 +193,26 @@ static char **get_specific_form_values(xmpp_stanza_t *field, const char *var) {
     return rv;
 }
 
+static kvpair_t *grok_form(xmpp_stanza_t *fields)
+{
+    kvpair_t *rv = NULL;
+
+    /* walk the field peers and grab their values and stuff */
+    while (fields) {
+        if (xmpp_stanza_is_tag(fields)) {
+            char* k = xmpp_stanza_get_attribute(fields, "var");
+            char **vals = get_specific_form_values(fields, k);
+            kvpair_t* thispair = mk_kvpair(k, vals);
+            free_string_list(vals);
+            thispair->next = rv;
+            rv = thispair;
+        }
+        fields = xmpp_stanza_get_next(fields);
+    }
+
+    return rv;
+}
+
 static xmpp_stanza_t* process_serverlist(const char *cmd,
                                          xmpp_stanza_t* cmd_stanza,
                                          xmpp_conn_t * const conn,
@@ -213,18 +233,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     fields = xmpp_stanza_get_child_by_name(x, "field");
     assert(fields);
 
-    /* walk the field peers and grab their values and stuff */
-    while (fields) {
-        if (xmpp_stanza_is_tag(fields)) {
-            char* k = xmpp_stanza_get_attribute(fields, "var");
-            char **vals = get_specific_form_values(fields, k);
-            kvpair_t* thispair = mk_kvpair(k, vals);
-            free_string_list(vals);
-            thispair->next = conf;
-            conf = thispair;
-        }
-        fields = xmpp_stanza_get_next(fields);
-    }
+    conf = grok_form(fields);
 
     /* Persist the config lists */
     if (!save_kvpairs(conf, handle->conf->save_path)) {
