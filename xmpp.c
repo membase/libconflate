@@ -590,6 +590,7 @@ conflate_config_t* dup_conf(conflate_config_t c) {
     rv->new_config = c.new_config;
     rv->get_stats = c.get_stats;
     rv->reset_stats = c.reset_stats;
+    rv->ping_test = c.ping_test;
 
     return rv;
 }

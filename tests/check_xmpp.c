@@ -21,6 +21,11 @@ static void reset_stats_cb(void* userdata)
 {
 }
 
+static void ping_test_cb(void* userdata, void* opaque,
+                         char** servers, conflate_add_ping_report cb)
+{
+}
+
 static void init_config(conflate_config_t* conf)
 {
     conf->jid = "user@example.com";
@@ -33,6 +38,7 @@ static void init_config(conflate_config_t* conf)
     conf->new_config = conf_cb;
     conf->get_stats = stats_cb;
     conf->reset_stats = reset_stats_cb;
+    conf->ping_test = ping_test_cb;
 }
 
 static int count_nulls(conflate_config_t* conf)

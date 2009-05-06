@@ -34,6 +34,12 @@ void do_reset_stats(void* userdata)
     printf("Resetting stats...\n");
 }
 
+static void do_ping_test(void* userdata, void* opaque, char** servers,
+                         conflate_add_ping_report cb)
+{
+    printf("Doing a ping test...\n");
+}
+
 int main(int argc, char **argv) {
 
     conflate_config_t conf;
@@ -54,6 +60,7 @@ int main(int argc, char **argv) {
     conf.new_config = display_config;
     conf.get_stats = do_stats;
     conf.reset_stats = do_reset_stats;
+    conf.ping_test = do_ping_test;
 
     if(!start_conflate(conf)) {
         fprintf(stderr, "Couldn't initialize libconflate.\n");

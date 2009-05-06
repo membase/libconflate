@@ -99,6 +99,20 @@ void free_kvpair(kvpair_t* pair)
  */
 typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
 
+
+/**
+ * Callback for conflate ping reports.
+ *
+ * When performing a ping test, results are given back in named sets,
+ * one for each input under test.
+ *
+ * The opaque argument will be passed to the client and must be passed
+ * back in as-is.
+ */
+typedef void (*conflate_add_ping_report)(void* opaque,
+                                         const char* set,
+                                         const kvpair_t* pair);
+
 /**
  * Configuration for a conflatee.
  */
@@ -161,6 +175,19 @@ typedef struct {
      * Callback issued when libconflate wants to reset stats.
      */
     void (*reset_stats)(void*);
+
+    /**
+     * Callback issued when libconflate would like to run a ping test
+     * against a series of servers.
+     *
+     * @param userdata user's callback info
+     * @param opaque an opaque that must be given to the callback
+     *        unmodified
+     * @param servers null-terminated list of null-terminated strings
+     * @param cb callback to issue at the end of each test result
+     */
+    void (*ping_test)(void* userdata, void* opaque,
+                      char** servers, conflate_add_ping_report cb);
 
 } conflate_config_t;
 
