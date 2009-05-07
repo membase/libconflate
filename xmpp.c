@@ -261,29 +261,44 @@ struct stat_context {
     bool           complete;
 };
 
+static void add_form_values(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
+                            const char *key, const char **values)
+{
+    xmpp_stanza_t* field = xmpp_stanza_new(ctx);
+    assert(field);
+
+    xmpp_stanza_set_name(field, "field");
+    xmpp_stanza_set_attribute(field, "var", key);
+    add_and_release(parent, field);
+
+    for (int i = 0; values[i]; i++) {
+        xmpp_stanza_t* value = xmpp_stanza_new(ctx);
+        xmpp_stanza_t* text = xmpp_stanza_new(ctx);
+        assert(value);
+        assert(text);
+
+        xmpp_stanza_set_name(value, "value");
+        add_and_release(field, value);
+
+        xmpp_stanza_set_text(text, values[i]);
+        add_and_release(value, text);
+    }
+}
+
+static void add_form_value(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
+                            const char *key, const char *value)
+{
+    const char *values[2] = {value, NULL};
+    add_form_values(ctx, parent, key, values);
+}
+
 static void stat_adder(void* opaque,
                        const char* key, const char* val)
 {
     struct stat_context* scontext = (struct stat_context*)opaque;
 
     if (key) {
-        xmpp_stanza_t* field = xmpp_stanza_new(scontext->ctx);
-        xmpp_stanza_t* value = xmpp_stanza_new(scontext->ctx);
-        xmpp_stanza_t* text = xmpp_stanza_new(scontext->ctx);
-
-        assert(field);
-        assert(value);
-        assert(text);
-
-        xmpp_stanza_set_name(field, "field");
-        xmpp_stanza_set_attribute(field, "var", key);
-        add_and_release(scontext->container, field);
-
-        xmpp_stanza_set_name(value, "value");
-        add_and_release(field, value);
-
-        xmpp_stanza_set_text(text, val);
-        add_and_release(value, text);
+        add_form_value(scontext->ctx, scontext->container, key, val);
     } else {
         scontext->complete = true;
     }
@@ -362,37 +377,6 @@ struct ping_context {
     xmpp_stanza_t* container;
     bool           complete;
 };
-
-static void add_form_values(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
-                            const char *key, const char **values)
-{
-    xmpp_stanza_t* field = xmpp_stanza_new(ctx);
-    assert(field);
-
-    xmpp_stanza_set_name(field, "field");
-    xmpp_stanza_set_attribute(field, "var", key);
-    add_and_release(parent, field);
-
-    for (int i = 0; values[i]; i++) {
-        xmpp_stanza_t* value = xmpp_stanza_new(ctx);
-        xmpp_stanza_t* text = xmpp_stanza_new(ctx);
-        assert(value);
-        assert(text);
-
-        xmpp_stanza_set_name(value, "value");
-        add_and_release(field, value);
-
-        xmpp_stanza_set_text(text, values[i]);
-        add_and_release(value, text);
-    }
-}
-
-static void add_form_value(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
-                            const char *key, const char *value)
-{
-    const char *values[2] = {value, NULL};
-    add_form_values(ctx, parent, key, values);
-}
 
 static void ping_adder(void *opaque, const char *set, const kvpair_t *pair)
 {
