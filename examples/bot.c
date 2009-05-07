@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <assert.h>
 #include <sysexits.h>
 
 #include "conflate.h"
@@ -37,7 +38,25 @@ static void do_reset_stats(void* userdata)
 static void do_ping_test(void* userdata, void* opaque, kvpair_t *form,
                          conflate_add_ping_report cb)
 {
-    printf("Doing a ping test...\n");
+    kvpair_t *servers_p = find_kvpair(form, "servers");
+    assert(servers_p);
+    char **servers = servers_p->values;
+
+    for (int i = 0; servers[i]; i++) {
+        printf("\t%s\n", servers[i]);
+        kvpair_t *data = mk_kvpair("test1", NULL);
+        add_kvpair_value(data, "val1");
+        add_kvpair_value(data, "val2");
+
+        kvpair_t *data2 = mk_kvpair("test2", NULL);
+        add_kvpair_value(data2, "some val");
+        data->next = data2;
+
+        cb(opaque, servers[i], data);
+        free_kvpair(data);
+    }
+
+    cb(opaque, NULL, NULL);
 }
 
 int main(int argc, char **argv) {
