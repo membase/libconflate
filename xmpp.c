@@ -363,6 +363,37 @@ struct ping_context {
     bool           complete;
 };
 
+static void add_form_values(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
+                            const char *key, const char **values)
+{
+    xmpp_stanza_t* field = xmpp_stanza_new(ctx);
+    assert(field);
+
+    xmpp_stanza_set_name(field, "field");
+    xmpp_stanza_set_attribute(field, "var", key);
+    add_and_release(parent, field);
+
+    for (int i = 0; values[i]; i++) {
+        xmpp_stanza_t* value = xmpp_stanza_new(ctx);
+        xmpp_stanza_t* text = xmpp_stanza_new(ctx);
+        assert(value);
+        assert(text);
+
+        xmpp_stanza_set_name(value, "value");
+        add_and_release(field, value);
+
+        xmpp_stanza_set_text(text, values[i]);
+        add_and_release(value, text);
+    }
+}
+
+static void add_form_value(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
+                            const char *key, const char *value)
+{
+    const char *values[2] = {value, NULL};
+    add_form_values(ctx, parent, key, values);
+}
+
 static void ping_adder(void *opaque, const char *set, const kvpair_t *pair)
 {
     struct ping_context *pcontext = (struct ping_context*)opaque;
@@ -374,27 +405,10 @@ static void ping_adder(void *opaque, const char *set, const kvpair_t *pair)
         xmpp_stanza_set_name(item, "item");
         add_and_release(pcontext->container, item);
 
-        while (pair) {
-            int i = 0;
-            xmpp_stanza_t* field = xmpp_stanza_new(pcontext->ctx);
-            assert(field);
-
-            xmpp_stanza_set_name(field, "field");
-            xmpp_stanza_set_attribute(field, "var", pair->key);
-            add_and_release(item, field);
-
-            for (i = 0; pair->values[i]; i++) {
-                xmpp_stanza_t* value = xmpp_stanza_new(pcontext->ctx);
-                xmpp_stanza_t* text = xmpp_stanza_new(pcontext->ctx);
-                assert(value);
-                assert(text);
-
-                xmpp_stanza_set_name(value, "value");
-                add_and_release(field, value);
-
-                xmpp_stanza_set_text(text, pair->values[i]);
-                add_and_release(value, text);
-            }
+        for (; pair; pair = pair->next) {
+            add_form_value(pcontext->ctx, item, "-set-", set);
+            add_form_values(pcontext->ctx, item, pair->key,
+                            (const char**)pair->values);
         }
     } else {
         pcontext->complete = true;
