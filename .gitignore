@@ -1,6 +1,7 @@
 *.o
 *.a
 *~
+/TAGS
 /python/twistd.pid
 /examples/bot
 /docs
