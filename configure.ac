@@ -1,5 +1,5 @@
 AC_PREREQ(2.52)
-AC_INIT(memcached, 1.0, dustin@spy.net)
+AC_INIT(libconflate, 1.0, dustin@spy.net)
 AC_CANONICAL_SYSTEM
 AC_CONFIG_SRCDIR(conflate.h)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
