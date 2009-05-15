@@ -153,7 +153,7 @@ typedef struct {
     /** The XMPP Password */
     char *pass;
     /**
-     * The XMPP server address.
+     * The XMPP server address (may be NULL).
      *
      * This is optional -- setting this to NULL will allow for normal
      * XMPP SRV lookups to locate the server.
