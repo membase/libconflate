@@ -75,12 +75,18 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
 
 /**
  * Copy a chain of kvpairs.
+ *
+ * @param pair the pair to duplicate (recursively)
+ *
+ * @return a complete deep copy of the kvpair structure
  */
 kvpair_t *dup_kvpair(kvpair_t *pair)
     __attribute__ ((warn_unused_result, nonnull (1)));
 
 /**
  * Free a chain of kvpairs.
+ *
+ * @param pair the pair to free (recursively)
  */
 void free_kvpair(kvpair_t* pair)
     __attribute__ ((nonnull (1)));
