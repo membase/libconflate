@@ -24,6 +24,10 @@ static void ping_test_cb(void* userdata, void* opaque,
 {
 }
 
+static void log_cb(void *userdata, enum conflate_log_level level, const char *msg)
+{
+}
+
 static void init_config(conflate_config_t* conf)
 {
     init_conflate(conf);
@@ -34,6 +38,7 @@ static void init_config(conflate_config_t* conf)
     conf->version = "1.x";
     conf->save_path = "/tmp/something.db";
     conf->userdata = "some user data";
+    conf->log = log_cb;
     conf->new_config = conf_cb;
     conf->get_stats = stats_cb;
     conf->reset_stats = reset_stats_cb;

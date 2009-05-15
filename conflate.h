@@ -144,6 +144,17 @@ typedef void (*conflate_add_ping_report)(void* opaque,
                                          const kvpair_t* pair);
 
 /**
+ * Log levels.
+ */
+enum conflate_log_level {
+    DEBUG, /**< Various debug messages (for example xmpp stanzas) */
+    INFO,  /**< Info messages that might be helpful */
+    WARN,  /**< Warnings of stuff going bad */
+    ERROR, /**< Noteworthy error conditions */
+    FATAL  /**< The rapture is upon us */
+};
+
+/**
  * Configuration for a conflatee.
  */
 typedef struct {
@@ -182,6 +193,16 @@ typedef struct {
      * User defined data to be passed to callbacks.
      */
     void *userdata;
+
+    /**
+     * Logging callback.
+     *
+     * @param udata The client's custom user data
+     * @param level log level (see ::conflate_log_level)
+     * @param msg the message to log
+     */
+    void (*log)(void *udata, enum conflate_log_level level, const char *msg);
+
     /**
      * Callback issued when a new configuration is to be activated.
      *

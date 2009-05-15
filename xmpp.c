@@ -691,6 +691,7 @@ conflate_config_t* dup_conf(conflate_config_t c) {
     rv->version = safe_strdup(c.version);
     rv->save_path = safe_strdup(c.save_path);
     rv->userdata = c.userdata;
+    rv->log = c.log;
     rv->new_config = c.new_config;
     rv->get_stats = c.get_stats;
     rv->reset_stats = c.reset_stats;
