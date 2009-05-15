@@ -103,11 +103,12 @@ void free_kvpair(kvpair_t* pair)
 /**
  * Callback for conflate stats.
  *
- * The key and value parameters represent the stat
- * name and value that should be reported.
+ * The key and value parameters represent the stat name and value that
+ * should be reported.
  *
- * The opaque argument will be passed to the client and must be passed
- * back in as-is.
+ * @param opaque value given in the stat callback
+ * @param k a stat key (may not be NULL)
+ * @param v a stat value (may not be NULL)
  */
 typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
 
@@ -118,8 +119,9 @@ typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
  * When performing a ping test, results are given back in named sets,
  * one for each input under test.
  *
- * The opaque argument will be passed to the client and must be passed
- * back in as-is.
+ * @param opaque value given in the ping report callback
+ * @param set a key indicating which of the calling sets is being reported
+ * @param pair detailed information about this set's test
  */
 typedef void (*conflate_add_ping_report)(void* opaque,
                                          const char* set,
