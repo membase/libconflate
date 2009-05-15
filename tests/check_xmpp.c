@@ -26,6 +26,7 @@ static void ping_test_cb(void* userdata, void* opaque,
 
 static void init_config(conflate_config_t* conf)
 {
+    init_conflate(conf);
     conf->jid = "user@example.com";
     conf->pass = "somepass";
     conf->host = NULL;

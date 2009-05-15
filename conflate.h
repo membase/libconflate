@@ -230,6 +230,9 @@ typedef struct {
     void (*ping_test)(void* userdata, void* opaque,
                       kvpair_t *form, conflate_add_ping_report cb);
 
+    /** \private */
+    void *initialization_marker;
+
 } conflate_config_t;
 
 /**
@@ -252,6 +255,15 @@ typedef struct {
  * \defgroup Core
  * @{
  */
+
+/**
+ * Initilize the given configuration to defaults.
+ *
+ * This should be called *before* you fill in your config.
+ *
+ * @param conf configuration to be initialized
+ */
+void init_conflate(conflate_config_t *conf) __attribute__ ((nonnull (1)));
 
 /**
  * The main entry point for starting a conflate agent.

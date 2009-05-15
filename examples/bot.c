@@ -69,6 +69,8 @@ int main(int argc, char **argv) {
         exit(EX_USAGE);
     }
 
+    init_conflate(&conf);
+
     conf.jid = argv[1];
     conf.pass = argv[2];
     conf.host = (argc == 4 ? argv[3] : NULL);
