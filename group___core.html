@@ -50,7 +50,14 @@
 Callback for conflate ping reports. 
 <p>
 When performing a ping test, results are given back in named sets, one for each input under test.<p>
-The opaque argument will be passed to the client and must be passed back in as-is. 
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>value given in the ping report callback </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>set</em>&nbsp;</td><td>a key indicating which of the calling sets is being reported </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>detailed information about this set's test </td></tr>
+  </table>
+</dl>
+
 </div>
 </div><p>
 <a class="anchor" name="g3b4df1f97fc7b9d5b5421fab0b809afc"></a><!-- doxytag: member="conflate.h::conflate_add_stat" ref="g3b4df1f97fc7b9d5b5421fab0b809afc" args=")(void *opaque, const char *k, const char *v)" -->
@@ -68,7 +75,14 @@ The opaque argument will be passed to the client and must be passed back in as-i
 Callback for conflate stats. 
 <p>
 The key and value parameters represent the stat name and value that should be reported.<p>
-The opaque argument will be passed to the client and must be passed back in as-is. 
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>value given in the stat callback </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>k</em>&nbsp;</td><td>a stat key (may not be NULL) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>v</em>&nbsp;</td><td>a stat value (may not be NULL) </td></tr>
+  </table>
+</dl>
+
 </div>
 </div><p>
 <hr><h2>Function Documentation</h2>
@@ -91,12 +105,17 @@ The opaque argument will be passed to the client and must be passed back in as-i
 <p>
 The main entry point for starting a conflate agent. 
 <p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>conf</em>&nbsp;</td><td>configuration for libconflate</td></tr>
+  </table>
+</dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>true if libconflate was able to properly initialize itself </dd></dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 10:49:46 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 11:02:15 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

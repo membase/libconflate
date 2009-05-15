@@ -46,7 +46,12 @@
 <p>
 Load the key/value pairs from the file at the given path. 
 <p>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>NULL if the config could not be loaded for any reason. </dd></dl>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>filename</em>&nbsp;</td><td>the path from which the config should be read</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>the config, or NULL if the config could not be read for any reason </dd></dl>
 
 </div>
 </div><p>
@@ -78,12 +83,18 @@ Load the key/value pairs from the file at the given path.
 <p>
 Save a config at the given path. 
 <p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pairs</em>&nbsp;</td><td>the kvpairs to store </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>filename</em>&nbsp;</td><td>the path to which the config should be written</td></tr>
+  </table>
+</dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>false if the configuration could not be saved for any reason </dd></dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 10:49:47 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 11:02:15 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
