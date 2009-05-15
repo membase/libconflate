@@ -238,6 +238,8 @@ typedef struct {
 /**
  * The main entry point for starting a conflate agent.
  *
+ * @param conf configuration for libconflate
+ *
  * @return true if libconflate was able to properly initialize itself
  */
 bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result));
@@ -252,6 +254,10 @@ void free_string_list(char **);
 
 /**
  * Create a copy of a config.
+ *
+ * @param c the configuration to duplicate
+ *
+ * @return a deep copy of the configuration
  */
 conflate_config_t* dup_conf(conflate_config_t c);
 
@@ -263,13 +269,18 @@ conflate_config_t* dup_conf(conflate_config_t c);
 /**
  * Load the key/value pairs from the file at the given path.
  *
- * @return NULL if the config could not be loaded for any reason.
+ * @param filename the path from which the config should be read
+ *
+ * @return the config, or NULL if the config could not be read for any reason
  */
 kvpair_t* load_kvpairs(const char *filename)
     __attribute__ ((warn_unused_result, nonnull(1)));
 
 /**
  * Save a config at the given path.
+ *
+ * @param pairs the kvpairs to store
+ * @param filename the path to which the config should be written
  *
  * @return false if the configuration could not be saved for any reason
  */
