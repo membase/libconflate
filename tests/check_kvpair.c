@@ -124,6 +124,48 @@ START_TEST (test_find_missing_item)
 }
 END_TEST
 
+static void check_pair_equality(kvpair_t *one, kvpair_t *two)
+{
+    fail_if(one == NULL, "one is null.");
+    fail_if(one == two, "Comparing identical pairs.");
+    fail_unless(strcmp(one->key, two->key) == 0, "Keys don't match.");
+
+    int i = 0;
+    for (i=0; one->values[i]; i++) {
+        fail_unless(two->values[i] != NULL, "Value at one, but not two");
+        fail_unless(strcmp(one->values[i], two->values[i]) == 0,
+                    "Values don't match.");
+        fail_unless((one->values[i+1] != NULL && two->values[i+1] != NULL)
+                    || (one->values[i+1] == NULL && two->values[i+1] == NULL),
+                    "Unbalanced values.");
+
+    }
+
+    if (one->next) {
+        fail_unless(two->next != NULL, "No two->next.");
+        check_pair_equality(one->next, two->next);
+    } else {
+        fail_if(two->next, "No one->next, but a two->next");
+    }
+}
+
+START_TEST (test_copy_pair)
+{
+    char *args1[] = {"arg1", "arg2", NULL};
+    char *args2[] = {"other", NULL};
+    kvpair_t *pair1 = mk_kvpair("some_key", args1);
+    kvpair_t *pair2 = mk_kvpair("some_other_key", args2);
+    pair2->next = pair1;
+
+    kvpair_t *copy = dup_kvpair(pair2);
+    fail_if(copy == NULL, "Copy failed.");
+    fail_if(copy == pair2, "Copy something not an identity.");
+
+    fail_unless(strcmp(copy->key, pair2->key) == 0, "Keys don't match.");
+    fail_if(copy->key == pair2->key, "Keys were identical.");
+}
+END_TEST
+
 static Suite* kvpair_suite (void)
 {
     Suite *s = suite_create ("kvpair");
@@ -138,6 +180,7 @@ static Suite* kvpair_suite (void)
     tcase_add_test (tc_core, test_find_first_item);
     tcase_add_test (tc_core, test_find_second_item);
     tcase_add_test (tc_core, test_find_missing_item);
+    tcase_add_test (tc_core, test_copy_pair);
     suite_add_tcase (s, tc_core);
 
     return s;

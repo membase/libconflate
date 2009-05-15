@@ -66,3 +66,13 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
 
     return pair;
 }
+
+kvpair_t *dup_kvpair(kvpair_t *pair)
+{
+    assert(pair);
+    kvpair_t *copy = mk_kvpair(pair->key, pair->values);
+    if (pair->next) {
+        copy->next = dup_kvpair(pair->next);
+    }
+    return copy;
+}

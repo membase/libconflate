@@ -74,6 +74,12 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
     __attribute__ ((warn_unused_result, nonnull (2)));
 
 /**
+ * Copy a chain of kvpairs.
+ */
+kvpair_t *dup_kvpair(kvpair_t *pair)
+    __attribute__ ((warn_unused_result, nonnull (1)));
+
+/**
  * Free a chain of kvpairs.
  */
 void free_kvpair(kvpair_t* pair)
