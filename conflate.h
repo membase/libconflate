@@ -7,6 +7,22 @@
 
 #include <strophe.h>
 
+/*! \mainpage libconflate
+ *
+ * \section intro_sec Introduction
+ *
+ * libconflate is a library that helps you configure large
+ * installations of applications easily.
+ *
+ * It's designed to be easy to use, safe, and autonomous while still
+ * leveraging centralized resources to allow you to have your clusters
+ * easily adapt to change.
+ *
+ * \section docs_sec API Documentation
+ *
+ * Jump right into <a href="modules.html">the modules docs</a> to get started.
+ */
+
 /**
  * \defgroup Core
  */
