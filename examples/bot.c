@@ -23,7 +23,8 @@ static void display_config(void* userdata, kvpair_t* conf)
     }
 }
 
-static void do_stats(void* userdata, void* opaque, conflate_add_stat add_stat)
+static void do_stats(void* userdata, void* opaque,
+                     char* type, kvpair_t *form, conflate_add_stat add_stat)
 {
     add_stat(opaque, "stat1", "val1");
     add_stat(opaque, "stat2", "val2");

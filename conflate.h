@@ -174,8 +174,15 @@ typedef struct {
      * The client is expected to call the conflate_add_stat callback
      * once for every stat it wishes to report along with the given
      * opaque, followed by one invocation with two NULLs.
+     *
+     * @param udata The client's custom user data
+     * @param opaque an opaque value that must be supplied to the callback
+     * @param type primary stat type (may be NULL)
+     * @param form detailed stat request form (may be NULL)
+     * @param cb the callback into which stats will be fed
      */
-    void (*get_stats)(void*, void*, conflate_add_stat);
+    void (*get_stats)(void *udata, void *opaque, char *type, kvpair_t *form,
+                      conflate_add_stat cb);
 
     /**
      * Callback issued when libconflate wants to reset stats.

@@ -337,7 +337,7 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     xmpp_stanza_set_type(scontext.container, "result");
     add_and_release(cmd_res, scontext.container);
 
-    handle->conf->get_stats(handle->conf->userdata, &scontext, stat_adder);
+    handle->conf->get_stats(handle->conf->userdata, &scontext, NULL, NULL, stat_adder);
 
     assert(scontext.complete);
 
