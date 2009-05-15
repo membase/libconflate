@@ -38,80 +38,80 @@
 <a name="l00040"></a><a class="code" href="structkvpair.html#5d734e06894d8d15cac31bb04017998a">00040</a>     <span class="keyword">struct </span><a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a>* <a class="code" href="structkvpair.html#5d734e06894d8d15cac31bb04017998a" title="The next kv pair in this list.">next</a>;
 <a name="l00041"></a>00041 } <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>;
 <a name="l00042"></a>00042 
-<a name="l00053"></a>00053 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="group__kvpairs.html#g06d18d1cb1381b7d834d69dadf947fe7" title="Create a kvpair_t.">mk_kvpair</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* k, <span class="keywordtype">char</span>** v)
+<a name="l00053"></a>00053 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="group__kvpairs.html#ga6227dac14b148bf0124a9d35f12c7f9" title="Create a kvpair_t.">mk_kvpair</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* k, <span class="keywordtype">char</span>** v)
 <a name="l00054"></a>00054     __attribute__ ((warn_unused_result, nonnull (1)));
 <a name="l00055"></a>00055 
-<a name="l00062"></a>00062 <span class="keywordtype">void</span> <a class="code" href="group__kvpairs.html#ga7aaad8e91633ec2d49153dcd1162c91" title="Add a value to a kvpair_t.">add_kvpair_value</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a>, <span class="keyword">const</span> <span class="keywordtype">char</span>* value)
+<a name="l00062"></a>00062 <span class="keywordtype">void</span> <a class="code" href="group__kvpairs.html#g93a55c77de77a356d8eb0c4124c08cec" title="Add a value to a kvpair_t.">add_kvpair_value</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a>, <span class="keyword">const</span> <span class="keywordtype">char</span>* value)
 <a name="l00063"></a>00063     __attribute__ ((nonnull (1, 2)));
 <a name="l00064"></a>00064 
-<a name="l00073"></a>00073 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="group__kvpairs.html#g92d5ea9cb3bb23e6345bed8e400fce3f" title="Find a kvpair with the given key.">find_kvpair</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pair, <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structkvpair.html#30daf9e514ca735a0d5677fffa0868b9" title="The key in this kv pair.">key</a>)
+<a name="l00073"></a>00073 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="group__kvpairs.html#gfe43e55c132b92581f442543f03fd181" title="Find a kvpair with the given key.">find_kvpair</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pair, <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structkvpair.html#30daf9e514ca735a0d5677fffa0868b9" title="The key in this kv pair.">key</a>)
 <a name="l00074"></a>00074     __attribute__ ((warn_unused_result, nonnull (2)));
 <a name="l00075"></a>00075 
-<a name="l00079"></a>00079 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *<a class="code" href="group__kvpairs.html#gaa49483ed3308c068c3ac629dc144930" title="Copy a chain of kvpairs.">dup_kvpair</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *pair)
-<a name="l00080"></a>00080     __attribute__ ((warn_unused_result, nonnull (1)));
-<a name="l00081"></a>00081 
-<a name="l00085"></a>00085 <span class="keywordtype">void</span> <a class="code" href="group__kvpairs.html#gadb71dd8d55513bf01243097a29c80f8" title="Free a chain of kvpairs.">free_kvpair</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pair)
-<a name="l00086"></a>00086     __attribute__ ((nonnull (1)));
-<a name="l00087"></a>00087 
-<a name="l00106"></a><a class="code" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc">00106</a> <span class="keyword">typedef</span> void (*<a class="code" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc" title="Callback for conflate stats.">conflate_add_stat</a>)(<span class="keywordtype">void</span>* opaque, <span class="keyword">const</span> <span class="keywordtype">char</span> *k, <span class="keyword">const</span> <span class="keywordtype">char</span> *v);
-<a name="l00107"></a>00107 
-<a name="l00108"></a>00108 
-<a name="l00118"></a><a class="code" href="group___core.html#g97911227b507eef1dbcd54461cdf0398">00118</a> <span class="keyword">typedef</span> void (*<a class="code" href="group___core.html#g97911227b507eef1dbcd54461cdf0398" title="Callback for conflate ping reports.">conflate_add_ping_report</a>)(<span class="keywordtype">void</span>* opaque,
-<a name="l00119"></a>00119                                          <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">set</span>,
-<a name="l00120"></a>00120                                          <span class="keyword">const</span> <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pair);
-<a name="l00121"></a>00121 
-<a name="l00125"></a><a class="code" href="structconflate__config__t.html">00125</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>{
-<a name="l00126"></a>00126 
-<a name="l00128"></a><a class="code" href="structconflate__config__t.html#f50d437d55588dee8bfae48b50df3472">00128</a>     <span class="keywordtype">char</span> *jid;
-<a name="l00130"></a><a class="code" href="structconflate__config__t.html#30ac9525a98b1a37acc6876101729d58">00130</a>     <span class="keywordtype">char</span> *pass;
-<a name="l00137"></a><a class="code" href="structconflate__config__t.html#8a17cef47ef8338189845f2f490791b9">00137</a>     <span class="keywordtype">char</span> *host;
-<a name="l00138"></a>00138 
-<a name="l00144"></a><a class="code" href="structconflate__config__t.html#8375f4440596f25cb44554a9430ab5cc">00144</a>     <span class="keywordtype">char</span> *software;
-<a name="l00150"></a><a class="code" href="structconflate__config__t.html#dd8b76f27e59ca5bac58f8e156f2085a">00150</a>     <span class="keywordtype">char</span> *version;
-<a name="l00151"></a>00151 
-<a name="l00155"></a><a class="code" href="structconflate__config__t.html#ba88b8d50e4cbd4491f8de469bba49a0">00155</a>     <span class="keywordtype">char</span> *save_path;
-<a name="l00156"></a>00156 
-<a name="l00160"></a><a class="code" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7">00160</a>     <span class="keywordtype">void</span> *userdata;
-<a name="l00170"></a>00170     void (*new_config)(<span class="keywordtype">void</span>*, <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>*);
-<a name="l00184"></a>00184     void (*get_stats)(<span class="keywordtype">void</span> *udata, <span class="keywordtype">void</span> *opaque, <span class="keywordtype">char</span> *type, <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *form,
-<a name="l00185"></a>00185                       <a class="code" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc" title="Callback for conflate stats.">conflate_add_stat</a> cb);
-<a name="l00186"></a>00186 
-<a name="l00194"></a>00194     void (*reset_stats)(<span class="keywordtype">void</span> *udata, <span class="keywordtype">char</span> *type, <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *form);
-<a name="l00195"></a>00195 
-<a name="l00206"></a>00206     void (*ping_test)(<span class="keywordtype">void</span>* userdata, <span class="keywordtype">void</span>* opaque,
-<a name="l00207"></a>00207                       <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *form, <a class="code" href="group___core.html#g97911227b507eef1dbcd54461cdf0398" title="Callback for conflate ping reports.">conflate_add_ping_report</a> cb);
-<a name="l00208"></a>00208 
-<a name="l00209"></a>00209 } <a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a>;
-<a name="l00210"></a>00210 
-<a name="l00215"></a>00215 <span class="keyword">typedef</span> <span class="keyword">struct </span>{
+<a name="l00083"></a>00083 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *<a class="code" href="group__kvpairs.html#g10cd28ca5b56dbc5bfcc453d122126bf" title="Copy a chain of kvpairs.">dup_kvpair</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *pair)
+<a name="l00084"></a>00084     __attribute__ ((warn_unused_result, nonnull (1)));
+<a name="l00085"></a>00085 
+<a name="l00091"></a>00091 <span class="keywordtype">void</span> <a class="code" href="group__kvpairs.html#g975eadbba089155d7b46d133b0aa7180" title="Free a chain of kvpairs.">free_kvpair</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pair)
+<a name="l00092"></a>00092     __attribute__ ((nonnull (1)));
+<a name="l00093"></a>00093 
+<a name="l00112"></a><a class="code" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc">00112</a> <span class="keyword">typedef</span> void (*<a class="code" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc" title="Callback for conflate stats.">conflate_add_stat</a>)(<span class="keywordtype">void</span>* opaque, <span class="keyword">const</span> <span class="keywordtype">char</span> *k, <span class="keyword">const</span> <span class="keywordtype">char</span> *v);
+<a name="l00113"></a>00113 
+<a name="l00114"></a>00114 
+<a name="l00124"></a><a class="code" href="group___core.html#g97911227b507eef1dbcd54461cdf0398">00124</a> <span class="keyword">typedef</span> void (*<a class="code" href="group___core.html#g97911227b507eef1dbcd54461cdf0398" title="Callback for conflate ping reports.">conflate_add_ping_report</a>)(<span class="keywordtype">void</span>* opaque,
+<a name="l00125"></a>00125                                          <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">set</span>,
+<a name="l00126"></a>00126                                          <span class="keyword">const</span> <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pair);
+<a name="l00127"></a>00127 
+<a name="l00131"></a><a class="code" href="structconflate__config__t.html">00131</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>{
+<a name="l00132"></a>00132 
+<a name="l00134"></a><a class="code" href="structconflate__config__t.html#f50d437d55588dee8bfae48b50df3472">00134</a>     <span class="keywordtype">char</span> *jid;
+<a name="l00136"></a><a class="code" href="structconflate__config__t.html#30ac9525a98b1a37acc6876101729d58">00136</a>     <span class="keywordtype">char</span> *pass;
+<a name="l00143"></a><a class="code" href="structconflate__config__t.html#8a17cef47ef8338189845f2f490791b9">00143</a>     <span class="keywordtype">char</span> *host;
+<a name="l00144"></a>00144 
+<a name="l00150"></a><a class="code" href="structconflate__config__t.html#8375f4440596f25cb44554a9430ab5cc">00150</a>     <span class="keywordtype">char</span> *software;
+<a name="l00156"></a><a class="code" href="structconflate__config__t.html#dd8b76f27e59ca5bac58f8e156f2085a">00156</a>     <span class="keywordtype">char</span> *version;
+<a name="l00157"></a>00157 
+<a name="l00161"></a><a class="code" href="structconflate__config__t.html#ba88b8d50e4cbd4491f8de469bba49a0">00161</a>     <span class="keywordtype">char</span> *save_path;
+<a name="l00162"></a>00162 
+<a name="l00166"></a><a class="code" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7">00166</a>     <span class="keywordtype">void</span> *userdata;
+<a name="l00176"></a>00176     void (*new_config)(<span class="keywordtype">void</span>*, <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>*);
+<a name="l00190"></a>00190     void (*get_stats)(<span class="keywordtype">void</span> *udata, <span class="keywordtype">void</span> *opaque, <span class="keywordtype">char</span> *type, <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *form,
+<a name="l00191"></a>00191                       <a class="code" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc" title="Callback for conflate stats.">conflate_add_stat</a> cb);
+<a name="l00192"></a>00192 
+<a name="l00200"></a>00200     void (*reset_stats)(<span class="keywordtype">void</span> *udata, <span class="keywordtype">char</span> *type, <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *form);
+<a name="l00201"></a>00201 
+<a name="l00212"></a>00212     void (*ping_test)(<span class="keywordtype">void</span>* userdata, <span class="keywordtype">void</span>* opaque,
+<a name="l00213"></a>00213                       <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *form, <a class="code" href="group___core.html#g97911227b507eef1dbcd54461cdf0398" title="Callback for conflate ping reports.">conflate_add_ping_report</a> cb);
+<a name="l00214"></a>00214 
+<a name="l00215"></a>00215 } <a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a>;
 <a name="l00216"></a>00216 
-<a name="l00217"></a>00217     xmpp_ctx_t *ctx;
-<a name="l00218"></a>00218     xmpp_conn_t *conn;
-<a name="l00219"></a>00219     xmpp_log_t *log;
-<a name="l00220"></a>00220 
-<a name="l00221"></a>00221     <a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> *conf;
+<a name="l00221"></a>00221 <span class="keyword">typedef</span> <span class="keyword">struct </span>{
 <a name="l00222"></a>00222 
-<a name="l00223"></a>00223     pthread_t thread;
-<a name="l00224"></a>00224 
-<a name="l00225"></a>00225 } conflate_handle_t;
+<a name="l00223"></a>00223     xmpp_ctx_t *ctx;
+<a name="l00224"></a>00224     xmpp_conn_t *conn;
+<a name="l00225"></a>00225     xmpp_log_t *log;
 <a name="l00226"></a>00226 
-<a name="l00237"></a>00237 <span class="keywordtype">bool</span> <a class="code" href="group___core.html#g09916f5e65f5ab4875232f19e55e14c5" title="The main entry point for starting a conflate agent.">start_conflate</a>(<a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> conf) __attribute__ ((warn_unused_result));
-<a name="l00238"></a>00238 
-<a name="l00243"></a>00243 <span class="comment">/* Misc */</span>
-<a name="l00244"></a>00244 <span class="keywordtype">char</span>* safe_strdup(<span class="keyword">const</span> <span class="keywordtype">char</span>*);
-<a name="l00245"></a>00245 <span class="keywordtype">void</span> free_string_list(<span class="keywordtype">char</span> **);
-<a name="l00246"></a>00246 
-<a name="l00250"></a>00250 <a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a>* dup_conf(<a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> c);
-<a name="l00251"></a>00251 
-<a name="l00262"></a>00262 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="group___persistence.html#g6757c82f426eb3093b038f3c42bad6fd" title="Load the key/value pairs from the file at the given path.">load_kvpairs</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
-<a name="l00263"></a>00263     __attribute__ ((warn_unused_result, nonnull(1)));
-<a name="l00264"></a>00264 
-<a name="l00270"></a>00270 <span class="keywordtype">bool</span> <a class="code" href="group___persistence.html#gf94eded0f17eee3a86536683765befee" title="Save a config at the given path.">save_kvpairs</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pairs, <span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
-<a name="l00271"></a>00271     __attribute__ ((warn_unused_result, nonnull(1, 2)));
-<a name="l00272"></a>00272 
-<a name="l00277"></a>00277 <span class="preprocessor">#endif </span><span class="comment">/* CONFLATE_H */</span>
+<a name="l00227"></a>00227     <a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> *conf;
+<a name="l00228"></a>00228 
+<a name="l00229"></a>00229     pthread_t thread;
+<a name="l00230"></a>00230 
+<a name="l00231"></a>00231 } conflate_handle_t;
+<a name="l00232"></a>00232 
+<a name="l00243"></a>00243 <span class="keywordtype">bool</span> <a class="code" href="group___core.html#g1a3cec80d219a90587142dd6af14ed61" title="The main entry point for starting a conflate agent.">start_conflate</a>(<a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> conf) __attribute__ ((warn_unused_result));
+<a name="l00244"></a>00244 
+<a name="l00249"></a>00249 <span class="comment">/* Misc */</span>
+<a name="l00250"></a>00250 <span class="keywordtype">char</span>* safe_strdup(<span class="keyword">const</span> <span class="keywordtype">char</span>*);
+<a name="l00251"></a>00251 <span class="keywordtype">void</span> free_string_list(<span class="keywordtype">char</span> **);
+<a name="l00252"></a>00252 
+<a name="l00256"></a>00256 <a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a>* dup_conf(<a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> c);
+<a name="l00257"></a>00257 
+<a name="l00268"></a>00268 <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* <a class="code" href="group___persistence.html#g01e01d32436f2ed0cecd809d47acfd07" title="Load the key/value pairs from the file at the given path.">load_kvpairs</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
+<a name="l00269"></a>00269     __attribute__ ((warn_unused_result, nonnull(1)));
+<a name="l00270"></a>00270 
+<a name="l00276"></a>00276 <span class="keywordtype">bool</span> <a class="code" href="group___persistence.html#gcc66a814c44ea443d03fbac98a81c633" title="Save a config at the given path.">save_kvpairs</a>(<a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pairs, <span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
+<a name="l00277"></a>00277     __attribute__ ((warn_unused_result, nonnull(1, 2)));
+<a name="l00278"></a>00278 
+<a name="l00283"></a>00283 <span class="preprocessor">#endif </span><span class="comment">/* CONFLATE_H */</span>
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 10:26:31 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 10:49:46 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

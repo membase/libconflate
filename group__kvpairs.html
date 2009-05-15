@@ -28,32 +28,24 @@ typedef struct <a class="el" href="structkvpair.html">kvpair</a>&nbsp;</td><td c
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">A linked list of keys each which may have zero or more values. <br></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g06d18d1cb1381b7d834d69dadf947fe7">mk_kvpair</a> (const char *k, char **v) __attribute__((warn_unused_result</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#ga6227dac14b148bf0124a9d35f12c7f9">mk_kvpair</a> (const char *k, char **v)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create a kvpair_t.  <a href="#g06d18d1cb1381b7d834d69dadf947fe7"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="g985fd5f4f2804049f0064a0ac0fd6e14"></a><!-- doxytag: member="kvpairs::nonnull" ref="g985fd5f4f2804049f0064a0ac0fd6e14" args="(1)))" -->
-<a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><b>nonnull</b> (1)))</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create a kvpair_t.  <a href="#ga6227dac14b148bf0124a9d35f12c7f9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g93a55c77de77a356d8eb0c4124c08cec">add_kvpair_value</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *<a class="el" href="structkvpair.html">kvpair</a>, const char *value)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#ga7aaad8e91633ec2d49153dcd1162c91">add_kvpair_value</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *<a class="el" href="structkvpair.html">kvpair</a>, const char *value) __attribute__((nonnull(1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a value to a kvpair_t.  <a href="#g93a55c77de77a356d8eb0c4124c08cec"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#gfe43e55c132b92581f442543f03fd181">find_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair, const char *key)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a value to a kvpair_t.  <a href="#ga7aaad8e91633ec2d49153dcd1162c91"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void <a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g92d5ea9cb3bb23e6345bed8e400fce3f">find_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair, const char *key) __attribute__((warn_unused_result</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Find a <a class="el" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a> with the given key.  <a href="#gfe43e55c132b92581f442543f03fd181"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g10cd28ca5b56dbc5bfcc453d122126bf">dup_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Find a <a class="el" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a> with the given key.  <a href="#g92d5ea9cb3bb23e6345bed8e400fce3f"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="g3c6df025406e53617a61089199cf53c4"></a><!-- doxytag: member="kvpairs::nonnull" ref="g3c6df025406e53617a61089199cf53c4" args="(2)))" -->
-void <a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><b>nonnull</b> (2)))</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copy a chain of kvpairs.  <a href="#g10cd28ca5b56dbc5bfcc453d122126bf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g975eadbba089155d7b46d133b0aa7180">free_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="gaa49483ed3308c068c3ac629dc144930"></a><!-- doxytag: member="kvpairs::dup_kvpair" ref="gaa49483ed3308c068c3ac629dc144930" args="(kvpair_t *pair) __attribute__((warn_unused_result" -->
-<a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#gaa49483ed3308c068c3ac629dc144930">dup_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair) __attribute__((warn_unused_result</td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copy a chain of kvpairs. <br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="gadb71dd8d55513bf01243097a29c80f8"></a><!-- doxytag: member="kvpairs::free_kvpair" ref="gadb71dd8d55513bf01243097a29c80f8" args="(kvpair_t *pair) __attribute__((nonnull(1)))" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#gadb71dd8d55513bf01243097a29c80f8">free_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair) __attribute__((nonnull(1)))</td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Free a chain of kvpairs. <br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Free a chain of kvpairs.  <a href="#g975eadbba089155d7b46d133b0aa7180"></a><br></td></tr>
 </table>
 <hr><h2>Function Documentation</h2>
-<a class="anchor" name="ga7aaad8e91633ec2d49153dcd1162c91"></a><!-- doxytag: member="conflate.h::add_kvpair_value" ref="ga7aaad8e91633ec2d49153dcd1162c91" args="(kvpair_t *kvpair, const char *value) __attribute__((nonnull(1" -->
+<a class="anchor" name="g93a55c77de77a356d8eb0c4124c08cec"></a><!-- doxytag: member="conflate.h::add_kvpair_value" ref="g93a55c77de77a356d8eb0c4124c08cec" args="(kvpair_t *kvpair, const char *value)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -88,14 +80,67 @@ Add a value to a kvpair_t.
   </table>
 </dl>
 
+<p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group__kvpairs_g93a55c77de77a356d8eb0c4124c08cec_icgraph.png" border="0" usemap="#group__kvpairs_g93a55c77de77a356d8eb0c4124c08cec_icgraph_map" alt=""></center>
+<map name="group__kvpairs_g93a55c77de77a356d8eb0c4124c08cec_icgraph_map">
+<area shape="rect" id="node3" href="group__kvpairs.html#ga6227dac14b148bf0124a9d35f12c7f9" title="Create a kvpair_t." alt="" coords="189,29,277,59"><area shape="rect" id="node5" href="group__kvpairs.html#g10cd28ca5b56dbc5bfcc453d122126bf" title="Copy a chain of kvpairs." alt="" coords="327,29,417,59"></map>
+</div>
+
 </div>
 </div><p>
-<a class="anchor" name="g92d5ea9cb3bb23e6345bed8e400fce3f"></a><!-- doxytag: member="conflate.h::find_kvpair" ref="g92d5ea9cb3bb23e6345bed8e400fce3f" args="(kvpair_t *pair, const char *key) __attribute__((warn_unused_result" -->
+<a class="anchor" name="g10cd28ca5b56dbc5bfcc453d122126bf"></a><!-- doxytag: member="conflate.h::dup_kvpair" ref="g10cd28ca5b56dbc5bfcc453d122126bf" args="(kvpair_t *pair)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="structkvpair.html">kvpair_t</a>* find_kvpair           </td>
+          <td class="memname"><a class="el" href="structkvpair.html">kvpair_t</a>* dup_kvpair           </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td>
+          <td class="paramname"> <em>pair</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Copy a chain of kvpairs. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>the pair to duplicate (recursively)</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>a complete deep copy of the <a class="el" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a> structure </dd></dl>
+
+<p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group__kvpairs_g10cd28ca5b56dbc5bfcc453d122126bf_cgraph.png" border="0" usemap="#group__kvpairs_g10cd28ca5b56dbc5bfcc453d122126bf_cgraph_map" alt=""></center>
+<map name="group__kvpairs_g10cd28ca5b56dbc5bfcc453d122126bf_cgraph_map">
+<area shape="rect" id="node4" href="group__kvpairs.html#ga6227dac14b148bf0124a9d35f12c7f9" title="Create a kvpair_t." alt="" coords="147,29,235,59"><area shape="rect" id="node6" href="group__kvpairs.html#g93a55c77de77a356d8eb0c4124c08cec" title="Add a value to a kvpair_t." alt="" coords="284,29,417,59"></map>
+</div>
+
+<p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group__kvpairs_g10cd28ca5b56dbc5bfcc453d122126bf_icgraph.png" border="0" usemap="#group__kvpairs_g10cd28ca5b56dbc5bfcc453d122126bf_icgraph_map" alt=""></center>
+</div>
+
+</div>
+</div><p>
+<a class="anchor" name="gfe43e55c132b92581f442543f03fd181"></a><!-- doxytag: member="conflate.h::find_kvpair" ref="gfe43e55c132b92581f442543f03fd181" args="(kvpair_t *pair, const char *key)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structkvpair.html">kvpair_t</a>* find_kvpair           </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td>
           <td class="paramname"> <em>pair</em>, </td>
@@ -128,7 +173,48 @@ Find a <a class="el" href="structkvpair.html" title="A linked list of keys each 
 
 </div>
 </div><p>
-<a class="anchor" name="g06d18d1cb1381b7d834d69dadf947fe7"></a><!-- doxytag: member="conflate.h::mk_kvpair" ref="g06d18d1cb1381b7d834d69dadf947fe7" args="(const char *k, char **v) __attribute__((warn_unused_result" -->
+<a class="anchor" name="g975eadbba089155d7b46d133b0aa7180"></a><!-- doxytag: member="conflate.h::free_kvpair" ref="g975eadbba089155d7b46d133b0aa7180" args="(kvpair_t *pair)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void free_kvpair           </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td>
+          <td class="paramname"> <em>pair</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Free a chain of kvpairs. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>the pair to free (recursively) </td></tr>
+  </table>
+</dl>
+
+<p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group__kvpairs_g975eadbba089155d7b46d133b0aa7180_cgraph.png" border="0" usemap="#group__kvpairs_g975eadbba089155d7b46d133b0aa7180_cgraph_map" alt=""></center>
+</div>
+
+<p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group__kvpairs_g975eadbba089155d7b46d133b0aa7180_icgraph.png" border="0" usemap="#group__kvpairs_g975eadbba089155d7b46d133b0aa7180_icgraph_map" alt=""></center>
+</div>
+
+</div>
+</div><p>
+<a class="anchor" name="ga6227dac14b148bf0124a9d35f12c7f9"></a><!-- doxytag: member="conflate.h::mk_kvpair" ref="ga6227dac14b148bf0124a9d35f12c7f9" args="(const char *k, char **v)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -165,10 +251,28 @@ When building out a <a class="el" href="structkvpair.html" title="A linked list 
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>a newly allocated kvpair_t </dd></dl>
 
+<p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group__kvpairs_ga6227dac14b148bf0124a9d35f12c7f9_cgraph.png" border="0" usemap="#group__kvpairs_ga6227dac14b148bf0124a9d35f12c7f9_cgraph_map" alt=""></center>
+<map name="group__kvpairs_ga6227dac14b148bf0124a9d35f12c7f9_cgraph_map">
+<area shape="rect" id="node3" href="group__kvpairs.html#g93a55c77de77a356d8eb0c4124c08cec" title="Add a value to a kvpair_t." alt="" coords="143,5,276,35"></map>
+</div>
+
+<p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group__kvpairs_ga6227dac14b148bf0124a9d35f12c7f9_icgraph.png" border="0" usemap="#group__kvpairs_ga6227dac14b148bf0124a9d35f12c7f9_icgraph_map" alt=""></center>
+<map name="group__kvpairs_ga6227dac14b148bf0124a9d35f12c7f9_icgraph_map">
+<area shape="rect" id="node3" href="group__kvpairs.html#g10cd28ca5b56dbc5bfcc453d122126bf" title="Copy a chain of kvpairs." alt="" coords="143,29,233,59"></map>
+</div>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 10:26:31 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 10:49:47 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
