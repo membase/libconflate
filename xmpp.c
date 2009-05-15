@@ -357,7 +357,7 @@ static xmpp_stanza_t* process_reset_stats(const char *cmd,
     /* Only direct stat requests are handled. */
     assert(direct);
 
-    handle->conf->reset_stats(handle->conf->userdata);
+    handle->conf->reset_stats(handle->conf->userdata, NULL, NULL);
 
     xmpp_stanza_t* cmd_res = xmpp_stanza_new(ctx);
 

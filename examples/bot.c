@@ -31,7 +31,7 @@ static void do_stats(void* userdata, void* opaque,
     add_stat(opaque, NULL, NULL);
 }
 
-static void do_reset_stats(void* userdata)
+static void do_reset_stats(void* userdata, char *type, kvpair_t *form)
 {
     printf("Resetting stats...\n");
 }

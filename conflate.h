@@ -186,8 +186,12 @@ typedef struct {
 
     /**
      * Callback issued when libconflate wants to reset stats.
+     *
+     * @param udata the client's custom user data
+     * @param type stat type to clear (may be NULL)
+     * @param form detailed stat request form (may be NULL)
      */
-    void (*reset_stats)(void*);
+    void (*reset_stats)(void *udata, char *type, kvpair_t *form);
 
     /**
      * Callback issued when libconflate would like to run a ping test
