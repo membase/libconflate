@@ -10,7 +10,8 @@ examples_bot_DEPENDENCIES = libconflate.a
 examples_bot_SOURCES = examples/bot.c
 examples_bot_LDADD = -L. -lconflate
 
-libconflate_a_SOURCES = conflate.h kvpair.c util.c persist.c xmpp.c
+libconflate_a_SOURCES = conflate.h conflate_convenience.h kvpair.c util.c \
+	persist.c xmpp.c
 
 .PHONY: docs
 docs:

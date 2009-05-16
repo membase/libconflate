@@ -201,7 +201,8 @@ typedef struct {
      * @param level log level (see ::conflate_log_level)
      * @param msg the message to log
      */
-    void (*log)(void *udata, enum conflate_log_level level, const char *msg);
+    void (*log)(void *udata, enum conflate_log_level level, const char *msg, ...)
+        __attribute__ ((format (printf, 3, 4)));
 
     /**
      * Callback issued when a new configuration is to be activated.
@@ -264,7 +265,6 @@ typedef struct {
 
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
-    xmpp_log_t *log;
 
     conflate_config_t *conf;
 
