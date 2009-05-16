@@ -241,7 +241,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     conf = grok_form(fields);
 
     /* Persist the config lists */
-    if (!save_kvpairs(conf, handle->conf->save_path)) {
+    if (!save_kvpairs(handle, conf, handle->conf->save_path)) {
         CONFLATE_LOG(handle, ERROR, "Can not save config to %s",
                      handle->conf->save_path);
     }
@@ -666,7 +666,7 @@ static void* run_conflate(void *arg) {
     conflate_handle_t* handle = (conflate_handle_t*)arg;
 
     /* Before connecting and all that, load the stored config */
-    kvpair_t* conf = load_kvpairs(handle->conf->save_path);
+    kvpair_t* conf = load_kvpairs(handle, handle->conf->save_path);
     if (conf) {
         handle->conf->new_config(handle->conf->userdata, conf);
         free_kvpair(conf);

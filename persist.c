@@ -6,6 +6,7 @@
 #include <sqlite3.h>
 
 #include "conflate.h"
+#include "conflate_convenience.h"
 
 #define HAS_KEYS   1
 #define HAS_VALUES 2
@@ -109,7 +110,8 @@ static bool initialize_db(sqlite3 *db)
     return rv;
 }
 
-bool save_kvpairs(kvpair_t* kvpair, const char *filename)
+bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
+                  const char *filename)
 {
     bool rv = false;
     int err = 0, steps_run = 0;
@@ -229,7 +231,7 @@ static int append_kvpair_from_db(void* arg, int n, char **vals, char **cols)
     return SQLITE_OK;
 }
 
-kvpair_t* load_kvpairs(const char *filename)
+kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
 {
     char* errmsg = NULL;
     sqlite3 *db = NULL;

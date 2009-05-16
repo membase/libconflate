@@ -320,23 +320,25 @@ conflate_config_t* dup_conf(conflate_config_t c);
 /**
  * Load the key/value pairs from the file at the given path.
  *
+ * @param handle the conflate handle (for logging contexts and stuff)
  * @param filename the path from which the config should be read
  *
  * @return the config, or NULL if the config could not be read for any reason
  */
-kvpair_t* load_kvpairs(const char *filename)
-    __attribute__ ((warn_unused_result, nonnull(1)));
+kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
+    __attribute__ ((warn_unused_result, nonnull(1, 2)));
 
 /**
  * Save a config at the given path.
  *
+ * @param handle the conflate handle (for logging contexts and stuff)
  * @param pairs the kvpairs to store
  * @param filename the path to which the config should be written
  *
  * @return false if the configuration could not be saved for any reason
  */
-bool save_kvpairs(kvpair_t* pairs, const char *filename)
-    __attribute__ ((warn_unused_result, nonnull(1, 2)));
+bool save_kvpairs(conflate_handle_t *handle, kvpair_t* pairs, const char *filename)
+    __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 
 /**
  * @}
