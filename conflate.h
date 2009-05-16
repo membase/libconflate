@@ -195,7 +195,10 @@ typedef struct {
     void *userdata;
 
     /**
-     * Logging callback.
+     * Logging callback (optional).
+     *
+     * If you do not specify a logger, one will be suplied for you
+     * that sends a lot of stuff to stderr.
      *
      * @param udata The client's custom user data
      * @param level log level (see ::conflate_log_level)
