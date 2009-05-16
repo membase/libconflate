@@ -29,6 +29,18 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#g97911227b507eef1dbcd54461cdf0398">conflate_add_ping_report</a> )(void *opaque, const char *set, const <a class="el" href="structkvpair.html">kvpair_t</a> *pair)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback for conflate ping reports.  <a href="#g97911227b507eef1dbcd54461cdf0398"></a><br></td></tr>
+<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a> { <br>
+&nbsp;&nbsp;<a class="el" href="group___core.html#ggd731674cf91ee0dae60a8b64e6b5d8140593585da9181e972974c1274d8f2b4f">DEBUG</a>, 
+<a class="el" href="group___core.html#ggd731674cf91ee0dae60a8b64e6b5d814748005382152808a72b1a9177d9dc806">INFO</a>, 
+<a class="el" href="group___core.html#ggd731674cf91ee0dae60a8b64e6b5d81474dac7ac23d5b810db6d4067f14e8676">WARN</a>, 
+<a class="el" href="group___core.html#ggd731674cf91ee0dae60a8b64e6b5d8142fd6f336d08340583bd620a7f5694c90">ERROR</a>, 
+<br>
+&nbsp;&nbsp;<a class="el" href="group___core.html#ggd731674cf91ee0dae60a8b64e6b5d814651d8a47a6976d6fe05c0e03fb4cd2d0">FATAL</a>
+<br>
+ }</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Log levels.  <a href="group___core.html#gd731674cf91ee0dae60a8b64e6b5d814">More...</a><br></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#g01166c7b5298facebdca3e5744ce9ed9">init_conflate</a> (<a class="el" href="structconflate__config__t.html">conflate_config_t</a> *conf)</td></tr>
 
@@ -88,6 +100,38 @@ The key and value parameters represent the stat name and value that should be re
 
 </div>
 </div><p>
+<hr><h2>Enumeration Type Documentation</h2>
+<a class="anchor" name="gd731674cf91ee0dae60a8b64e6b5d814"></a><!-- doxytag: member="conflate.h::conflate_log_level" ref="gd731674cf91ee0dae60a8b64e6b5d814" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group___core.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Log levels. 
+<p>
+<dl compact><dt><b>Enumerator: </b></dt><dd>
+<table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" name="ggd731674cf91ee0dae60a8b64e6b5d8140593585da9181e972974c1274d8f2b4f"></a><!-- doxytag: member="DEBUG" ref="ggd731674cf91ee0dae60a8b64e6b5d8140593585da9181e972974c1274d8f2b4f" args="" -->DEBUG</em>&nbsp;</td><td>
+Various debug messages (for example xmpp stanzas). </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="ggd731674cf91ee0dae60a8b64e6b5d814748005382152808a72b1a9177d9dc806"></a><!-- doxytag: member="INFO" ref="ggd731674cf91ee0dae60a8b64e6b5d814748005382152808a72b1a9177d9dc806" args="" -->INFO</em>&nbsp;</td><td>
+Info messages that might be helpful. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="ggd731674cf91ee0dae60a8b64e6b5d81474dac7ac23d5b810db6d4067f14e8676"></a><!-- doxytag: member="WARN" ref="ggd731674cf91ee0dae60a8b64e6b5d81474dac7ac23d5b810db6d4067f14e8676" args="" -->WARN</em>&nbsp;</td><td>
+Warnings of stuff going bad. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="ggd731674cf91ee0dae60a8b64e6b5d8142fd6f336d08340583bd620a7f5694c90"></a><!-- doxytag: member="ERROR" ref="ggd731674cf91ee0dae60a8b64e6b5d8142fd6f336d08340583bd620a7f5694c90" args="" -->ERROR</em>&nbsp;</td><td>
+Noteworthy error conditions. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="ggd731674cf91ee0dae60a8b64e6b5d814651d8a47a6976d6fe05c0e03fb4cd2d0"></a><!-- doxytag: member="FATAL" ref="ggd731674cf91ee0dae60a8b64e6b5d814651d8a47a6976d6fe05c0e03fb4cd2d0" args="" -->FATAL</em>&nbsp;</td><td>
+The rapture is upon us. </td></tr>
+</table>
+</dl>
+
+</div>
+</div><p>
 <hr><h2>Function Documentation</h2>
 <a class="anchor" name="g01166c7b5298facebdca3e5744ce9ed9"></a><!-- doxytag: member="conflate.h::init_conflate" ref="g01166c7b5298facebdca3e5744ce9ed9" args="(conflate_config_t *conf)" -->
 <div class="memitem">
@@ -111,7 +155,7 @@ Initilize the given configuration to defaults.
 This should be called *before* you fill in your config.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>config</em>&nbsp;</td><td>configuration to be initialized </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>conf</em>&nbsp;</td><td>configuration to be initialized </td></tr>
   </table>
 </dl>
 
@@ -146,7 +190,7 @@ The main entry point for starting a conflate agent.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 15:38:22 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 17:51:23 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

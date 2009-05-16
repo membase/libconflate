@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>LibConflate: File Index</title>
+<title>LibConflate: conflate_convenience.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -16,16 +16,14 @@
   </div>
   <div class="tabs">
     <ul>
-      <li class="current"><a href="files.html"><span>File&nbsp;List</span></a></li>
+      <li><a href="files.html"><span>File&nbsp;List</span></a></li>
     </ul>
   </div>
-</div>
-<div class="contents">
-<h1>File List</h1>Here is a list of all documented files with brief descriptions:<table>
-  <tr><td class="indexkey"><b>conflate.h</b> <a href="conflate_8h-source.html">[code]</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><b>conflate_convenience.h</b> <a href="conflate__convenience_8h-source.html">[code]</a></td><td class="indexvalue"></td></tr>
-</table>
-</div>
+<h1>conflate_convenience.h</h1><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/* Convenience stuff that shouldn't be part of the API */</span>
+<a name="l00002"></a>00002 
+<a name="l00003"></a>00003 <span class="preprocessor">#define CONFLATE_LOG(handle, level, msg, args...)                   \</span>
+<a name="l00004"></a>00004 <span class="preprocessor">    handle-&gt;conf-&gt;log(handle-&gt;conf-&gt;userdata, level, msg, ##args)</span>
+</pre></div></div>
 <hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 17:51:23 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
