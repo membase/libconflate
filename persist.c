@@ -25,17 +25,22 @@
 /* safety-net */
 #define MAX_STEPS 1024
 
+struct table_mask_userdata {
+    int found;
+    conflate_handle_t *handle;
+};
+
 static int set_table_mask(void* arg, int n, char **vals, char **cols)
 {
-    int* out = (int*)arg;
+    struct table_mask_userdata *udata = (struct table_mask_userdata*)arg;
     assert(n == 1);
 
     if (strcmp(vals[0], "keys") == 0) {
-        *out |= HAS_KEYS;
+        udata->found |= HAS_KEYS;
     } else if(strcmp(vals[0], "vals") == 0) {
-        *out |= HAS_VALUES;
+        udata->found |= HAS_VALUES;
     } else {
-        fprintf(stderr, "Warning:  Unknown table:  %s\n", vals[0]);
+        CONFLATE_LOG(udata->handle, WARN, "Unknown table:  %s", vals[0]);
     }
 
     return SQLITE_OK;
@@ -52,13 +57,13 @@ static char* get_table_name(int flag) {
     }
 }
 
-static bool db_do(sqlite3 *db, const char* query)
+static bool db_do(conflate_handle_t *handle, sqlite3 *db, const char* query)
 {
     char* errmsg = NULL;
     bool rv = true;
 
     if (sqlite3_exec(db, query, NULL, NULL, &errmsg) != SQLITE_OK) {
-        fprintf(stderr, "DB Error:  %s\n%s\n", errmsg, query);
+        CONFLATE_LOG(handle, ERROR, "DB Error:  %s\n%s", errmsg, query);
         sqlite3_free(errmsg);
         rv = false;
     }
@@ -66,7 +71,9 @@ static bool db_do(sqlite3 *db, const char* query)
     return rv;
 }
 
-static bool maybe_create_table(sqlite3 *db, int flag, int flags, const char* query)
+static bool maybe_create_table(conflate_handle_t *handle,
+                               sqlite3 *db, int flag, int flags,
+                               const char* query)
 {
     assert(db);
     assert(query);
@@ -75,12 +82,12 @@ static bool maybe_create_table(sqlite3 *db, int flag, int flags, const char* que
     char* table_name = get_table_name(flag);
 
     if (flag & flags) {
-        fprintf(stderr, "Table %s already exists\n", table_name);
+        CONFLATE_LOG(handle, DEBUG, "Table %s already exists", table_name);
     } else {
-        if (db_do(db, query)) {
-            fprintf(stderr, "Created table: %s\n", table_name);
+        if (db_do(handle, db, query)) {
+            CONFLATE_LOG(handle, INFO, "Created table:  %s", table_name);
         } else {
-            fprintf(stderr, "DB error creating %s\n", table_name);
+            CONFLATE_LOG(handle, WARN, "DB error creating table:  %s", table_name);
             rv = false;
         }
     }
@@ -88,9 +95,8 @@ static bool maybe_create_table(sqlite3 *db, int flag, int flags, const char* que
     return rv;
 }
 
-static bool initialize_db(sqlite3 *db)
+static bool initialize_db(conflate_handle_t *handle, sqlite3 *db)
 {
-    int found_tables = 0;
     bool rv = true;
     char *errmsg = NULL;
     char* query = "SELECT name FROM sqlite_master "
@@ -99,12 +105,14 @@ static bool initialize_db(sqlite3 *db)
 
     assert(db);
 
-    if (sqlite3_exec(db, query, set_table_mask, &found_tables, &errmsg) != SQLITE_OK) {
-        fprintf(stderr, "DB error:  %s\n", errmsg);
+    struct table_mask_userdata udata = { 0, handle };
+
+    if (sqlite3_exec(db, query, set_table_mask, &udata, &errmsg) != SQLITE_OK) {
+        CONFLATE_LOG(handle, ERROR, "DB error:  %s", errmsg);
         sqlite3_free(errmsg);
     } else {
-        rv &= maybe_create_table(db, HAS_KEYS, found_tables, CREATE_KEYS);
-        rv &= maybe_create_table(db, HAS_VALUES, found_tables, CREATE_VALUES);
+        rv &= maybe_create_table(handle, db, HAS_KEYS, udata.found, CREATE_KEYS);
+        rv &= maybe_create_table(handle, db, HAS_VALUES, udata.found, CREATE_VALUES);
     }
 
     return rv;
@@ -123,22 +131,22 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
         goto finished;
     }
 
-    if (!initialize_db(db)) {
-        fprintf(stderr, "Error initializing tables.\n");
+    if (!initialize_db(handle, db)) {
+        CONFLATE_LOG(handle, ERROR, "Error initializing tables");
         goto finished;
     }
 
-    if (!db_do(db, "begin transaction")) {
+    if (!db_do(handle, db, "begin transaction")) {
         goto finished;
     }
 
     /* Cleanup the existing stuff */
 
-    if (!db_do(db, "delete from keys")) {
+    if (!db_do(handle, db, "delete from keys")) {
         goto finished;
     }
 
-    if (!db_do(db, "delete from vals")) {
+    if (!db_do(handle, db, "delete from vals")) {
         goto finished;
     }
 
@@ -167,7 +175,7 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
         while ((rc = sqlite3_step(ins_keys)) != SQLITE_DONE) {
             steps_run++;
             assert(steps_run < MAX_STEPS);
-            fprintf(stderr, "keys step result:  %d\n", rc);
+            CONFLATE_LOG(handle, DEBUG, "keys step result: %d", rc);
         }
 
         key_id = sqlite3_last_insert_rowid(db);
@@ -181,7 +189,7 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
             while ((rc = sqlite3_step(ins_vals)) != SQLITE_DONE) {
                 steps_run++;
                 assert(steps_run < MAX_STEPS);
-                fprintf(stderr, "vals step result:  %d\n", rc);
+                CONFLATE_LOG(handle, DEBUG, "vals step result:  %d", rc);
             }
 
             sqlite3_reset(ins_vals);
@@ -192,7 +200,7 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
         kvpair = kvpair -> next;
     }
 
-    if (!db_do(db, "commit")) {
+    if (!db_do(handle, db, "commit")) {
         goto finished;
     }
 
@@ -200,7 +208,8 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
 
  finished:
     if (sqlite3_errcode(db) != SQLITE_OK) {
-        fprintf(stderr, "DB error %d:  %s\n", sqlite3_errcode(db), sqlite3_errmsg(db));
+        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+                     sqlite3_errcode(db), sqlite3_errmsg(db));
     }
 
     if (ins_keys) {
@@ -247,9 +256,10 @@ kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
 
  finished:
     if (sqlite3_errcode(db) != SQLITE_OK) {
-        fprintf(stderr, "DB error %d:  %s\n", sqlite3_errcode(db), sqlite3_errmsg(db));
+        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+                     sqlite3_errcode(db), sqlite3_errmsg(db));
         if (errmsg) {
-            fprintf(stderr, "  %s\n", errmsg);
+            CONFLATE_LOG(handle, ERROR, "  %s", errmsg);
             sqlite3_free(errmsg);
         }
     }
