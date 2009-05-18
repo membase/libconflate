@@ -659,7 +659,7 @@ static void conflate_strophe_logger(void *const userdata,
     }
 
     conflate_handle_t *handle = (conflate_handle_t*)userdata;
-    CONFLATE_LOG(handle, lvl, msg);
+    CONFLATE_LOG(handle, lvl, "%s", msg);
 }
 
 static void* run_conflate(void *arg) {
