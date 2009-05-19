@@ -24,7 +24,8 @@ static void ping_test_cb(void* userdata, void* opaque,
 {
 }
 
-static void log_cb(void *userdata, enum conflate_log_level level, const char *msg)
+static void log_cb(void *userdata, enum conflate_log_level level,
+                   const char *fmt, ...)
 {
 }
 
