@@ -163,6 +163,7 @@ START_TEST (test_copy_pair)
 
     fail_unless(strcmp(copy->key, pair2->key) == 0, "Keys don't match.");
     fail_if(copy->key == pair2->key, "Keys were identical.");
+    check_pair_equality(pair2, copy);
 }
 END_TEST
 
