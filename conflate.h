@@ -57,6 +57,19 @@ typedef struct kvpair {
 } kvpair_t;
 
 /**
+ * Visitor callback for walking a kvpair_t.
+ *
+ * @param opaque opaque value passed into walk
+ * @param key the kvpair_t key
+ * @param values the kvpair_t values
+ *
+ * @return true if traversal should continue
+ */
+typedef bool (*kvpair_visitor_t)(void *opaque,
+                                 const char *name,
+                                 const char **values);
+
+/**
  * Create a kvpair_t.
  *
  * When building out a kvpair chain, one would presumably set the
@@ -98,6 +111,16 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
  */
 kvpair_t *dup_kvpair(kvpair_t *pair)
     __attribute__ ((warn_unused_result, nonnull (1)));
+
+/**
+ * Walk a kvpair.
+ *
+ * @param pair the kvpair to walk
+ * @param opaque a value to be transparently passed to the visitor
+ * @param visitor the visitor to call for each kvpair_t
+ */
+void walk_kvpair(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)
+    __attribute__ ((nonnull(1, 3)));
 
 /**
  * Free a chain of kvpairs.

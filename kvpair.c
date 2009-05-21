@@ -56,6 +56,17 @@ void free_kvpair(kvpair_t* pair)
     free(pair);
 }
 
+void walk_kvpair(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)
+{
+    bool keep_going = true;
+    while (keep_going && pair) {
+        keep_going = visitor(opaque,
+                             (const char*)pair->key,
+                             (const char **)pair->values);
+        pair = pair->next;
+    }
+}
+
 kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
 {
     assert(key);

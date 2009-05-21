@@ -167,6 +167,51 @@ START_TEST (test_copy_pair)
 }
 END_TEST
 
+static bool walk_incr_count_true(void *opaque,
+                                 const char *key, const char **values)
+{
+    (*(int*)opaque)++;
+    return true;
+}
+
+static bool walk_incr_count_false(void *opaque,
+                                  const char *key, const char **values)
+{
+    (*(int*)opaque)++;
+    return false;
+}
+
+START_TEST (test_walk_true)
+{
+    char *args1[] = {"arg1", "arg2", NULL};
+    char *args2[] = {"other", NULL};
+    kvpair_t *pair1 = mk_kvpair("some_key", args1);
+    kvpair_t *pair2 = mk_kvpair("some_other_key", args2);
+    pair2->next = pair1;
+
+    int count = 0;
+    walk_kvpair(pair2, &count, walk_incr_count_true);
+
+    fail_unless(count == 2, "Count was not two");
+}
+END_TEST
+
+START_TEST (test_walk_false)
+{
+    char *args1[] = {"arg1", "arg2", NULL};
+    char *args2[] = {"other", NULL};
+    kvpair_t *pair1 = mk_kvpair("some_key", args1);
+    kvpair_t *pair2 = mk_kvpair("some_other_key", args2);
+    pair2->next = pair1;
+
+    int count = 0;
+    walk_kvpair(pair2, &count, walk_incr_count_false);
+
+    printf("Count was %d\n", count);
+    fail_unless(count == 1, "Count was not one");
+}
+END_TEST
+
 static Suite* kvpair_suite (void)
 {
     Suite *s = suite_create ("kvpair");
@@ -182,6 +227,8 @@ static Suite* kvpair_suite (void)
     tcase_add_test (tc_core, test_find_second_item);
     tcase_add_test (tc_core, test_find_missing_item);
     tcase_add_test (tc_core, test_copy_pair);
+    tcase_add_test (tc_core, test_walk_true);
+    tcase_add_test (tc_core, test_walk_false);
     suite_add_tcase (s, tc_core);
 
     return s;
