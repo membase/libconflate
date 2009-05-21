@@ -27,6 +27,9 @@
 typedef struct <a class="el" href="structkvpair.html">kvpair</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#gd4516a8d20e602fa9b1941563af08f16">kvpair_t</a></td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">A linked list of keys each which may have zero or more values. <br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef bool(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g868812a603b6bd17c2e026489b896166">kvpair_visitor_t</a> )(void *opaque, const char *name, const char **values)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Visitor callback for walking a kvpair_t.  <a href="#g868812a603b6bd17c2e026489b896166"></a><br></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#ga6227dac14b148bf0124a9d35f12c7f9">mk_kvpair</a> (const char *k, char **v)</td></tr>
 
@@ -40,10 +43,39 @@ typedef struct <a class="el" href="structkvpair.html">kvpair</a>&nbsp;</td><td c
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g10cd28ca5b56dbc5bfcc453d122126bf">dup_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copy a chain of kvpairs.  <a href="#g10cd28ca5b56dbc5bfcc453d122126bf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g897182a91291ee670be08ce26321a1c2">walk_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair, void *opaque, <a class="el" href="group__kvpairs.html#g868812a603b6bd17c2e026489b896166">kvpair_visitor_t</a> visitor)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Walk a <a class="el" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a>.  <a href="#g897182a91291ee670be08ce26321a1c2"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvpairs.html#g975eadbba089155d7b46d133b0aa7180">free_kvpair</a> (<a class="el" href="structkvpair.html">kvpair_t</a> *pair)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Free a chain of kvpairs.  <a href="#g975eadbba089155d7b46d133b0aa7180"></a><br></td></tr>
 </table>
+<hr><h2>Typedef Documentation</h2>
+<a class="anchor" name="g868812a603b6bd17c2e026489b896166"></a><!-- doxytag: member="conflate.h::kvpair_visitor_t" ref="g868812a603b6bd17c2e026489b896166" args=")(void *opaque, const char *name, const char **values)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef bool(* <a class="el" href="group__kvpairs.html#g868812a603b6bd17c2e026489b896166">kvpair_visitor_t</a>)(void *opaque, const char *name, const char **values)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Visitor callback for walking a kvpair_t. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>opaque value passed into walk </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>key</em>&nbsp;</td><td>the kvpair_t key </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>values</em>&nbsp;</td><td>the kvpair_t values</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>true if traversal should continue </dd></dl>
+
+</div>
+</div><p>
 <hr><h2>Function Documentation</h2>
 <a class="anchor" name="g93a55c77de77a356d8eb0c4124c08cec"></a><!-- doxytag: member="conflate.h::add_kvpair_value" ref="g93a55c77de77a356d8eb0c4124c08cec" args="(kvpair_t *kvpair, const char *value)" -->
 <div class="memitem">
@@ -271,8 +303,52 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div><p>
+<a class="anchor" name="g897182a91291ee670be08ce26321a1c2"></a><!-- doxytag: member="conflate.h::walk_kvpair" ref="g897182a91291ee670be08ce26321a1c2" args="(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void walk_kvpair           </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td>
+          <td class="paramname"> <em>pair</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&nbsp;</td>
+          <td class="paramname"> <em>opaque</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__kvpairs.html#g868812a603b6bd17c2e026489b896166">kvpair_visitor_t</a>&nbsp;</td>
+          <td class="paramname"> <em>visitor</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri May 15 17:51:23 2009 for LibConflate by&nbsp;
+<div class="memdoc">
+
+<p>
+Walk a <a class="el" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a>. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>the <a class="el" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a> to walk </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>a value to be transparently passed to the visitor </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>visitor</em>&nbsp;</td><td>the visitor to call for each kvpair_t </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed May 20 23:52:54 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
