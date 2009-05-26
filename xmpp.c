@@ -422,30 +422,52 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
     assert(pcontext.container);
 
     xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
-    assert(x);
+    if (x) {
+        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
+        assert(fields);
 
-    xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
-    assert(fields);
+        kvpair_t *form = grok_form(fields);
 
-    kvpair_t *form = grok_form(fields);
+        pcontext.reply = create_reply(ctx, stanza);
+        xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
 
-    pcontext.reply = create_reply(ctx, stanza);
-    xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
+        add_and_release(pcontext.reply, cmd_res);
 
-    add_and_release(pcontext.reply, cmd_res);
+        /* X data in the command response */
+        xmpp_stanza_set_name(pcontext.container, "x");
+        xmpp_stanza_set_attribute(pcontext.container, "xmlns", "jabber:x:data");
+        xmpp_stanza_set_type(pcontext.container, "result");
+        add_and_release(cmd_res, pcontext.container);
 
-    /* X data in the command response */
-    xmpp_stanza_set_name(pcontext.container, "x");
-    xmpp_stanza_set_attribute(pcontext.container, "xmlns", "jabber:x:data");
-    xmpp_stanza_set_type(pcontext.container, "result");
-    add_and_release(cmd_res, pcontext.container);
+        handle->conf->ping_test(handle->conf->userdata, &pcontext,
+                                form, ping_adder);
 
-    handle->conf->ping_test(handle->conf->userdata, &pcontext,
-                            form, ping_adder);
+        free_kvpair(form);
 
-    free_kvpair(form);
+        assert(pcontext.complete);
+    } else {
+        /* Maybe someday we can drive the other side through the
+           complex task of specifying a ping test. */
+        pcontext.reply = create_reply(ctx, stanza);
+        xmpp_stanza_set_attribute(pcontext.reply, "type", "error");
 
-    assert(pcontext.complete);
+        xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
+
+        xmpp_stanza_set_name(pcontext.container, "error");
+        xmpp_stanza_set_attribute(pcontext.container, "type", "modify");
+        xmpp_stanza_set_attribute(pcontext.container, "code", "400");
+
+        add_and_release(pcontext.reply, cmd_res);
+
+        xmpp_stanza_t *etype = xmpp_stanza_new(ctx);
+        assert(etype);
+
+        xmpp_stanza_set_name(etype, "bad-request");
+        xmpp_stanza_set_attribute(etype, "xmlns",
+                                  "urn:ietf:params:xml:ns:xmpp-stanzas");
+
+        add_and_release(cmd_res, etype);
+    }
 
     return pcontext.reply;
 }
