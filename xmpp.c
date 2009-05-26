@@ -560,6 +560,8 @@ static int disco_items_handler(xmpp_conn_t * const conn,
                    "client_stats", "Get the client stats");
     add_disco_item(handle->ctx, query, myjid,
                    "reset_stats", "Reset the client stats");
+    add_disco_item(handle->ctx, query, myjid,
+                   "ping_test", "Perform a ping test.");
 
     xmpp_send(conn, reply);
     xmpp_stanza_release(reply);
