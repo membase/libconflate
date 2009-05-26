@@ -532,7 +532,7 @@ static int disco_items_handler(xmpp_conn_t * const conn,
                                void * const userdata)
 {
     xmpp_stanza_t *reply, *query;
-    const char* myjid = xmpp_conn_get_jid(conn);
+    const char* myjid = xmpp_conn_get_bound_jid(conn);
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
 
     assert(conn);
