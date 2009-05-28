@@ -385,7 +385,29 @@ static xmpp_stanza_t* process_reset_stats(const char *cmd,
     /* Only direct stat requests are handled. */
     assert(direct);
 
-    handle->conf->reset_stats(handle->conf->userdata, NULL, NULL);
+    char *subtype = NULL;
+    kvpair_t *form = NULL;
+
+    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
+    if (x) {
+        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
+        assert(fields);
+
+        kvpair_t *form = grok_form(fields);
+        kvpair_t *valnode = find_kvpair(form, "-subtype-");
+        if (valnode) {
+            subtype = valnode->values[0];
+        }
+    }
+
+    CONFLATE_LOG(handle, DEBUG, "Handling stats reset with subtype:  %s",
+                 subtype ? subtype : "(null)");
+
+    handle->conf->reset_stats(handle->conf->userdata, subtype, form);
+
+    if (form) {
+        free_kvpair(form);
+    }
 
     xmpp_stanza_t* cmd_res = xmpp_stanza_new(ctx);
 
