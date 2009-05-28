@@ -342,7 +342,30 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     xmpp_stanza_set_type(scontext.container, "result");
     add_and_release(cmd_res, scontext.container);
 
-    handle->conf->get_stats(handle->conf->userdata, &scontext, NULL, NULL, stat_adder);
+    char *subtype = NULL;
+    kvpair_t *form = NULL;
+
+    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
+    if (x) {
+        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
+        assert(fields);
+
+        kvpair_t *form = grok_form(fields);
+        kvpair_t *valnode = find_kvpair(form, "-subtype-");
+        if (valnode) {
+            subtype = valnode->values[0];
+        }
+    }
+
+    CONFLATE_LOG(handle, DEBUG, "Handling stats request with subtype:  %s",
+                 subtype ? subtype : "(null)");
+
+    handle->conf->get_stats(handle->conf->userdata, &scontext,
+                            subtype, form, stat_adder);
+
+    if (form) {
+        free_kvpair(form);
+    }
 
     assert(scontext.complete);
 
