@@ -8,16 +8,21 @@
 #include "conflate.h"
 #include "conflate_convenience.h"
 
-#define HAS_KEYS   1
-#define HAS_VALUES 2
+#define HAS_KEYS    1
+#define HAS_VALUES  2
+#define HAS_PRIVATE 4
 
-#define CREATE_KEYS "create table keys " \
+#define CREATE_KEYS "create table keys "        \
     "(id integer primary key, name varchar(32))"
-#define CREATE_VALUES "create table vals " \
+#define CREATE_VALUES "create table vals "      \
     "(key_id integer, value varchar(64))"
+#define CREATE_PRIVATE "create table private "            \
+    "(key varchar(256) primary key on conflict replace, " \
+    "value text not null)"
 
 #define INS_KEYS "insert into keys (name) values (?)"
 #define INS_VALS "insert into vals (key_id, value) values (?, ?)"
+#define INS_PRIV "insert into private (key, value) values (?, ?)"
 
 #define LOAD_KVPAIRS "select k.name, v.value " \
     "from keys k join vals v on (k.id = v.key_id)"
@@ -39,6 +44,8 @@ static int set_table_mask(void* arg, int n, char **vals, char **cols)
         udata->found |= HAS_KEYS;
     } else if(strcmp(vals[0], "vals") == 0) {
         udata->found |= HAS_VALUES;
+    } else if(strcmp(vals[0], "private") == 0) {
+        udata->found |= HAS_PRIVATE;
     } else {
         CONFLATE_LOG(udata->handle, WARN, "Unknown table:  %s", vals[0]);
     }
@@ -52,6 +59,8 @@ static char* get_table_name(int flag) {
         return "keys";
     case HAS_VALUES:
         return "vals";
+    case HAS_PRIVATE:
+        return "private";
     default:
         assert(false);
     }
@@ -113,6 +122,7 @@ static bool initialize_db(conflate_handle_t *handle, sqlite3 *db)
     } else {
         rv &= maybe_create_table(handle, db, HAS_KEYS, udata.found, CREATE_KEYS);
         rv &= maybe_create_table(handle, db, HAS_VALUES, udata.found, CREATE_VALUES);
+        rv &= maybe_create_table(handle, db, HAS_PRIVATE, udata.found, CREATE_PRIVATE);
     }
 
     return rv;
