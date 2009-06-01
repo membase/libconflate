@@ -367,6 +367,46 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* pairs, const char *filena
     __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 
 /**
+ * Save some instance-private data.
+ *
+ * @param handle the conflate handle (for logging contexts and stuff)
+ * @param k the key to store
+ * @param v the value to store
+ * @param filename the path to which the data should be written
+ *
+ * @return false if the data could not be saved for any reason
+ */
+bool conflate_save_private(conflate_handle_t *handle,
+                           const char *k, const char *v, const char *filename)
+    __attribute__ ((warn_unused_result, nonnull(1, 2, 3, 4)));
+
+/**
+ * Delete some saved instance-private data.
+ *
+ * @param handle the conflate handle (for logging contexts and stuff)
+ * @param k the key to delete
+ * @param filename the path from which the data should be removed
+ *
+ * @return false if the data could not be deleted for any reason
+ */
+bool conflate_delete_private(conflate_handle_t *handle,
+                             const char *k, const char *filename)
+    __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+
+/**
+ * Get some saved instance-private data.
+ *
+ * @param handle the conflate handle (for logging contexts and stuff)
+ * @param k the key to look up
+ * @param filename the path from which the data should be retrieved
+ *
+ * @return an allocated value or NULL if one could not be retrieved
+ */
+char *conflate_get_private(conflate_handle_t *handle,
+                           const char *k, const char *filename)
+    __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+
+/**
  * @}
  */
 
