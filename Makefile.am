@@ -8,8 +8,9 @@ SUBDIRS= . tests
 
 examples_bot_DEPENDENCIES = libconflate.a
 examples_bot_SOURCES = examples/bot.c
-examples_bot_LDADD = -L. -lconflate
+examples_bot_LDADD = -L. -lconflate @PROFILER_LDFLAGS@
 
+libconflate_a_CFLAGS = @PROFILER_FLAGS@
 libconflate_a_SOURCES = conflate.h conflate_convenience.h kvpair.c util.c \
 	persist.c xmpp.c
 

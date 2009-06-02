@@ -28,3 +28,6 @@ stamp-h1
 tests/check_kvpair
 tests/check_xmpp
 tests/check_persist
+*.gcda
+*.gcno
+*.gcov
