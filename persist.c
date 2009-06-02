@@ -30,6 +30,10 @@
 /* safety-net */
 #define MAX_STEPS 1024
 
+static int run_mod_steps(conflate_handle_t *handle, sqlite3 *db,
+                         sqlite3_stmt *statement)
+    __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+
 struct table_mask_userdata {
     int found;
     conflate_handle_t *handle;
@@ -146,11 +150,23 @@ static int open_and_initialize_db(conflate_handle_t *handle,
     return SQLITE_OK;
 }
 
+static int run_mod_steps(conflate_handle_t *handle, sqlite3 *db,
+                         sqlite3_stmt *statement)
+{
+    int steps_run = 0, rc = 0;
+    while ((rc = sqlite3_step(statement)) != SQLITE_DONE) {
+        steps_run++;
+        assert(steps_run < MAX_STEPS);
+        CONFLATE_LOG(handle, DEBUG, "statement step result: %d", rc);
+    }
+    return sqlite3_changes(db);
+}
+
 bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
                   const char *filename)
 {
     bool rv = false;
-    int err = 0, steps_run = 0;
+    int err = 0;
     sqlite3 *db = NULL;
     sqlite3_stmt *ins_keys = NULL, *ins_vals = NULL;
     const char* unused;
@@ -188,7 +204,7 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
 
     /* OK, Add them all in */
     while (kvpair) {
-        int j = 0, rc = 0;
+        int j = 0;
         sqlite_int64 key_id;
 
         sqlite3_clear_bindings(ins_keys);
@@ -197,10 +213,8 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
         sqlite3_bind_text(ins_keys, 1, kvpair->key, strlen(kvpair->key),
                           SQLITE_TRANSIENT);
 
-        while ((rc = sqlite3_step(ins_keys)) != SQLITE_DONE) {
-            steps_run++;
-            assert(steps_run < MAX_STEPS);
-            CONFLATE_LOG(handle, DEBUG, "keys step result: %d", rc);
+        if (run_mod_steps(handle, db, ins_keys) != 1) {
+            goto finished;
         }
 
         key_id = sqlite3_last_insert_rowid(db);
@@ -211,10 +225,8 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
             sqlite3_bind_int64(ins_vals, 1, key_id);
             sqlite3_bind_text(ins_vals, 2, val, strlen(val), SQLITE_TRANSIENT);
 
-            while ((rc = sqlite3_step(ins_vals)) != SQLITE_DONE) {
-                steps_run++;
-                assert(steps_run < MAX_STEPS);
-                CONFLATE_LOG(handle, DEBUG, "vals step result:  %d", rc);
+            if (run_mod_steps(handle, db, ins_vals) != 1) {
+                goto finished;
             }
 
             sqlite3_reset(ins_vals);
@@ -298,7 +310,7 @@ bool conflate_save_private(conflate_handle_t *handle,
                            const char *k, const char *v, const char *filename)
 {
     bool rv = false;
-    int err = 0, steps_run = 0, rc = 0;
+    int err = 0;
     sqlite3 *db = NULL;
     sqlite3_stmt *ins = NULL;
     const char *unused = NULL;
@@ -317,13 +329,7 @@ bool conflate_save_private(conflate_handle_t *handle,
     sqlite3_bind_text(ins, 1, k, strlen(k), SQLITE_TRANSIENT);
     sqlite3_bind_text(ins, 2, v, strlen(v), SQLITE_TRANSIENT);
 
-    while ((rc = sqlite3_step(ins)) != SQLITE_DONE) {
-        steps_run++;
-        assert(steps_run < MAX_STEPS);
-        CONFLATE_LOG(handle, DEBUG, "private step result: %d", rc);
-    }
-
-    rv = true;
+    rv = run_mod_steps(handle, db, ins) == 1;
 
  finished:
     err = sqlite3_errcode(db);
