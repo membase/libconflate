@@ -1,5 +1,5 @@
-TESTS = check_kvpair check_xmpp
-check_PROGRAMS = check_kvpair check_xmpp
+TESTS = check_kvpair check_xmpp check_persist
+check_PROGRAMS = check_kvpair check_xmpp check_persist
 
 check_kvpair_SOURCES = check_kvpair.c $(top_builddir)/conflate.h
 check_kvpair_CFLAGS = @CHECK_CFLAGS@
@@ -9,3 +9,6 @@ check_xmpp_SOURCES = check_xmpp.c $(top_builddir)/conflate.h
 check_xmpp_CFLAGS = @CHECK_CFLAGS@
 check_xmpp_LDADD = $(top_builddir)/libconflate.a @CHECK_LIBS@
 
+check_persist_SOURCES = check_persist.c $(top_builddir)/conflate.h
+check_persist_CFLAGS = @CHECK_CFLAGS@
+check_persist_LDADD = $(top_builddir)/libconflate.a @CHECK_LIBS@

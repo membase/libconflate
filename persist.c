@@ -128,23 +128,38 @@ static bool initialize_db(conflate_handle_t *handle, sqlite3 *db)
     return rv;
 }
 
+static int open_and_initialize_db(conflate_handle_t *handle,
+                                  const char *filename,
+                                  sqlite3 **db)
+{
+    int err = 0;
+
+    if ((err = sqlite3_open(filename, &*db)) != SQLITE_OK) {
+        return err;
+    }
+
+    if (!initialize_db(handle, *db)) {
+        CONFLATE_LOG(handle, ERROR, "Error initializing tables");
+        return SQLITE_ERROR;
+    }
+
+    return SQLITE_OK;
+}
+
 bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
                   const char *filename)
 {
     bool rv = false;
     int err = 0, steps_run = 0;
-    sqlite3 *db;
+    sqlite3 *db = NULL;
     sqlite3_stmt *ins_keys = NULL, *ins_vals = NULL;
     const char* unused;
 
-    if ((err = sqlite3_open(filename, &db)) != SQLITE_OK) {
+    if ((err = open_and_initialize_db(handle, filename, &db)) != SQLITE_OK) {
         goto finished;
     }
 
-    if (!initialize_db(handle, db)) {
-        CONFLATE_LOG(handle, ERROR, "Error initializing tables");
-        goto finished;
-    }
+    assert(db != NULL);
 
     if (!db_do(handle, db, "begin transaction")) {
         goto finished;
@@ -277,4 +292,63 @@ kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
     sqlite3_close(db);
 
     return pairs;
+}
+
+bool conflate_save_private(conflate_handle_t *handle,
+                           const char *k, const char *v, const char *filename)
+{
+    bool rv = false;
+    int err = 0, steps_run = 0, rc = 0;
+    sqlite3 *db = NULL;
+    sqlite3_stmt *ins = NULL;
+    const char *unused = NULL;
+
+    if ((err = open_and_initialize_db(handle, filename, &db)) != SQLITE_OK) {
+        goto finished;
+    }
+
+    assert(db != NULL);
+
+    if ((err = sqlite3_prepare_v2(db, INS_PRIV, strlen(INS_PRIV),
+                                  &ins, &unused)) != SQLITE_OK) {
+        goto finished;
+    }
+
+    sqlite3_bind_text(ins, 1, k, strlen(k), SQLITE_TRANSIENT);
+    sqlite3_bind_text(ins, 2, v, strlen(v), SQLITE_TRANSIENT);
+
+    while ((rc = sqlite3_step(ins)) != SQLITE_DONE) {
+        steps_run++;
+        assert(steps_run < MAX_STEPS);
+        CONFLATE_LOG(handle, DEBUG, "private step result: %d", rc);
+    }
+
+    rv = true;
+
+ finished:
+    err = sqlite3_errcode(db);
+    if (err != SQLITE_OK && err != SQLITE_DONE) {
+        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+                     sqlite3_errcode(db), sqlite3_errmsg(db));
+    }
+
+    if (ins) {
+        sqlite3_finalize(ins);
+    }
+
+    sqlite3_close(db);
+
+    return rv;
+}
+
+bool conflate_delete_private(conflate_handle_t *handle,
+                             const char *k, const char *filename)
+{
+    return false;
+}
+
+char *conflate_get_private(conflate_handle_t *handle,
+                           const char *k, const char *filename)
+{
+    return NULL;
 }
