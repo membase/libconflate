@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 
 #include <check.h>
@@ -9,27 +10,32 @@
 static conflate_handle_t *handle;
 static conflate_config_t conf;
 
+char db_loc[L_tmpnam];
+
 static void handle_setup(void) {
     init_conflate(&conf);
     handle = calloc(1, sizeof(conflate_handle_t));
     fail_if(handle == NULL, "calloc failed");
     handle->conf = &conf;
+
+    tmpnam(db_loc);
 }
 
 static void handle_teardown(void) {
     free(handle);
+    unlink(db_loc);
 }
 
 START_TEST (test_empty_private_get)
 {
-    fail_unless(conflate_get_private(handle, "some key", ":memory:") == NULL,
+    fail_unless(conflate_get_private(handle, "some key", db_loc) == NULL,
                 "Expected NULLness from an empty get_private");
 }
 END_TEST
 
 START_TEST (test_empty_private_delete)
 {
-    fail_unless(conflate_delete_private(handle, "some key", ":memory:"),
+    fail_unless(conflate_delete_private(handle, "some key", db_loc),
                 "Expected a delete to fail");
 }
 END_TEST
@@ -37,7 +43,7 @@ END_TEST
 START_TEST (test_private_save)
 {
     fail_unless(conflate_save_private(handle,"some key", "some value",
-                                      ":memory:"),
+                                      db_loc),
                 "Failed to save a new value.");
 }
 END_TEST
@@ -45,9 +51,9 @@ END_TEST
 START_TEST (test_private_delete)
 {
     fail_unless(conflate_save_private(handle, "some key", "some value",
-                                      ":memory:"),
+                                      db_loc),
                 "Failed to save a new value.");
-    fail_unless(conflate_delete_private(handle, "some key", ":memory:"),
+    fail_unless(conflate_delete_private(handle, "some key", db_loc),
                 "Failed to delete.");
 }
 END_TEST
