@@ -24,6 +24,7 @@
 #define INS_VALS "insert into vals (key_id, value) values (?, ?)"
 #define INS_PRIV "insert into private (key, value) values (?, ?)"
 #define DEL_PRIV "delete from private where key = ?"
+#define SEL_PRIV "select value from private where key = ?"
 
 #define LOAD_KVPAIRS "select k.name, v.value " \
     "from keys k join vals v on (k.id = v.key_id)"
@@ -390,5 +391,59 @@ bool conflate_delete_private(conflate_handle_t *handle,
 char *conflate_get_private(conflate_handle_t *handle,
                            const char *k, const char *filename)
 {
-    return NULL;
+    char *errmsg = NULL;
+    sqlite3 *db = NULL;
+    sqlite3_stmt *get = NULL;
+    char *rv = NULL;
+    bool done = false;
+    int steps_run = 0, err = 0;
+
+    if (sqlite3_open(filename, &db) != SQLITE_OK) {
+        goto finished;
+    }
+
+    if (sqlite3_prepare_v2(db, SEL_PRIV, strlen(SEL_PRIV),
+                           &get, NULL) != SQLITE_OK) {
+        goto finished;
+    }
+
+    sqlite3_bind_text(get, 1, k, strlen(k), SQLITE_TRANSIENT);
+
+    while (!done) {
+        switch(sqlite3_step(get)) {
+        case SQLITE_BUSY:
+            CONFLATE_LOG(handle, INFO, "DB was busy, retrying...\n");
+            break;
+        case SQLITE_ROW:
+            assert(rv == NULL);
+            rv = safe_strdup((char*)sqlite3_column_text(get, 0));
+            CONFLATE_LOG(handle, DEBUG, "Retrieved value for ``%s'':  ``%s''",
+                         k, rv);
+            break;
+        case SQLITE_DONE:
+            done = true;
+            break;
+        }
+        ++steps_run;
+        assert(steps_run < MAX_STEPS);
+    }
+
+ finished:
+    err = sqlite3_errcode(db);
+    if (err != SQLITE_OK && err != SQLITE_DONE) {
+        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+                     sqlite3_errcode(db), sqlite3_errmsg(db));
+        if (errmsg) {
+            CONFLATE_LOG(handle, ERROR, "  %s", errmsg);
+            sqlite3_free(errmsg);
+        }
+    }
+
+    if (get) {
+        sqlite3_finalize(get);
+    }
+
+    sqlite3_close(db);
+
+    return rv;
 }

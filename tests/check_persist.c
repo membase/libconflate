@@ -58,6 +58,19 @@ START_TEST (test_private_delete)
 }
 END_TEST
 
+START_TEST (test_private_retrieve)
+{
+    fail_unless(conflate_save_private(handle, "some key", "some value",
+                                      db_loc),
+                "Failed to save a new value.");
+    char *val = conflate_get_private(handle, "some key", db_loc);
+    fail_if(val == NULL, "Did not retrieve a value.");
+    fail_unless(strcmp(val, "some value") == 0,
+                "Incorrect value returned.");
+    free(val);
+}
+END_TEST
+
 static Suite* persist_suite(void)
 {
     Suite *s = suite_create("persist");
@@ -71,6 +84,7 @@ static Suite* persist_suite(void)
     tcase_add_test(tc, test_empty_private_delete);
     tcase_add_test(tc, test_private_save);
     tcase_add_test(tc, test_private_delete);
+    tcase_add_test(tc, test_private_retrieve);
 
     suite_add_tcase(s, tc);
 
