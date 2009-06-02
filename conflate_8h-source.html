@@ -131,9 +131,21 @@
 <a name="l00366"></a>00366 <span class="keywordtype">bool</span> <a class="code" href="group___persistence.html#g7ec669ed14809e27bea674b39a0ae133" title="Save a config at the given path.">save_kvpairs</a>(conflate_handle_t *handle, <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* pairs, <span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
 <a name="l00367"></a>00367     __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 <a name="l00368"></a>00368 
-<a name="l00373"></a>00373 <span class="preprocessor">#endif </span><span class="comment">/* CONFLATE_H */</span>
+<a name="l00379"></a>00379 <span class="keywordtype">bool</span> <a class="code" href="group___persistence.html#g283cc46fc3ee177f91d3eb716071fdfc" title="Save some instance-private data.">conflate_save_private</a>(conflate_handle_t *handle,
+<a name="l00380"></a>00380                            <span class="keyword">const</span> <span class="keywordtype">char</span> *k, <span class="keyword">const</span> <span class="keywordtype">char</span> *v, <span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
+<a name="l00381"></a>00381     __attribute__ ((warn_unused_result, nonnull(1, 2, 3, 4)));
+<a name="l00382"></a>00382 
+<a name="l00392"></a>00392 <span class="keywordtype">bool</span> <a class="code" href="group___persistence.html#g9f9fd5ff8c2ecd475e9b421639b2fea1" title="Delete some saved instance-private data.">conflate_delete_private</a>(conflate_handle_t *handle,
+<a name="l00393"></a>00393                              <span class="keyword">const</span> <span class="keywordtype">char</span> *k, <span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
+<a name="l00394"></a>00394     __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+<a name="l00395"></a>00395 
+<a name="l00405"></a>00405 <span class="keywordtype">char</span> *<a class="code" href="group___persistence.html#g766515cf091212200610ec277138363d" title="Get some saved instance-private data.">conflate_get_private</a>(conflate_handle_t *handle,
+<a name="l00406"></a>00406                            <span class="keyword">const</span> <span class="keywordtype">char</span> *k, <span class="keyword">const</span> <span class="keywordtype">char</span> *filename)
+<a name="l00407"></a>00407     __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+<a name="l00408"></a>00408 
+<a name="l00413"></a>00413 <span class="preprocessor">#endif </span><span class="comment">/* CONFLATE_H */</span>
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed May 20 23:52:54 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Mon Jun 1 23:59:38 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

@@ -25,8 +25,159 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___persistence.html#g7ec669ed14809e27bea674b39a0ae133">save_kvpairs</a> (conflate_handle_t *handle, <a class="el" href="structkvpair.html">kvpair_t</a> *pairs, const char *filename)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Save a config at the given path.  <a href="#g7ec669ed14809e27bea674b39a0ae133"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___persistence.html#g283cc46fc3ee177f91d3eb716071fdfc">conflate_save_private</a> (conflate_handle_t *handle, const char *k, const char *v, const char *filename)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Save some instance-private data.  <a href="#g283cc46fc3ee177f91d3eb716071fdfc"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___persistence.html#g9f9fd5ff8c2ecd475e9b421639b2fea1">conflate_delete_private</a> (conflate_handle_t *handle, const char *k, const char *filename)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Delete some saved instance-private data.  <a href="#g9f9fd5ff8c2ecd475e9b421639b2fea1"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___persistence.html#g766515cf091212200610ec277138363d">conflate_get_private</a> (conflate_handle_t *handle, const char *k, const char *filename)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get some saved instance-private data.  <a href="#g766515cf091212200610ec277138363d"></a><br></td></tr>
 </table>
 <hr><h2>Function Documentation</h2>
+<a class="anchor" name="g9f9fd5ff8c2ecd475e9b421639b2fea1"></a><!-- doxytag: member="conflate.h::conflate_delete_private" ref="g9f9fd5ff8c2ecd475e9b421639b2fea1" args="(conflate_handle_t *handle, const char *k, const char *filename)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool conflate_delete_private           </td>
+          <td>(</td>
+          <td class="paramtype">conflate_handle_t *&nbsp;</td>
+          <td class="paramname"> <em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>k</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Delete some saved instance-private data. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>handle</em>&nbsp;</td><td>the conflate handle (for logging contexts and stuff) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>k</em>&nbsp;</td><td>the key to delete </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>filename</em>&nbsp;</td><td>the path from which the data should be removed</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>false if the data could not be deleted for any reason </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="g766515cf091212200610ec277138363d"></a><!-- doxytag: member="conflate.h::conflate_get_private" ref="g766515cf091212200610ec277138363d" args="(conflate_handle_t *handle, const char *k, const char *filename)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* conflate_get_private           </td>
+          <td>(</td>
+          <td class="paramtype">conflate_handle_t *&nbsp;</td>
+          <td class="paramname"> <em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>k</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Get some saved instance-private data. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>handle</em>&nbsp;</td><td>the conflate handle (for logging contexts and stuff) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>k</em>&nbsp;</td><td>the key to look up </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>filename</em>&nbsp;</td><td>the path from which the data should be retrieved</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>an allocated value or NULL if one could not be retrieved </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="g283cc46fc3ee177f91d3eb716071fdfc"></a><!-- doxytag: member="conflate.h::conflate_save_private" ref="g283cc46fc3ee177f91d3eb716071fdfc" args="(conflate_handle_t *handle, const char *k, const char *v, const char *filename)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool conflate_save_private           </td>
+          <td>(</td>
+          <td class="paramtype">conflate_handle_t *&nbsp;</td>
+          <td class="paramname"> <em>handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>k</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Save some instance-private data. 
+<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>handle</em>&nbsp;</td><td>the conflate handle (for logging contexts and stuff) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>k</em>&nbsp;</td><td>the key to store </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>v</em>&nbsp;</td><td>the value to store </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>filename</em>&nbsp;</td><td>the path to which the data should be written</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>false if the data could not be saved for any reason </dd></dl>
+
+</div>
+</div><p>
 <a class="anchor" name="g3e5e57dbf529ad3a24e41f6ae9fd6653"></a><!-- doxytag: member="conflate.h::load_kvpairs" ref="g3e5e57dbf529ad3a24e41f6ae9fd6653" args="(conflate_handle_t *handle, const char *filename)" -->
 <div class="memitem">
 <div class="memproto">
@@ -111,7 +262,7 @@ Save a config at the given path.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed May 20 23:52:54 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Mon Jun 1 23:59:38 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
