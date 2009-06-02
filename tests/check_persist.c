@@ -29,7 +29,7 @@ END_TEST
 
 START_TEST (test_empty_private_delete)
 {
-    fail_if(conflate_delete_private(handle, "some key", ":memory:"),
+    fail_unless(conflate_delete_private(handle, "some key", ":memory:"),
                 "Expected a delete to fail");
 }
 END_TEST
@@ -39,6 +39,16 @@ START_TEST (test_private_save)
     fail_unless(conflate_save_private(handle,"some key", "some value",
                                       ":memory:"),
                 "Failed to save a new value.");
+}
+END_TEST
+
+START_TEST (test_private_delete)
+{
+    fail_unless(conflate_save_private(handle, "some key", "some value",
+                                      ":memory:"),
+                "Failed to save a new value.");
+    fail_unless(conflate_delete_private(handle, "some key", ":memory:"),
+                "Failed to delete.");
 }
 END_TEST
 
@@ -54,6 +64,7 @@ static Suite* persist_suite(void)
     tcase_add_test(tc, test_empty_private_get);
     tcase_add_test(tc, test_empty_private_delete);
     tcase_add_test(tc, test_private_save);
+    tcase_add_test(tc, test_private_delete);
 
     suite_add_tcase(s, tc);
 

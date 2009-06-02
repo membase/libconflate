@@ -23,6 +23,7 @@
 #define INS_KEYS "insert into keys (name) values (?)"
 #define INS_VALS "insert into vals (key_id, value) values (?, ?)"
 #define INS_PRIV "insert into private (key, value) values (?, ?)"
+#define DEL_PRIV "delete from private where key = ?"
 
 #define LOAD_KVPAIRS "select k.name, v.value " \
     "from keys k join vals v on (k.id = v.key_id)"
@@ -348,7 +349,42 @@ bool conflate_save_private(conflate_handle_t *handle,
 bool conflate_delete_private(conflate_handle_t *handle,
                              const char *k, const char *filename)
 {
-    return false;
+    bool rv = false;
+    int err = 0;
+    sqlite3 *db = NULL;
+    sqlite3_stmt *del = NULL;
+
+    if ((err = open_and_initialize_db(handle, filename, &db)) != SQLITE_OK) {
+        goto finished;
+    }
+
+    assert(db != NULL);
+
+    if ((err = sqlite3_prepare_v2(db, DEL_PRIV, strlen(DEL_PRIV),
+                                  &del, NULL)) != SQLITE_OK) {
+        goto finished;
+    }
+
+    sqlite3_bind_text(del, 1, k, strlen(k), SQLITE_TRANSIENT);
+
+    int deleted = run_mod_steps(handle, db, del);
+    CONFLATE_LOG(handle, DEBUG, "Removed %d records", deleted);
+    rv = deleted >= 0;
+
+ finished:
+    err = sqlite3_errcode(db);
+    if (err != SQLITE_OK && err != SQLITE_DONE) {
+        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+                     sqlite3_errcode(db), sqlite3_errmsg(db));
+    }
+
+    if (del) {
+        sqlite3_finalize(del);
+    }
+
+    sqlite3_close(db);
+
+    return rv;
 }
 
 char *conflate_get_private(conflate_handle_t *handle,
