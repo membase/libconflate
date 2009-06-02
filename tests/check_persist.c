@@ -12,8 +12,15 @@ static conflate_config_t conf;
 
 char db_loc[L_tmpnam];
 
+static void null_logger(void *userdata, enum conflate_log_level lvl,
+                        const char *msg, ...)
+{
+    /* Don't log during tests. */
+}
+
 static void handle_setup(void) {
     init_conflate(&conf);
+    conf.log = null_logger; /* Comment this line out for logging */
     handle = calloc(1, sizeof(conflate_handle_t));
     fail_if(handle == NULL, "calloc failed");
     handle->conf = &conf;
