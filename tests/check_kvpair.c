@@ -6,10 +6,22 @@
 
 #include <conflate.h>
 
+static kvpair_t *pair = NULL;
+
+static void setup(void) {
+    pair = NULL;
+}
+
+static void teardown(void) {
+    if (pair) {
+        free_kvpair(pair);
+    }
+}
+
 START_TEST (test_mk_pair_with_arg)
 {
     char* args[] = {"arg1", "arg2", NULL};
-    kvpair_t* pair = mk_kvpair("some_key", args);
+    pair = mk_kvpair("some_key", args);
 
     fail_if(pair == NULL, "Didn't create a pair.");
     fail_unless(strcmp(pair->key, "some_key") == 0, "Key is broken.");
@@ -19,14 +31,12 @@ START_TEST (test_mk_pair_with_arg)
     fail_unless(pair->allocated_values >= pair->used_values,
                 "Allocated values can't be smaller than used values.");
     fail_unless(pair->next == NULL, "Next pointer is non-null.");
-
-    free_kvpair(pair);
 }
 END_TEST
 
 START_TEST (test_mk_pair_without_arg)
 {
-    kvpair_t* pair = mk_kvpair("some_key", NULL);
+    pair = mk_kvpair("some_key", NULL);
 
     fail_if(pair == NULL, "Didn't create a pair.");
     fail_unless(strcmp(pair->key, "some_key") == 0, "Key is broken.");
@@ -35,14 +45,12 @@ START_TEST (test_mk_pair_without_arg)
                 "Allocated values can't be smaller than used values.");
     fail_unless(pair->values[0] == NULL, "First value isn't null.");
     fail_unless(pair->next == NULL, "Next pointer is non-null.");
-
-    free_kvpair(pair);
 }
 END_TEST
 
 START_TEST (test_add_value_to_empty_values)
 {
-    kvpair_t* pair = mk_kvpair("some_key", NULL);
+    pair = mk_kvpair("some_key", NULL);
 
     fail_if(pair == NULL, "Didn't create a pair.");
     fail_unless(strcmp(pair->key, "some_key") == 0, "Key is broken.");
@@ -59,15 +67,13 @@ START_TEST (test_add_value_to_empty_values)
     add_kvpair_value(pair, "newvalue2");
     fail_unless(pair->used_values == 2, "Value at 2");
     fail_unless(strcmp(pair->values[1], "newvalue2") == 0, "Unexpected value at 1");
-
-    free_kvpair(pair);
 }
 END_TEST
 
 START_TEST (test_add_value_to_existing_values)
 {
     char* args[] = {"arg1", "arg2", NULL};
-    kvpair_t* pair = mk_kvpair("some_key", args);
+    pair = mk_kvpair("some_key", args);
 
     fail_if(pair == NULL, "Didn't create a pair.");
     fail_unless(strcmp(pair->key, "some_key") == 0, "Key is broken.");
@@ -85,8 +91,6 @@ START_TEST (test_add_value_to_existing_values)
     fail_unless(strcmp(pair->values[1], "arg2") == 0, "Unexpected value at 1");
     fail_unless(strcmp(pair->values[2], "newvalue1") == 0, "Unexpected value at 2");
     fail_unless(strcmp(pair->values[3], "newvalue2") == 0, "Unexpected value at 3");
-
-    free_kvpair(pair);
 }
 END_TEST
 
@@ -98,29 +102,28 @@ END_TEST
 
 START_TEST (test_find_first_item)
 {
-    kvpair_t* pair = mk_kvpair("some_key", NULL);
-
+    pair = mk_kvpair("some_key", NULL);
     fail_unless(find_kvpair(pair, "some_key") == pair, "Identity search failed.");
 }
 END_TEST
 
 START_TEST (test_find_second_item)
 {
-    kvpair_t* pair1 = mk_kvpair("some_key", NULL);
-    kvpair_t* pair2 = mk_kvpair("some_other_key", NULL);
-    pair2->next = pair1;
+    kvpair_t *pair1 = mk_kvpair("some_key", NULL);
+    pair = mk_kvpair("some_other_key", NULL);
+    pair->next = pair1;
 
-    fail_unless(find_kvpair(pair2, "some_key") == pair1, "Depth search failed.");
+    fail_unless(find_kvpair(pair, "some_key") == pair1, "Depth search failed.");
 }
 END_TEST
 
 START_TEST (test_find_missing_item)
 {
-    kvpair_t* pair1 = mk_kvpair("some_key", NULL);
-    kvpair_t* pair2 = mk_kvpair("some_other_key", NULL);
-    pair2->next = pair1;
+    kvpair_t *pair1 = mk_kvpair("some_key", NULL);
+    pair = mk_kvpair("some_other_key", NULL);
+    pair->next = pair1;
 
-    fail_unless(find_kvpair(pair2, "missing_key") == NULL, "Negative search failed.");
+    fail_unless(find_kvpair(pair, "missing_key") == NULL, "Negative search failed.");
 }
 END_TEST
 
@@ -154,16 +157,18 @@ START_TEST (test_copy_pair)
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
     kvpair_t *pair1 = mk_kvpair("some_key", args1);
-    kvpair_t *pair2 = mk_kvpair("some_other_key", args2);
-    pair2->next = pair1;
+    pair = mk_kvpair("some_other_key", args2);
+    pair->next = pair1;
 
-    kvpair_t *copy = dup_kvpair(pair2);
+    kvpair_t *copy = dup_kvpair(pair);
     fail_if(copy == NULL, "Copy failed.");
-    fail_if(copy == pair2, "Copy something not an identity.");
+    fail_if(copy == pair, "Copy something not an identity.");
 
-    fail_unless(strcmp(copy->key, pair2->key) == 0, "Keys don't match.");
-    fail_if(copy->key == pair2->key, "Keys were identical.");
-    check_pair_equality(pair2, copy);
+    fail_unless(strcmp(copy->key, pair->key) == 0, "Keys don't match.");
+    fail_if(copy->key == pair->key, "Keys were identical.");
+    check_pair_equality(pair, copy);
+
+    free_kvpair(copy);
 }
 END_TEST
 
@@ -186,11 +191,11 @@ START_TEST (test_walk_true)
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
     kvpair_t *pair1 = mk_kvpair("some_key", args1);
-    kvpair_t *pair2 = mk_kvpair("some_other_key", args2);
-    pair2->next = pair1;
+    pair = mk_kvpair("some_other_key", args2);
+    pair->next = pair1;
 
     int count = 0;
-    walk_kvpair(pair2, &count, walk_incr_count_true);
+    walk_kvpair(pair, &count, walk_incr_count_true);
 
     fail_unless(count == 2, "Count was not two");
 }
@@ -201,11 +206,11 @@ START_TEST (test_walk_false)
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
     kvpair_t *pair1 = mk_kvpair("some_key", args1);
-    kvpair_t *pair2 = mk_kvpair("some_other_key", args2);
-    pair2->next = pair1;
+    pair = mk_kvpair("some_other_key", args2);
+    pair->next = pair1;
 
     int count = 0;
-    walk_kvpair(pair2, &count, walk_incr_count_false);
+    walk_kvpair(pair, &count, walk_incr_count_false);
 
     printf("Count was %d\n", count);
     fail_unless(count == 1, "Count was not one");
@@ -218,6 +223,9 @@ static Suite* kvpair_suite (void)
 
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
+
+    tcase_add_checked_fixture(tc_core, setup, teardown);
+
     tcase_add_test (tc_core, test_mk_pair_with_arg);
     tcase_add_test (tc_core, test_mk_pair_without_arg);
     tcase_add_test (tc_core, test_add_value_to_existing_values);
