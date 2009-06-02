@@ -169,7 +169,6 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
     int err = 0;
     sqlite3 *db = NULL;
     sqlite3_stmt *ins_keys = NULL, *ins_vals = NULL;
-    const char* unused;
 
     if ((err = open_and_initialize_db(handle, filename, &db)) != SQLITE_OK) {
         goto finished;
@@ -193,12 +192,12 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
 
     /* Add the keys */
     if (sqlite3_prepare_v2(db, INS_KEYS, strlen(INS_KEYS),
-                           &ins_keys, &unused) != SQLITE_OK) {
+                           &ins_keys, NULL) != SQLITE_OK) {
         goto finished;
     }
     /* Add the values */
     if (sqlite3_prepare_v2(db, INS_VALS, strlen(INS_VALS),
-                           &ins_vals, &unused) != SQLITE_OK) {
+                           &ins_vals, NULL) != SQLITE_OK) {
         goto finished;
     }
 
@@ -313,7 +312,6 @@ bool conflate_save_private(conflate_handle_t *handle,
     int err = 0;
     sqlite3 *db = NULL;
     sqlite3_stmt *ins = NULL;
-    const char *unused = NULL;
 
     if ((err = open_and_initialize_db(handle, filename, &db)) != SQLITE_OK) {
         goto finished;
@@ -322,7 +320,7 @@ bool conflate_save_private(conflate_handle_t *handle,
     assert(db != NULL);
 
     if ((err = sqlite3_prepare_v2(db, INS_PRIV, strlen(INS_PRIV),
-                                  &ins, &unused)) != SQLITE_OK) {
+                                  &ins, NULL)) != SQLITE_OK) {
         goto finished;
     }
 
