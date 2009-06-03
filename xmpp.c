@@ -248,6 +248,20 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     xmpp_ctx_t *ctx = handle->ctx;
     kvpair_t* conf = NULL;
 
+    /* If we have "config_is_private" set to "yes" we should only
+       process this if it's direct (i.e. ignore pubsub) */
+    if (!direct) {
+        char *priv = conflate_get_private(handle, "config_is_private",
+                                          handle->conf->save_path);
+
+        if (priv && strcmp(priv, "yes") == 0) {
+            CONFLATE_LOG(handle, INFO,
+                         "Currently using a private config, ignoring update.");
+            return NULL;
+        }
+        free(priv);
+    }
+
     CONFLATE_LOG(handle, INFO, "Processing a serverlist");
 
     x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
