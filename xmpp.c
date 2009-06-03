@@ -118,43 +118,6 @@ static int version_handler(xmpp_conn_t * const conn,
     return 1;
 }
 
-static xmpp_stanza_t* error_unknown_command(const char *cmd,
-                                            xmpp_conn_t* const conn,
-                                            xmpp_stanza_t * const stanza,
-                                            void * const userdata,
-                                            bool direct)
-{
-    xmpp_stanza_t *reply, *error, *condition;
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
-
-    CONFLATE_LOG(handle, WARN, "Unknown command:  %s", cmd);
-
-    reply = xmpp_stanza_new(ctx);
-    assert(reply);
-    xmpp_stanza_set_name(reply, "iq");
-    xmpp_stanza_set_type(reply, "error");
-    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
-    xmpp_stanza_set_attribute(reply, "to", xmpp_stanza_get_attribute(stanza, "from"));
-
-    /* Error element */
-    error = xmpp_stanza_new(ctx);
-    assert(error);
-    xmpp_stanza_set_name(error, "error");
-    add_and_release(reply, error);
-    xmpp_stanza_set_attribute(error, "code", "404");
-    xmpp_stanza_set_attribute(error, "type", "modify");
-
-    /* Error condition */
-    condition = xmpp_stanza_new(ctx);
-    assert(condition);
-    xmpp_stanza_set_name(condition, "item-not-found");
-    xmpp_stanza_set_ns(condition, "urn:ietf:params:xml:ns:xmpp-stanzas");
-    add_and_release(error, condition);
-
-    return reply;
-}
-
 static char **get_form_values(xmpp_stanza_t *t) {
     xmpp_stanza_t *current = NULL;
     int i = 0, allocated = 8;
@@ -329,6 +292,24 @@ static void add_cmd_error(xmpp_ctx_t *ctx,
 
         add_and_release(error, specific);
     }
+}
+
+static xmpp_stanza_t* error_unknown_command(const char *cmd,
+                                            xmpp_stanza_t * const cmd_stanza,
+                                            xmpp_conn_t* const conn,
+                                            xmpp_stanza_t * const stanza,
+                                            void * const userdata,
+                                            bool direct)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+    xmpp_ctx_t *ctx = handle->ctx;
+
+    xmpp_stanza_t* reply = create_reply(ctx, stanza);
+    add_and_release(reply, create_cmd_response(ctx, cmd_stanza));
+    add_cmd_error(ctx, reply, "404",
+                  "urn:ietf:params:xml:ns:xmpp-stanzas", "item-not-found",
+                  NULL, NULL);
+    return reply;
 }
 
 static void stat_adder(void* opaque,
@@ -702,7 +683,7 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
     } else if (strcmp(cmd, "rm_private") == 0) {
         reply = process_delete_private(cmd, req, conn, stanza, handle, direct);
     } else {
-        reply = error_unknown_command(cmd, conn, stanza, handle, direct);
+        reply = error_unknown_command(cmd, req, conn, stanza, handle, direct);
     }
 
     return reply;
