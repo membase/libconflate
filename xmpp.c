@@ -616,21 +616,17 @@ static xmpp_stanza_t* process_get_private(const char *cmd,
     add_and_release(reply, cmd_res);
 
     if (key) {
+        /* X data in the command response */
+        xmpp_stanza_t *x = xmpp_stanza_new(ctx);
+        assert(x);
+        xmpp_stanza_set_name(x, "x");
+        xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
+        xmpp_stanza_set_type(x, "result");
+        add_and_release(cmd_res, x);
+
         value = conflate_get_private(handle, key, handle->conf->save_path);
         if (value) {
-            /* X data in the command response */
-            xmpp_stanza_t *x = xmpp_stanza_new(ctx);
-            assert(x);
-            xmpp_stanza_set_name(x, "x");
-            xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
-            xmpp_stanza_set_type(x, "result");
-            add_and_release(cmd_res, x);
-
             add_form_value(ctx, x, key, value);
-        } else {
-            add_cmd_error(ctx, reply, "404",
-                          "urn:ietf:params:xml:ns:xmpp-stanzas", "item-not-found",
-                          NULL, NULL);
         }
     } else {
         add_cmd_error(ctx, reply, "400",
