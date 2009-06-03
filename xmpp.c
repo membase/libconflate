@@ -18,49 +18,23 @@ typedef xmpp_stanza_t *(*adhoc_handler_t)(const char *cmd,
                                           void * const userdata,
                                           bool direct);
 
-static xmpp_stanza_t* process_serverlist(const char *cmd,
-                                         xmpp_stanza_t* cmd_stanza,
-                                         xmpp_conn_t * const conn,
-                                         xmpp_stanza_t * const stanza,
-                                         void * const userdata,
-                                         bool direct);
-static xmpp_stanza_t* process_stats(const char *cmd,
-                                    xmpp_stanza_t* cmd_stanza,
-                                    xmpp_conn_t * const conn,
-                                    xmpp_stanza_t * const stanza,
-                                    void * const userdata,
-                                    bool direct);
-static xmpp_stanza_t* process_reset_stats(const char *cmd,
-                                          xmpp_stanza_t* cmd_stanza,
-                                          xmpp_conn_t * const conn,
-                                          xmpp_stanza_t * const stanza,
-                                          void * const userdata,
-                                          bool direct);
-static xmpp_stanza_t* process_ping_test(const char *cmd,
-                                        xmpp_stanza_t* cmd_stanza,
-                                        xmpp_conn_t * const conn,
-                                        xmpp_stanza_t * const stanza,
-                                        void * const userdata,
-                                        bool direct);
-static xmpp_stanza_t* process_set_private(const char *cmd,
-                                          xmpp_stanza_t* cmd_stanza,
-                                          xmpp_conn_t * const conn,
-                                          xmpp_stanza_t * const stanza,
-                                          void * const userdata,
-                                          bool direct);
-static xmpp_stanza_t* process_get_private(const char *cmd,
-                                          xmpp_stanza_t* cmd_stanza,
-                                          xmpp_conn_t * const conn,
-                                          xmpp_stanza_t * const stanza,
-                                          void * const userdata,
-                                          bool direct);
-static xmpp_stanza_t* process_delete_private(const char *cmd,
-                                             xmpp_stanza_t* cmd_stanza,
-                                             xmpp_conn_t * const conn,
-                                             xmpp_stanza_t * const stanza,
-                                             void * const userdata,
-                                             bool direct);
+#define DECLARE_ADHOC(funcname)                                        \
+    static xmpp_stanza_t* funcname(const char *cmd,                    \
+                                   xmpp_stanza_t* cmd_stanza,          \
+                                   xmpp_conn_t * const conn,           \
+                                   xmpp_stanza_t * const stanza,       \
+                                   void * const userdata,              \
+                                   bool direct);
 
+DECLARE_ADHOC(process_serverlist)
+DECLARE_ADHOC(process_stats)
+DECLARE_ADHOC(process_reset_stats)
+DECLARE_ADHOC(process_ping_test)
+DECLARE_ADHOC(process_set_private)
+DECLARE_ADHOC(process_get_private)
+DECLARE_ADHOC(process_delete_private)
+
+/* All commands */
 struct {
     char *name;
     char *description;
