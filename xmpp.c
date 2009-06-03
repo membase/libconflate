@@ -299,7 +299,8 @@ static void add_form_value(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
 
 static void add_cmd_error(xmpp_ctx_t *ctx,
                           xmpp_stanza_t * reply, const char *code,
-                          const char *ns, const char *name)
+                          const char *ns, const char *name,
+                          const char *specificns, const char *specificcond)
 {
     xmpp_stanza_set_attribute(reply, "type", "error");
 
@@ -318,6 +319,16 @@ static void add_cmd_error(xmpp_ctx_t *ctx,
     xmpp_stanza_set_name(etype, name);
     xmpp_stanza_set_attribute(etype, "xmlns", ns);
     add_and_release(error, etype);
+
+    if (specificns && specificcond) {
+        xmpp_stanza_t *specific = xmpp_stanza_new(ctx);
+        assert(specific);
+
+        xmpp_stanza_set_name(specific, specificcond);
+        xmpp_stanza_set_attribute(specific, "xmlns", specificns);
+
+        add_and_release(error, specific);
+    }
 }
 
 static void stat_adder(void* opaque,
@@ -515,7 +526,8 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
         pcontext.reply = create_reply(ctx, stanza);
         add_and_release(pcontext.reply, create_cmd_response(ctx, cmd_stanza));
         add_cmd_error(ctx, pcontext.reply, "400",
-                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
+                      "http://jabber.org/protocol/commands", "bad-payload");
     }
 
     return pcontext.reply;
@@ -568,12 +580,13 @@ static xmpp_stanza_t* process_set_private(const char *cmd,
                                    handle->conf->save_path)) {
             add_cmd_error(ctx, reply, "500",
                           "urn:ietf:params:xml:ns:xmpp-stanzas",
-                          "internal-server-error");
+                          "internal-server-error", NULL, NULL);
 
         }
     } else {
         add_cmd_error(ctx, reply, "400",
-                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
+                      "http://jabber.org/protocol/commands", "bad-payload");
     }
 
     free(key);
@@ -616,11 +629,13 @@ static xmpp_stanza_t* process_get_private(const char *cmd,
             add_form_value(ctx, x, key, value);
         } else {
             add_cmd_error(ctx, reply, "404",
-                          "urn:ietf:params:xml:ns:xmpp-stanzas", "item-not-found");
+                          "urn:ietf:params:xml:ns:xmpp-stanzas", "item-not-found",
+                          NULL, NULL);
         }
     } else {
         add_cmd_error(ctx, reply, "400",
-                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
+                      "http://jabber.org/protocol/commands", "bad-payload");
     }
 
     free(key);
@@ -652,12 +667,13 @@ static xmpp_stanza_t* process_delete_private(const char *cmd,
                                      handle->conf->save_path)) {
             add_cmd_error(ctx, reply, "500",
                           "urn:ietf:params:xml:ns:xmpp-stanzas",
-                          "internal-server-error");
+                          "internal-server-error", NULL, NULL);
 
         }
     } else {
         add_cmd_error(ctx, reply, "400",
-                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
+                      "http://jabber.org/protocol/commands", "bad-payload");
     }
 
     free(key);
