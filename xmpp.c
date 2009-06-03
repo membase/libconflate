@@ -517,6 +517,174 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
     return pcontext.reply;
 }
 
+/* This is inefficient, but easy. */
+static char *get_form_value(xmpp_stanza_t * const cmd_stanza, const char *key)
+{
+    char *rv = NULL;
+    kvpair_t *form = NULL;
+
+    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
+    if (x) {
+        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
+        assert(fields);
+
+        kvpair_t *form = grok_form(fields);
+        kvpair_t *valnode = find_kvpair(form, key);
+        if (valnode) {
+            rv = safe_strdup(valnode->values[0]);
+        }
+    }
+
+    if (form) {
+        free_kvpair(form);
+    }
+
+    return rv;
+}
+
+static void add_cmd_error(xmpp_ctx_t *ctx,
+                          xmpp_stanza_t * reply, const char *code,
+                          const char *ns, const char *name)
+{
+    xmpp_stanza_set_attribute(reply, "type", "error");
+
+    xmpp_stanza_t *error = xmpp_stanza_new(ctx);
+    assert(error);
+
+    xmpp_stanza_set_name(error, "error");
+    xmpp_stanza_set_attribute(error, "type", "modify");
+    xmpp_stanza_set_attribute(error, "code", code);
+
+    add_and_release(reply, error);
+
+    xmpp_stanza_t *etype = xmpp_stanza_new(ctx);
+    assert(etype);
+
+    xmpp_stanza_set_name(etype, name);
+    xmpp_stanza_set_attribute(etype, "xmlns", ns);
+    add_and_release(error, etype);
+}
+
+static xmpp_stanza_t* process_set_private(const char *cmd,
+                                          xmpp_stanza_t* cmd_stanza,
+                                          xmpp_conn_t * const conn,
+                                          xmpp_stanza_t * const stanza,
+                                          void * const userdata,
+                                          bool direct)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+    xmpp_ctx_t *ctx = handle->ctx;
+
+    /* Only direct stat requests are handled. */
+    assert(direct);
+
+    char *key = get_form_value(cmd_stanza, "key");
+    char *value = get_form_value(cmd_stanza, "value");
+
+    xmpp_stanza_t* reply = create_reply(ctx, stanza);
+    add_and_release(reply, create_cmd_response(ctx, cmd_stanza));
+
+    if (key && value) {
+        if (!conflate_save_private(handle, key, value,
+                                   handle->conf->save_path)) {
+            add_cmd_error(ctx, reply, "500",
+                          "urn:ietf:params:xml:ns:xmpp-stanzas",
+                          "internal-server-error");
+
+        }
+    } else {
+        add_cmd_error(ctx, reply, "400",
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
+    }
+
+    free(key);
+    free(value);
+
+    return reply;
+}
+
+static xmpp_stanza_t* process_get_private(const char *cmd,
+                                          xmpp_stanza_t* cmd_stanza,
+                                          xmpp_conn_t * const conn,
+                                          xmpp_stanza_t * const stanza,
+                                          void * const userdata,
+                                          bool direct)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+    xmpp_ctx_t *ctx = handle->ctx;
+
+    /* Only direct stat requests are handled. */
+    assert(direct);
+
+    char *key = get_form_value(cmd_stanza, "key");
+    char *value = NULL;
+
+    xmpp_stanza_t* reply = create_reply(ctx, stanza);
+    xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
+    add_and_release(reply, cmd_res);
+
+    if (key) {
+        value = conflate_get_private(handle, key, handle->conf->save_path);
+        if (value) {
+            /* X data in the command response */
+            xmpp_stanza_t *x = xmpp_stanza_new(ctx);
+            assert(x);
+            xmpp_stanza_set_name(x, "x");
+            xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
+            xmpp_stanza_set_type(x, "result");
+            add_and_release(cmd_res, x);
+
+            add_form_value(ctx, x, key, value);
+        } else {
+            add_cmd_error(ctx, reply, "404",
+                          "urn:ietf:params:xml:ns:xmpp-stanzas", "item-not-found");
+        }
+    } else {
+        add_cmd_error(ctx, reply, "400",
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
+    }
+
+    free(key);
+    free(value);
+
+    return reply;
+}
+
+static xmpp_stanza_t* process_delete_private(const char *cmd,
+                                             xmpp_stanza_t* cmd_stanza,
+                                             xmpp_conn_t * const conn,
+                                             xmpp_stanza_t * const stanza,
+                                             void * const userdata,
+                                             bool direct)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+    xmpp_ctx_t *ctx = handle->ctx;
+
+    /* Only direct stat requests are handled. */
+    assert(direct);
+
+    char *key = get_form_value(cmd_stanza, "key");
+
+    xmpp_stanza_t* reply = create_reply(ctx, stanza);
+    add_and_release(reply, create_cmd_response(ctx, cmd_stanza));
+
+    if (key) {
+        if (!conflate_delete_private(handle, key,
+                                     handle->conf->save_path)) {
+            add_cmd_error(ctx, reply, "500",
+                          "urn:ietf:params:xml:ns:xmpp-stanzas",
+                          "internal-server-error");
+
+        }
+    } else {
+        add_cmd_error(ctx, reply, "400",
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
+    }
+
+    free(key);
+
+    return reply;
+}
 
 static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
                                        xmpp_stanza_t * const stanza,
@@ -536,6 +704,12 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
         reply = process_reset_stats(cmd, req, conn, stanza, handle, direct);
     } else if (strcmp(cmd, "ping_test") == 0) {
         reply = process_ping_test(cmd, req, conn, stanza, handle, direct);
+    } else if (strcmp(cmd, "set_private") == 0) {
+        reply = process_set_private(cmd, req, conn, stanza, handle, direct);
+    } else if (strcmp(cmd, "get_private") == 0) {
+        reply = process_get_private(cmd, req, conn, stanza, handle, direct);
+    } else if (strcmp(cmd, "rm_private") == 0) {
+        reply = process_delete_private(cmd, req, conn, stanza, handle, direct);
     } else {
         reply = error_unknown_command(cmd, conn, stanza, handle, direct);
     }
@@ -629,6 +803,12 @@ static int disco_items_handler(xmpp_conn_t * const conn,
                    "reset_stats", "Reset the client stats");
     add_disco_item(handle->ctx, query, myjid,
                    "ping_test", "Perform a ping test.");
+    add_disco_item(handle->ctx, query, myjid,
+                   "set_private", "Set a private variable.");
+    add_disco_item(handle->ctx, query, myjid,
+                   "get_private", "Get a private variable.");
+    add_disco_item(handle->ctx, query, myjid,
+                   "rm_private", "Delete a private variable.");
 
     xmpp_send(conn, reply);
     xmpp_stanza_release(reply);
