@@ -297,6 +297,29 @@ static void add_form_value(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
     add_form_values(ctx, parent, key, values);
 }
 
+static void add_cmd_error(xmpp_ctx_t *ctx,
+                          xmpp_stanza_t * reply, const char *code,
+                          const char *ns, const char *name)
+{
+    xmpp_stanza_set_attribute(reply, "type", "error");
+
+    xmpp_stanza_t *error = xmpp_stanza_new(ctx);
+    assert(error);
+
+    xmpp_stanza_set_name(error, "error");
+    xmpp_stanza_set_attribute(error, "type", "modify");
+    xmpp_stanza_set_attribute(error, "code", code);
+
+    add_and_release(reply, error);
+
+    xmpp_stanza_t *etype = xmpp_stanza_new(ctx);
+    assert(etype);
+
+    xmpp_stanza_set_name(etype, name);
+    xmpp_stanza_set_attribute(etype, "xmlns", ns);
+    add_and_release(error, etype);
+}
+
 static void stat_adder(void* opaque,
                        const char* key, const char* val)
 {
@@ -490,24 +513,9 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
         /* Maybe someday we can drive the other side through the
            complex task of specifying a ping test. */
         pcontext.reply = create_reply(ctx, stanza);
-        xmpp_stanza_set_attribute(pcontext.reply, "type", "error");
-
-        xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
-
-        xmpp_stanza_set_name(pcontext.container, "error");
-        xmpp_stanza_set_attribute(pcontext.container, "type", "modify");
-        xmpp_stanza_set_attribute(pcontext.container, "code", "400");
-
-        add_and_release(pcontext.reply, cmd_res);
-
-        xmpp_stanza_t *etype = xmpp_stanza_new(ctx);
-        assert(etype);
-
-        xmpp_stanza_set_name(etype, "bad-request");
-        xmpp_stanza_set_attribute(etype, "xmlns",
-                                  "urn:ietf:params:xml:ns:xmpp-stanzas");
-
-        add_and_release(cmd_res, etype);
+        add_and_release(pcontext.reply, create_cmd_response(ctx, cmd_stanza));
+        add_cmd_error(ctx, pcontext.reply, "400",
+                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request");
     }
 
     return pcontext.reply;
@@ -534,29 +542,6 @@ static char *get_form_value(xmpp_stanza_t * const cmd_stanza, const char *key)
     free_kvpair(form);
 
     return rv;
-}
-
-static void add_cmd_error(xmpp_ctx_t *ctx,
-                          xmpp_stanza_t * reply, const char *code,
-                          const char *ns, const char *name)
-{
-    xmpp_stanza_set_attribute(reply, "type", "error");
-
-    xmpp_stanza_t *error = xmpp_stanza_new(ctx);
-    assert(error);
-
-    xmpp_stanza_set_name(error, "error");
-    xmpp_stanza_set_attribute(error, "type", "modify");
-    xmpp_stanza_set_attribute(error, "code", code);
-
-    add_and_release(reply, error);
-
-    xmpp_stanza_t *etype = xmpp_stanza_new(ctx);
-    assert(etype);
-
-    xmpp_stanza_set_name(etype, name);
-    xmpp_stanza_set_attribute(etype, "xmlns", ns);
-    add_and_release(error, etype);
 }
 
 static xmpp_stanza_t* process_set_private(const char *cmd,
