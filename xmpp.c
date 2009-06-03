@@ -363,9 +363,7 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     handle->conf->get_stats(handle->conf->userdata, &scontext,
                             subtype, form, stat_adder);
 
-    if (form) {
-        free_kvpair(form);
-    }
+    free_kvpair(form);
 
     assert(scontext.complete);
 
@@ -405,9 +403,7 @@ static xmpp_stanza_t* process_reset_stats(const char *cmd,
 
     handle->conf->reset_stats(handle->conf->userdata, subtype, form);
 
-    if (form) {
-        free_kvpair(form);
-    }
+    free_kvpair(form);
 
     xmpp_stanza_t* cmd_res = xmpp_stanza_new(ctx);
 
@@ -535,9 +531,7 @@ static char *get_form_value(xmpp_stanza_t * const cmd_stanza, const char *key)
         }
     }
 
-    if (form) {
-        free_kvpair(form);
-    }
+    free_kvpair(form);
 
     return rv;
 }

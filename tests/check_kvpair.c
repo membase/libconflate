@@ -13,9 +13,7 @@ static void setup(void) {
 }
 
 static void teardown(void) {
-    if (pair) {
-        free_kvpair(pair);
-    }
+    free_kvpair(pair);
 }
 
 START_TEST (test_mk_pair_with_arg)

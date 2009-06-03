@@ -47,13 +47,15 @@ void add_kvpair_value(kvpair_t* pair, const char* value)
 
 void free_kvpair(kvpair_t* pair)
 {
-    if (pair->next) {
-        free_kvpair(pair->next);
-    }
+    if (pair) {
+        if (pair->next) {
+            free_kvpair(pair->next);
+        }
 
-    free(pair->key);
-    free_string_list(pair->values);
-    free(pair);
+        free(pair->key);
+        free_string_list(pair->values);
+        free(pair);
+    }
 }
 
 void walk_kvpair(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)
