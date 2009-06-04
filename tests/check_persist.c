@@ -25,7 +25,7 @@ static void handle_setup(void) {
     fail_if(handle == NULL, "calloc failed");
     handle->conf = &conf;
 
-    tmpnam(db_loc);
+    fail_if(tmpnam(db_loc) == NULL, "Couldn't make a tmp db.");
 }
 
 static void handle_teardown(void) {
