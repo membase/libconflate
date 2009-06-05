@@ -30,7 +30,7 @@ Now you're ready to build the library and example application.
 
 There's a bit of infrastructure required to see it all work, but the
 example (bot.c) is ready to talk to your xmpp server and handle
-messages from your mcp:
+messages.
 
     ./bot myjid@example.com mypassword
 
