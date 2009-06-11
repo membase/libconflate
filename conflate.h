@@ -322,6 +322,45 @@ void init_conflate(conflate_config_t *conf) __attribute__ ((nonnull (1)));
 bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result));
 
 /**
+ * Callback return types indicating status and result type of an xmpp
+ * callback.
+ */
+enum conflate_xmpp_cb_result {
+    RV_ERROR,  /**< Invocation failed. */
+    RV_BADARG, /**< Bad/incomplete arguments */
+    RV_EMPTY,  /**< Invocation succeeded, but no result should be returned. */
+    RV_FORM,   /**< Invocation succeeded and a simple form should be returned. */
+    RV_LIST    /**< Invocation succeeded and a list of forms should be returned. */
+};
+
+/**
+ * Callback invoked to process an adhoc command.
+ *
+ * @param opaque registered opaque value
+ * @param handle the conflate handle
+ * @param cmd the name of the command being executed
+ * @param direct if true, this is a directed command (else issued via pubsub)
+ * @param pair the form sent with this command (may be NULL)
+ * @param result pointer to the results
+ */
+typedef enum conflate_xmpp_cb_result (*conflate_xmpp_cb_t)(void *opaque,
+                                                           conflate_handle_t *handle,
+                                                           const char *cmd,
+                                                           bool direct,
+                                                           kvpair_t *pair,
+                                                           void **result);
+
+/**
+ * Register a command.
+ *
+ * @param cmd the node name of the command
+ * @param desc short description of the command
+ * @param cb the callback to issue when this command is invoked
+ */
+void conflate_register_xmpp_cb(const char *cmd, const char *desc,
+                               conflate_xmpp_cb_t cb);
+
+/**
  * @}
  */
 

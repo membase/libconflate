@@ -33,9 +33,16 @@ DECLARE_ADHOC(process_serverlist)
 DECLARE_ADHOC(process_stats)
 DECLARE_ADHOC(process_reset_stats)
 DECLARE_ADHOC(process_ping_test)
-DECLARE_ADHOC(process_set_private)
-DECLARE_ADHOC(process_get_private)
-DECLARE_ADHOC(process_delete_private)
+
+struct command_def {
+    char *name;
+    char *description;
+    conflate_xmpp_cb_t cb;
+    struct command_def *next;
+};
+
+bool commands_initialized = false;
+struct command_def *n_commands = NULL;
 
 /* All commands */
 struct {
@@ -56,18 +63,23 @@ struct {
         "ping_test", "Perform a ping test", process_ping_test
     },
     {
-        "set_private", "Set a private value on the agent", process_set_private
-    },
-    {
-        "get_private", "Get a private value from the agent", process_get_private
-    },
-    {
-        "rm_private", "Delete a private value from the agent", process_delete_private
-    },
-    {
         NULL, NULL, NULL
     }
 };
+
+void conflate_register_xmpp_cb(const char *cmd, const char *desc,
+                               conflate_xmpp_cb_t cb)
+{
+    struct command_def *c = calloc(1, sizeof(struct command_def));
+    assert(c);
+
+    c->name = safe_strdup(cmd);
+    c->description = safe_strdup(desc);
+    c->cb = cb;
+    c->next = n_commands;
+
+    n_commands = c;
+}
 
 static void add_and_release(xmpp_stanza_t* parent, xmpp_stanza_t* child)
 {
@@ -586,146 +598,200 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
     return pcontext.reply;
 }
 
-/* This is inefficient, but easy. */
-static char *get_form_value(xmpp_stanza_t * const cmd_stanza, const char *key)
+static char *get_form_value(kvpair_t *form, const char *key)
 {
+    assert(key);
+
     char *rv = NULL;
-    kvpair_t *form = NULL;
 
-    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
-    if (x) {
-        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
-        assert(fields);
-
-        kvpair_t *form = grok_form(fields);
+    if (form) {
         kvpair_t *valnode = find_kvpair(form, key);
         if (valnode) {
             rv = safe_strdup(valnode->values[0]);
         }
     }
 
-    free_kvpair(form);
-
     return rv;
 }
 
-static xmpp_stanza_t* process_set_private(const char *cmd,
-                                          xmpp_stanza_t* cmd_stanza,
-                                          xmpp_conn_t * const conn,
-                                          xmpp_stanza_t * const stanza,
-                                          void * const userdata,
-                                          bool direct)
+static enum conflate_xmpp_cb_result process_set_private(void *opaque,
+                                                        conflate_handle_t *handle,
+                                                        const char *cmd,
+                                                        bool direct,
+                                                        kvpair_t *form,
+                                                        void **result)
 {
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
-
     /* Only direct stat requests are handled. */
     assert(direct);
+    enum conflate_xmpp_cb_result rv = RV_ERROR;
 
-    char *key = get_form_value(cmd_stanza, "key");
-    char *value = get_form_value(cmd_stanza, "value");
-
-    xmpp_stanza_t* reply = create_reply(ctx, stanza);
-    add_and_release(reply, create_cmd_response(ctx, cmd_stanza));
+    char *key = get_form_value(form, "key");
+    char *value = get_form_value(form, "value");
 
     if (key && value) {
-        if (!conflate_save_private(handle, key, value,
-                                   handle->conf->save_path)) {
-            add_cmd_error(ctx, reply, "500",
-                          "urn:ietf:params:xml:ns:xmpp-stanzas",
-                          "internal-server-error", NULL, NULL);
-
+        if (conflate_save_private(handle, key, value,
+                                  handle->conf->save_path)) {
+            rv = RV_EMPTY;
         }
     } else {
-        add_cmd_error(ctx, reply, "400",
-                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
-                      "http://jabber.org/protocol/commands", "bad-payload");
+        rv = RV_BADARG;
     }
 
     free(key);
     free(value);
 
-    return reply;
+    return rv;
 }
 
-static xmpp_stanza_t* process_get_private(const char *cmd,
-                                          xmpp_stanza_t* cmd_stanza,
-                                          xmpp_conn_t * const conn,
-                                          xmpp_stanza_t * const stanza,
-                                          void * const userdata,
-                                          bool direct)
+static enum conflate_xmpp_cb_result process_get_private(void *opaque,
+                                                        conflate_handle_t *handle,
+                                                        const char *cmd,
+                                                        bool direct,
+                                                        kvpair_t *form,
+                                                        void **result)
+{
+    /* Only direct stat requests are handled. */
+    assert(direct);
+    enum conflate_xmpp_cb_result rv = RV_ERROR;
+
+    char *key = get_form_value(form, "key");
+
+    if (key) {
+        char *value = conflate_get_private(handle, key,
+                                           handle->conf->save_path);
+        if (value) {
+            char *values[2] = { value, NULL };
+            kvpair_t *out = mk_kvpair(key, values);
+            *result = out;
+        }
+
+        rv = RV_FORM;
+    } else {
+        rv = RV_BADARG;
+    }
+
+    free(key);
+
+    return rv;
+}
+
+static enum conflate_xmpp_cb_result process_delete_private(void *opaque,
+                                                           conflate_handle_t *handle,
+                                                           const char *cmd,
+                                                           bool direct,
+                                                           kvpair_t *form,
+                                                           void **result)
+{
+    /* Only direct stat requests are handled. */
+    assert(direct);
+    enum conflate_xmpp_cb_result rv = RV_ERROR;
+
+    char *key = get_form_value(form, "key");
+
+    if (key) {
+        if (conflate_delete_private(handle, key,
+                                    handle->conf->save_path)) {
+            rv = RV_EMPTY;
+        }
+    } else {
+        rv = RV_BADARG;
+    }
+
+    free(key);
+
+    return rv;
+}
+
+static char* cb_name(enum conflate_xmpp_cb_result r)
+{
+    char *rv = "UNKNOWN";
+    switch(r) {
+    case RV_ERROR:  rv = "RV_ERROR";  break;
+    case RV_BADARG: rv = "RV_BADARG"; break;
+    case RV_EMPTY:  rv = "RV_EMPTY";  break;
+    case RV_FORM:   rv = "RV_FORM";   break;
+    case RV_LIST:   rv = "RV_LIST";   break;
+    }
+    return rv;
+}
+
+static xmpp_stanza_t *kvpair_to_form(conflate_handle_t *handle,
+                                     xmpp_ctx_t *ctx, kvpair_t *pair)
+{
+    assert(ctx);
+
+    xmpp_stanza_t *x = xmpp_stanza_new(ctx);
+    assert(x);
+    xmpp_stanza_set_name(x, "x");
+    xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
+    xmpp_stanza_set_type(x, "result");
+
+    for (kvpair_t *p = pair; p; p = p->next) {
+        add_form_values(ctx, x, p->key, (const char **)p->values);
+    }
+
+    return x;
+}
+
+static xmpp_stanza_t* n_handler(const char *cmd,
+                                xmpp_stanza_t* cmd_stanza,
+                                xmpp_conn_t * const conn,
+                                xmpp_stanza_t * const stanza,
+                                void * const userdata,
+                                bool direct,
+                                conflate_xmpp_cb_t cb)
 {
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
+    void *result = NULL;
+    kvpair_t *form = NULL;
 
-    /* Only direct stat requests are handled. */
-    assert(direct);
+    assert(cb);
 
-    char *key = get_form_value(cmd_stanza, "key");
-    char *value = NULL;
+    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
+    if (x) {
+        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
+        if (fields) {
+            form = grok_form(fields);
+        }
+    }
+
+    enum conflate_xmpp_cb_result rv = cb(handle->conf->userdata, handle,
+                                         cmd, direct, form, &result);
+
+    CONFLATE_LOG(handle, DEBUG, "Result type of %s:  %s", cmd, cb_name(rv));
 
     xmpp_stanza_t* reply = create_reply(ctx, stanza);
     xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
     add_and_release(reply, cmd_res);
 
-    if (key) {
-        /* X data in the command response */
-        xmpp_stanza_t *x = xmpp_stanza_new(ctx);
-        assert(x);
-        xmpp_stanza_set_name(x, "x");
-        xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
-        xmpp_stanza_set_type(x, "result");
-        add_and_release(cmd_res, x);
-
-        value = conflate_get_private(handle, key, handle->conf->save_path);
-        if (value) {
-            add_form_value(ctx, x, key, value);
-        }
-    } else {
+    switch (rv) {
+    case RV_ERROR:
+        assert(result == NULL);
+        add_cmd_error(ctx, reply, "500",
+                      "urn:ietf:params:xml:ns:xmpp-stanzas",
+                      "internal-server-error", NULL, NULL);
+        break;
+    case RV_BADARG:
+        assert(result == NULL);
         add_cmd_error(ctx, reply, "400",
                       "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
                       "http://jabber.org/protocol/commands", "bad-payload");
+        break;
+    case RV_EMPTY:
+        assert(result == NULL);
+        break;
+    case RV_FORM:
+        add_and_release(cmd_res,
+                        kvpair_to_form(handle, ctx, ((kvpair_t*)result)));
+        break;
+    case RV_LIST:
+        assert(result);
+        assert(false); /* XXX:  Unhandled */
+        break;
     }
 
-    free(key);
-    free(value);
-
-    return reply;
-}
-
-static xmpp_stanza_t* process_delete_private(const char *cmd,
-                                             xmpp_stanza_t* cmd_stanza,
-                                             xmpp_conn_t * const conn,
-                                             xmpp_stanza_t * const stanza,
-                                             void * const userdata,
-                                             bool direct)
-{
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
-
-    /* Only direct stat requests are handled. */
-    assert(direct);
-
-    char *key = get_form_value(cmd_stanza, "key");
-
-    xmpp_stanza_t* reply = create_reply(ctx, stanza);
-    add_and_release(reply, create_cmd_response(ctx, cmd_stanza));
-
-    if (key) {
-        if (!conflate_delete_private(handle, key,
-                                     handle->conf->save_path)) {
-            add_cmd_error(ctx, reply, "500",
-                          "urn:ietf:params:xml:ns:xmpp-stanzas",
-                          "internal-server-error", NULL, NULL);
-
-        }
-    } else {
-        add_cmd_error(ctx, reply, "400",
-                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
-                      "http://jabber.org/protocol/commands", "bad-payload");
-    }
-
-    free(key);
+    free_kvpair(form);
 
     return reply;
 }
@@ -746,7 +812,26 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
         }
     }
 
-    return handler(cmd, req, conn, stanza, handle, direct);
+    /* If we haven't found an old style command, look for a new style
+       command */
+    if (handler == error_unknown_command) {
+        conflate_xmpp_cb_t cb = NULL;
+        struct command_def *p = n_commands;
+
+        for (p = n_commands; p && !cb; p = p->next) {
+            if (strcmp(cmd, p->name) == 0) {
+                cb = p->cb;
+            }
+        }
+
+        if (cb) {
+            return n_handler(cmd, req, conn, stanza, handle, direct, cb);
+        } else {
+            return handler(cmd, req, conn, stanza, handle, direct);
+        }
+    } else {
+        return handler(cmd, req, conn, stanza, handle, direct);
+    }
 }
 
 static int command_handler(xmpp_conn_t * const conn,
@@ -832,6 +917,11 @@ static int disco_items_handler(xmpp_conn_t * const conn,
     for (int i = 0; commands[i].name; i++) {
         add_disco_item(handle->ctx, query, myjid,
                        commands[i].name, commands[i].description);
+    }
+
+    /* New style commands */
+    for (struct command_def *p = n_commands; p; p = p->next) {
+        add_disco_item(handle->ctx, query, myjid, p->name, p->description);
     }
 
     xmpp_send(conn, reply);
@@ -1043,12 +1133,33 @@ static void default_logger(void *userdata, enum conflate_log_level lvl,
     va_end(ap);
 }
 
+static void init_commands(void)
+{
+    if (commands_initialized) {
+        return;
+    }
+
+    conflate_register_xmpp_cb("set_private",
+                              "Set a private value on the agent.",
+                              process_set_private);
+    conflate_register_xmpp_cb("get_private",
+                              "Get a private value from the agent.",
+                              process_get_private);
+    conflate_register_xmpp_cb("rm_private",
+                              "Delete a private value from the agent.",
+                              process_delete_private);
+
+    commands_initialized = true;
+}
+
 void init_conflate(conflate_config_t *conf)
 {
     assert(conf);
     memset(conf, 0x00, sizeof(conflate_config_t));
     conf->log = default_logger;
     conf->initialization_marker = (void*)INITIALIZATION_MAGIC;
+
+    init_commands();
 }
 
 bool start_conflate(conflate_config_t conf) {
