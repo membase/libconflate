@@ -351,7 +351,20 @@ typedef enum conflate_xmpp_cb_result (*conflate_xmpp_cb_t)(void *opaque,
                                                            void **result);
 
 /**
- * Register a command.
+ * Register a management command handler.
+ *
+ * Callbacks allow applications using libconflate to register
+ * arbitrary callbacks to extend the capabilities of the management
+ * layer.
+ *
+ * There are three major forms of success results:
+ *
+ * - Empty (no specific results necessary)
+ * - A simple key/multi-value list.
+ * - A list of key/multi-value lists.
+ *
+ * See the definition of ::conflate_xmpp_cb_t for more information on
+ * result types.
  *
  * @param cmd the node name of the command
  * @param desc short description of the command
