@@ -35,7 +35,7 @@ DECLARE_ADHOC(process_ping_test)
 struct command_def {
     char *name;
     char *description;
-    conflate_xmpp_cb_t cb;
+    conflate_mgmt_cb_t cb;
     struct command_def *next;
 };
 
@@ -59,8 +59,8 @@ struct {
     }
 };
 
-void conflate_register_xmpp_cb(const char *cmd, const char *desc,
-                               conflate_xmpp_cb_t cb)
+void conflate_register_mgmt_cb(const char *cmd, const char *desc,
+                               conflate_mgmt_cb_t cb)
 {
     struct command_def *c = calloc(1, sizeof(struct command_def));
     assert(c);
@@ -261,7 +261,7 @@ static kvpair_t *grok_form(xmpp_stanza_t *fields)
     return rv;
 }
 
-static enum conflate_xmpp_cb_result process_serverlist(void *opaque,
+static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
                                                        conflate_handle_t *handle,
                                                        const char *cmd,
                                                        bool direct,
@@ -460,7 +460,7 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     return scontext.reply;
 }
 
-static enum conflate_xmpp_cb_result process_reset_stats(void *opaque,
+static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
                                                         conflate_handle_t *handle,
                                                         const char *cmd,
                                                         bool direct,
@@ -561,7 +561,7 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
     return pcontext.reply;
 }
 
-static enum conflate_xmpp_cb_result process_set_private(void *opaque,
+static enum conflate_mgmt_cb_result process_set_private(void *opaque,
                                                         conflate_handle_t *handle,
                                                         const char *cmd,
                                                         bool direct,
@@ -570,7 +570,7 @@ static enum conflate_xmpp_cb_result process_set_private(void *opaque,
 {
     /* Only direct stat requests are handled. */
     assert(direct);
-    enum conflate_xmpp_cb_result rv = RV_ERROR;
+    enum conflate_mgmt_cb_result rv = RV_ERROR;
 
     char *key = get_form_value(form, "key");
     char *value = get_form_value(form, "value");
@@ -590,7 +590,7 @@ static enum conflate_xmpp_cb_result process_set_private(void *opaque,
     return rv;
 }
 
-static enum conflate_xmpp_cb_result process_get_private(void *opaque,
+static enum conflate_mgmt_cb_result process_get_private(void *opaque,
                                                         conflate_handle_t *handle,
                                                         const char *cmd,
                                                         bool direct,
@@ -599,7 +599,7 @@ static enum conflate_xmpp_cb_result process_get_private(void *opaque,
 {
     /* Only direct stat requests are handled. */
     assert(direct);
-    enum conflate_xmpp_cb_result rv = RV_ERROR;
+    enum conflate_mgmt_cb_result rv = RV_ERROR;
 
     char *key = get_form_value(form, "key");
 
@@ -622,7 +622,7 @@ static enum conflate_xmpp_cb_result process_get_private(void *opaque,
     return rv;
 }
 
-static enum conflate_xmpp_cb_result process_delete_private(void *opaque,
+static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
                                                            conflate_handle_t *handle,
                                                            const char *cmd,
                                                            bool direct,
@@ -631,7 +631,7 @@ static enum conflate_xmpp_cb_result process_delete_private(void *opaque,
 {
     /* Only direct stat requests are handled. */
     assert(direct);
-    enum conflate_xmpp_cb_result rv = RV_ERROR;
+    enum conflate_mgmt_cb_result rv = RV_ERROR;
 
     char *key = get_form_value(form, "key");
 
@@ -649,7 +649,7 @@ static enum conflate_xmpp_cb_result process_delete_private(void *opaque,
     return rv;
 }
 
-static char* cb_name(enum conflate_xmpp_cb_result r)
+static char* cb_name(enum conflate_mgmt_cb_result r)
 {
     char *rv = "UNKNOWN";
     switch(r) {
@@ -686,7 +686,7 @@ static xmpp_stanza_t* n_handler(const char *cmd,
                                 xmpp_stanza_t * const stanza,
                                 void * const userdata,
                                 bool direct,
-                                conflate_xmpp_cb_t cb)
+                                conflate_mgmt_cb_t cb)
 {
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
@@ -703,7 +703,7 @@ static xmpp_stanza_t* n_handler(const char *cmd,
         }
     }
 
-    enum conflate_xmpp_cb_result rv = cb(handle->conf->userdata, handle,
+    enum conflate_mgmt_cb_result rv = cb(handle->conf->userdata, handle,
                                          cmd, direct, form, &result);
 
     CONFLATE_LOG(handle, DEBUG, "Result type of %s:  %s", cmd, cb_name(rv));
@@ -762,7 +762,7 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
     /* If we haven't found an old style command, look for a new style
        command */
     if (handler == error_unknown_command) {
-        conflate_xmpp_cb_t cb = NULL;
+        conflate_mgmt_cb_t cb = NULL;
         struct command_def *p = n_commands;
 
         for (p = n_commands; p && !cb; p = p->next) {
@@ -1086,20 +1086,20 @@ static void init_commands(void)
         return;
     }
 
-    conflate_register_xmpp_cb("set_private",
+    conflate_register_mgmt_cb("set_private",
                               "Set a private value on the agent.",
                               process_set_private);
-    conflate_register_xmpp_cb("get_private",
+    conflate_register_mgmt_cb("get_private",
                               "Get a private value from the agent.",
                               process_get_private);
-    conflate_register_xmpp_cb("rm_private",
+    conflate_register_mgmt_cb("rm_private",
                               "Delete a private value from the agent.",
                               process_delete_private);
 
-    conflate_register_xmpp_cb("reset_stats", "Reset stats on the agent",
+    conflate_register_mgmt_cb("reset_stats", "Reset stats on the agent",
                               process_reset_stats);
 
-    conflate_register_xmpp_cb("serverlist", "Configure a server list.",
+    conflate_register_mgmt_cb("serverlist", "Configure a server list.",
                               process_serverlist);
 
     commands_initialized = true;

@@ -322,10 +322,10 @@ void init_conflate(conflate_config_t *conf) __attribute__ ((nonnull (1)));
 bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result));
 
 /**
- * Callback return types indicating status and result type of an xmpp
- * callback.
+ * Callback return types indicating status and result type of a
+ * management callback.
  */
-enum conflate_xmpp_cb_result {
+enum conflate_mgmt_cb_result {
     RV_ERROR,  /**< Invocation failed. */
     RV_BADARG, /**< Bad/incomplete arguments */
     RV_EMPTY,  /**< Invocation succeeded, but no result should be returned. */
@@ -343,7 +343,7 @@ enum conflate_xmpp_cb_result {
  * @param pair the form sent with this command (may be NULL)
  * @param result pointer to the results
  */
-typedef enum conflate_xmpp_cb_result (*conflate_xmpp_cb_t)(void *opaque,
+typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
                                                            conflate_handle_t *handle,
                                                            const char *cmd,
                                                            bool direct,
@@ -363,15 +363,15 @@ typedef enum conflate_xmpp_cb_result (*conflate_xmpp_cb_t)(void *opaque,
  * - A simple key/multi-value list.
  * - A list of key/multi-value lists.
  *
- * See the definition of ::conflate_xmpp_cb_t for more information on
+ * See the definition of ::conflate_mgmt_cb_t for more information on
  * result types.
  *
  * @param cmd the node name of the command
  * @param desc short description of the command
  * @param cb the callback to issue when this command is invoked
  */
-void conflate_register_xmpp_cb(const char *cmd, const char *desc,
-                               conflate_xmpp_cb_t cb);
+void conflate_register_mgmt_cb(const char *cmd, const char *desc,
+                               conflate_mgmt_cb_t cb);
 
 /**
  * @}
