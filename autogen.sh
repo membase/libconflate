@@ -3,7 +3,6 @@
 ACLOCAL=`which aclocal-1.10 || which aclocal-1.9 || which aclocal19 || which aclocal-1.7 || which aclocal17 || which aclocal-1.5 || which aclocal15 || which aclocal`
 # ACLOCALFLAGS may need to be defined if you have macros in non-standard
 # locations, i.e. MacOS
-echo "*** running $ACLOCAL $ACLOCALFLAGS "
 $ACLOCAL $ACLOCALFLAGS || exit 1
 
 AUTOHEADER=${AUTOHEADER:-autoheader}

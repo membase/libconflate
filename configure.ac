@@ -15,9 +15,9 @@ AC_PROG_INSTALL
 AC_SUBST(PROFILER_LDFLAGS)
 
 AC_ARG_ENABLE(coverage,
-  [AS_HELP_STRING([--disable-coverage],[Disable code coverage])])
+  [AS_HELP_STRING([--enable-coverage],[Enable code coverage])])
 
-if test "x$enable_coverage" != "xno"; then
+if test "x$enable_coverage" != "xyes"; then
    if test "$ICC" = "yes"
    then
       :
