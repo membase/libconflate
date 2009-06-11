@@ -329,12 +329,12 @@ enum conflate_mgmt_cb_result {
     RV_ERROR,  /**< Invocation failed. */
     RV_BADARG, /**< Bad/incomplete arguments */
     RV_EMPTY,  /**< Invocation succeeded, but no result should be returned. */
-    RV_FORM,   /**< Invocation succeeded and a simple form should be returned. */
-    RV_LIST    /**< Invocation succeeded and a list of forms should be returned. */
+    RV_KVPAIR, /**< Invocation succeeded and a simple kv pair list should be returned. */
+    RV_LIST    /**< Invocation succeeded and a list of kv pair lists should be returned. */
 };
 
 /**
- * Callback invoked to process an adhoc command.
+ * Callback invoked to process a management command.
  *
  * @param opaque registered opaque value
  * @param handle the conflate handle

@@ -612,7 +612,7 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
             *result = out;
         }
 
-        rv = RV_FORM;
+        rv = RV_KVPAIR;
     } else {
         rv = RV_BADARG;
     }
@@ -656,7 +656,7 @@ static char* cb_name(enum conflate_mgmt_cb_result r)
     case RV_ERROR:  rv = "RV_ERROR";  break;
     case RV_BADARG: rv = "RV_BADARG"; break;
     case RV_EMPTY:  rv = "RV_EMPTY";  break;
-    case RV_FORM:   rv = "RV_FORM";   break;
+    case RV_KVPAIR: rv = "RV_KVPAIR"; break;
     case RV_LIST:   rv = "RV_LIST";   break;
     }
     return rv;
@@ -728,7 +728,7 @@ static xmpp_stanza_t* n_handler(const char *cmd,
     case RV_EMPTY:
         assert(result == NULL);
         break;
-    case RV_FORM:
+    case RV_KVPAIR:
         add_and_release(cmd_res,
                         kvpair_to_form(handle, ctx, ((kvpair_t*)result)));
         break;
