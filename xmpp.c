@@ -31,7 +31,6 @@ typedef xmpp_stanza_t *(*adhoc_handler_t)(const char *cmd,
 
 DECLARE_ADHOC(process_serverlist)
 DECLARE_ADHOC(process_stats)
-DECLARE_ADHOC(process_reset_stats)
 DECLARE_ADHOC(process_ping_test)
 
 struct command_def {
@@ -57,9 +56,6 @@ struct {
         "client_stats", "Retrieves stats from the agent", process_stats,
     },
     {
-        "reset_stats", "Reset stats on the agent", process_reset_stats,
-    },
-    {
         "ping_test", "Perform a ping test", process_ping_test
     },
     {
@@ -79,6 +75,22 @@ void conflate_register_xmpp_cb(const char *cmd, const char *desc,
     c->next = n_commands;
 
     n_commands = c;
+}
+
+static char *get_form_value(kvpair_t *form, const char *key)
+{
+    assert(key);
+
+    char *rv = NULL;
+
+    if (form) {
+        kvpair_t *valnode = find_kvpair(form, key);
+        if (valnode) {
+            rv = safe_strdup(valnode->values[0]);
+        }
+    }
+
+    return rv;
 }
 
 static void add_and_release(xmpp_stanza_t* parent, xmpp_stanza_t* child)
@@ -469,50 +481,22 @@ static xmpp_stanza_t* process_stats(const char *cmd,
     return scontext.reply;
 }
 
-static xmpp_stanza_t* process_reset_stats(const char *cmd,
-                                          xmpp_stanza_t* cmd_stanza,
-                                          xmpp_conn_t * const conn,
-                                          xmpp_stanza_t * const stanza,
-                                          void * const userdata,
-                                          bool direct)
+static enum conflate_xmpp_cb_result process_reset_stats(void *opaque,
+                                                        conflate_handle_t *handle,
+                                                        const char *cmd,
+                                                        bool direct,
+                                                        kvpair_t *form,
+                                                        void **result)
 {
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
-
-    /* Only direct stat requests are handled. */
-    assert(direct);
-
-    char *subtype = NULL;
-    kvpair_t *form = NULL;
-
-    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
-    if (x) {
-        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
-        assert(fields);
-
-        kvpair_t *form = grok_form(fields);
-        kvpair_t *valnode = find_kvpair(form, "-subtype-");
-        if (valnode) {
-            subtype = valnode->values[0];
-        }
-    }
+    char *subtype = get_form_value(form, "-subtype-");
 
     CONFLATE_LOG(handle, DEBUG, "Handling stats reset with subtype:  %s",
                  subtype ? subtype : "(null)");
 
     handle->conf->reset_stats(handle->conf->userdata, subtype, form);
 
-    free_kvpair(form);
-
-    xmpp_stanza_t* cmd_res = xmpp_stanza_new(ctx);
-
-    assert(cmd_res);
-
-    xmpp_stanza_t* reply = create_reply(ctx, stanza);
-
-    add_and_release(reply, create_cmd_response(ctx, cmd_stanza));
-
-    return reply;
+    free(subtype);
+    return RV_EMPTY;
 }
 
 struct ping_context {
@@ -596,22 +580,6 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
     }
 
     return pcontext.reply;
-}
-
-static char *get_form_value(kvpair_t *form, const char *key)
-{
-    assert(key);
-
-    char *rv = NULL;
-
-    if (form) {
-        kvpair_t *valnode = find_kvpair(form, key);
-        if (valnode) {
-            rv = safe_strdup(valnode->values[0]);
-        }
-    }
-
-    return rv;
 }
 
 static enum conflate_xmpp_cb_result process_set_private(void *opaque,
@@ -1148,6 +1116,9 @@ static void init_commands(void)
     conflate_register_xmpp_cb("rm_private",
                               "Delete a private value from the agent.",
                               process_delete_private);
+
+    conflate_register_xmpp_cb("reset_stats", "Reset stats on the agent",
+                              process_reset_stats);
 
     commands_initialized = true;
 }
