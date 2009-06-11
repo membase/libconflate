@@ -29,7 +29,6 @@ typedef xmpp_stanza_t *(*adhoc_handler_t)(const char *cmd,
                                    void * const userdata,              \
                                    bool direct);
 
-DECLARE_ADHOC(process_serverlist)
 DECLARE_ADHOC(process_stats)
 DECLARE_ADHOC(process_ping_test)
 
@@ -49,9 +48,6 @@ struct {
     char *description;
     adhoc_handler_t handler;
 } commands[] = {
-    {
-        "serverlist", "Configure a server list.", process_serverlist
-    },
     {
         "client_stats", "Retrieves stats from the agent", process_stats,
     },
@@ -124,7 +120,9 @@ static xmpp_stanza_t* create_reply(xmpp_ctx_t* ctx, xmpp_stanza_t* stanza)
 
     xmpp_stanza_set_name(reply, "iq");
     xmpp_stanza_set_type(reply, "result");
-    xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    if (xmpp_stanza_get_id(stanza)) {
+        xmpp_stanza_set_id(reply, xmpp_stanza_get_id(stanza));
+    }
     xmpp_stanza_set_attribute(reply, "to",
                               xmpp_stanza_get_attribute(stanza, "from"));
 
@@ -263,18 +261,13 @@ static kvpair_t *grok_form(xmpp_stanza_t *fields)
     return rv;
 }
 
-static xmpp_stanza_t* process_serverlist(const char *cmd,
-                                         xmpp_stanza_t* cmd_stanza,
-                                         xmpp_conn_t * const conn,
-                                         xmpp_stanza_t * const stanza,
-                                         void * const userdata,
-                                         bool direct)
+static enum conflate_xmpp_cb_result process_serverlist(void *opaque,
+                                                       conflate_handle_t *handle,
+                                                       const char *cmd,
+                                                       bool direct,
+                                                       kvpair_t *conf,
+                                                       void **result)
 {
-    xmpp_stanza_t *reply = NULL, *x = NULL, *fields = NULL;
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
-    kvpair_t* conf = NULL;
-
     /* If we have "config_is_private" set to "yes" we should only
        process this if it's direct (i.e. ignore pubsub) */
     if (!direct) {
@@ -284,20 +277,12 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
         if (priv && strcmp(priv, "yes") == 0) {
             CONFLATE_LOG(handle, INFO,
                          "Currently using a private config, ignoring update.");
-            return NULL;
+            return RV_EMPTY;
         }
         free(priv);
     }
 
     CONFLATE_LOG(handle, INFO, "Processing a serverlist");
-
-    x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
-    assert(x);
-
-    fields = xmpp_stanza_get_child_by_name(x, "field");
-    assert(fields);
-
-    conf = grok_form(fields);
 
     /* Persist the config lists */
     if (!save_kvpairs(handle, conf, handle->conf->save_path)) {
@@ -308,13 +293,7 @@ static xmpp_stanza_t* process_serverlist(const char *cmd,
     /* Send the config to the callback */
     handle->conf->new_config(handle->conf->userdata, conf);
 
-    free_kvpair(conf);
-
-    if (direct) {
-        reply = create_reply(ctx, stanza);
-    }
-
-    return reply;
+    return RV_EMPTY;
 }
 
 struct stat_context {
@@ -1119,6 +1098,9 @@ static void init_commands(void)
 
     conflate_register_xmpp_cb("reset_stats", "Reset stats on the agent",
                               process_reset_stats);
+
+    conflate_register_xmpp_cb("serverlist", "Configure a server list.",
+                              process_serverlist);
 
     commands_initialized = true;
 }
