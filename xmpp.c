@@ -731,6 +731,7 @@ static xmpp_stanza_t* n_handler(const char *cmd,
     case RV_KVPAIR:
         add_and_release(cmd_res,
                         kvpair_to_form(handle, ctx, ((kvpair_t*)result)));
+        free_kvpair(((kvpair_t*)result));
         break;
     case RV_LIST:
         assert(result);
