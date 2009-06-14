@@ -66,24 +66,24 @@ void *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="st
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#aa35807ba919761d514fc6e7a758018c">new_config</a> )(void *, <a class="el" href="structkvpair.html">kvpair_t</a> *)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when a new configuration is to be activated.  <a href="#aa35807ba919761d514fc6e7a758018c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#ecb7d2482bf96077cc839bddc9a5fe4f">get_stats</a> )(void *udata, void *opaque, char *type, <a class="el" href="structkvpair.html">kvpair_t</a> *form, <a class="el" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc">conflate_add_stat</a> cb)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#ed811fda83e3cfc43d0c3fb63ac3b23c">get_stats</a> )(void *udata, <a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, char *type, <a class="el" href="structkvpair.html">kvpair_t</a> *form)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when libconflate wants to report stats.  <a href="#ecb7d2482bf96077cc839bddc9a5fe4f"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when libconflate wants to report stats.  <a href="#ed811fda83e3cfc43d0c3fb63ac3b23c"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#7be81806fa2e08004326777f5a867a37">reset_stats</a> )(void *udata, char *type, <a class="el" href="structkvpair.html">kvpair_t</a> *form)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when libconflate wants to reset stats.  <a href="#7be81806fa2e08004326777f5a867a37"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#0066944c0fe26e74ea279e2192aa5f0c">ping_test</a> )(void *<a class="el" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7">userdata</a>, void *opaque, <a class="el" href="structkvpair.html">kvpair_t</a> *form, <a class="el" href="group___core.html#g97911227b507eef1dbcd54461cdf0398">conflate_add_ping_report</a> cb)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#7cd088bf066a22640df736a25e58e828">ping_test</a> )(void *<a class="el" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7">userdata</a>, <a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, <a class="el" href="structkvpair.html">kvpair_t</a> *form)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when libconflate would like to run a ping test against a series of servers.  <a href="#0066944c0fe26e74ea279e2192aa5f0c"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when libconflate would like to run a ping test against a series of servers.  <a href="#7cd088bf066a22640df736a25e58e828"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
 Configuration for a conflatee. <hr><h2>Member Data Documentation</h2>
-<a class="anchor" name="ecb7d2482bf96077cc839bddc9a5fe4f"></a><!-- doxytag: member="conflate_config_t::get_stats" ref="ecb7d2482bf96077cc839bddc9a5fe4f" args=")(void *udata, void *opaque, char *type, kvpair_t *form, conflate_add_stat cb)" -->
+<a class="anchor" name="ed811fda83e3cfc43d0c3fb63ac3b23c"></a><!-- doxytag: member="conflate_config_t::get_stats" ref="ed811fda83e3cfc43d0c3fb63ac3b23c" args=")(void *udata, conflate_form_result *r, char *type, kvpair_t *form)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void(* <a class="el" href="structconflate__config__t.html#ecb7d2482bf96077cc839bddc9a5fe4f">conflate_config_t::get_stats</a>)(void *udata, void *opaque, char *type, <a class="el" href="structkvpair.html">kvpair_t</a> *form, <a class="el" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc">conflate_add_stat</a> cb)          </td>
+          <td class="memname">void(* <a class="el" href="structconflate__config__t.html#ed811fda83e3cfc43d0c3fb63ac3b23c">conflate_config_t::get_stats</a>)(void *udata, <a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, char *type, <a class="el" href="structkvpair.html">kvpair_t</a> *form)          </td>
         </tr>
       </table>
 </div>
@@ -96,7 +96,7 @@ The client is expected to call the conflate_add_stat callback once for every sta
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>udata</em>&nbsp;</td><td>The client's custom user data </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>an opaque value that must be supplied to the callback </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the form into which results should be placed. </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>type</em>&nbsp;</td><td>primary stat type (may be NULL) </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>form</em>&nbsp;</td><td>detailed stat request form (may be NULL) </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>cb</em>&nbsp;</td><td>the callback into which stats will be fed </td></tr>
@@ -165,12 +165,12 @@ This callback will receive the caller's userdata and a kvpair_t of all of the ke
 The new config *may* be the same as the previous config. It's up to the client to detect and decide what to do in this case. 
 </div>
 </div><p>
-<a class="anchor" name="0066944c0fe26e74ea279e2192aa5f0c"></a><!-- doxytag: member="conflate_config_t::ping_test" ref="0066944c0fe26e74ea279e2192aa5f0c" args=")(void *userdata, void *opaque, kvpair_t *form, conflate_add_ping_report cb)" -->
+<a class="anchor" name="7cd088bf066a22640df736a25e58e828"></a><!-- doxytag: member="conflate_config_t::ping_test" ref="7cd088bf066a22640df736a25e58e828" args=")(void *userdata, conflate_form_result *r, kvpair_t *form)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void(* <a class="el" href="structconflate__config__t.html#0066944c0fe26e74ea279e2192aa5f0c">conflate_config_t::ping_test</a>)(void *<a class="el" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7">userdata</a>, void *opaque, <a class="el" href="structkvpair.html">kvpair_t</a> *form, <a class="el" href="group___core.html#g97911227b507eef1dbcd54461cdf0398">conflate_add_ping_report</a> cb)          </td>
+          <td class="memname">void(* <a class="el" href="structconflate__config__t.html#7cd088bf066a22640df736a25e58e828">conflate_config_t::ping_test</a>)(void *<a class="el" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7">userdata</a>, <a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, <a class="el" href="structkvpair.html">kvpair_t</a> *form)          </td>
         </tr>
       </table>
 </div>
@@ -182,9 +182,8 @@ Callback issued when libconflate would like to run a ping test against a series 
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>userdata</em>&nbsp;</td><td>user's callback info </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>an opaque that must be given to the callback unmodified </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>servers</em>&nbsp;</td><td>null-terminated list of null-terminated strings </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>cb</em>&nbsp;</td><td>callback to issue at the end of each test result </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the form into which results should be placed. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>form</em>&nbsp;</td><td>the form containing the ping test input </td></tr>
   </table>
 </dl>
 
@@ -251,7 +250,7 @@ For example: 1.3.3-8-gee0c3d5
 <hr>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="conflate_8h-source.html">conflate.h</a></ul>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sat Jun 13 23:28:59 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Sun Jun 14 01:00:34 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

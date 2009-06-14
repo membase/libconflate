@@ -23,9 +23,6 @@
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Configuration for a conflatee.  <a href="structconflate__config__t.html#_details">More...</a><br></td></tr>
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc">conflate_add_stat</a> )(void *opaque, const char *k, const char *v)</td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback for conflate stats.  <a href="#g3b4df1f97fc7b9d5b5421fab0b809afc"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#g97911227b507eef1dbcd54461cdf0398">conflate_add_ping_report</a> )(void *opaque, const char *set, const <a class="el" href="structkvpair.html">kvpair_t</a> *pair)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback for conflate ping reports.  <a href="#g97911227b507eef1dbcd54461cdf0398"></a><br></td></tr>
@@ -70,31 +67,6 @@ When performing a ping test, results are given back in named sets, one for each 
     <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>value given in the ping report callback </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>set</em>&nbsp;</td><td>a key indicating which of the calling sets is being reported </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>detailed information about this set's test </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="g3b4df1f97fc7b9d5b5421fab0b809afc"></a><!-- doxytag: member="conflate.h::conflate_add_stat" ref="g3b4df1f97fc7b9d5b5421fab0b809afc" args=")(void *opaque, const char *k, const char *v)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void(* <a class="el" href="group___core.html#g3b4df1f97fc7b9d5b5421fab0b809afc">conflate_add_stat</a>)(void *opaque, const char *k, const char *v)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Callback for conflate stats. 
-<p>
-The key and value parameters represent the stat name and value that should be reported.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>opaque</em>&nbsp;</td><td>value given in the stat callback </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>k</em>&nbsp;</td><td>a stat key (may not be NULL) </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>v</em>&nbsp;</td><td>a stat value (may not be NULL) </td></tr>
   </table>
 </dl>
 
@@ -190,7 +162,7 @@ The main entry point for starting a conflate agent.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sat Jun 13 23:28:59 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Sun Jun 14 01:00:34 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
