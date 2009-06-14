@@ -21,6 +21,7 @@ struct _conflate_form_result {
     xmpp_stanza_t *reply;
     xmpp_stanza_t *cmd_res;
     xmpp_stanza_t *container;
+    xmpp_stanza_t *current;
 };
 
 struct command_def {
@@ -363,8 +364,11 @@ void conflate_add_field_multi(conflate_form_result *r, const char *k,
                               const char **v)
 {
     conflate_init_form(r);
+    if (!r->current) {
+        r->current = r->container;
+    }
     if (k) {
-        add_form_values(r->ctx, r->container, k, v);
+        add_form_values(r->ctx, r->current, k, v);
     }
 }
 
@@ -417,21 +421,17 @@ static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
     return RV_OK;
 }
 
-void conflate_add_fieldset(conflate_form_result *r, const kvpair_t *pair)
+void conflate_next_fieldset(conflate_form_result *r)
 {
-    if (pair) {
         conflate_init_form(r);
-        xmpp_stanza_t *item = xmpp_stanza_new(r->ctx);
-        assert(item);
+        /* Fail if some k/v pairs were already added */
+        assert(r->current == NULL || r->current != r->container);
 
-        xmpp_stanza_set_name(item, "item");
-        add_and_release(r->container, item);
+        r->current = xmpp_stanza_new(r->ctx);
+        assert(r->current);
 
-        for (; pair; pair = pair->next) {
-            add_form_values(r->ctx, item, pair->key,
-                            (const char**)pair->values);
-        }
-    }
+        xmpp_stanza_set_name(r->current, "item");
+        add_and_release(r->container, r->current);
 }
 
 static enum conflate_mgmt_cb_result process_ping_test(void *opaque,

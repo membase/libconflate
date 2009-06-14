@@ -43,21 +43,13 @@ static void do_ping_test(void* userdata, conflate_form_result *r,
     char **servers = servers_p->values;
 
     for (int i = 0; servers[i]; i++) {
-        printf("\t%s\n", servers[i]);
-        kvpair_t *data = mk_kvpair("test1", NULL);
-        add_kvpair_value(data, "val1");
-        add_kvpair_value(data, "val2");
+        conflate_next_fieldset(r);
+        conflate_add_field(r, "-set-", servers[i]);
 
-        kvpair_t *data2 = mk_kvpair("test2", NULL);
-        add_kvpair_value(data2, "some val");
-        data->next = data2;
+        const char *vals[3] = { "val1", "val2", NULL };
+        conflate_add_field_multi(r, "test1", vals);
 
-        kvpair_t *set_name = mk_kvpair("-set-", NULL);
-        add_kvpair_value(set_name, servers[i]);
-        data2->next = set_name;
-
-        conflate_add_fieldset(r, data);
-        free_kvpair(data);
+        conflate_add_field(r, "test2", "some val");
     }
 }
 

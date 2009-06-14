@@ -176,15 +176,15 @@ void conflate_add_field_multi(conflate_form_result *r, const char *k,
     __attribute__ ((nonnull (1, 2, 3)));
 
 /**
- * Add a set of fields to a multi-valued result.
+ * Create a response container for a multi-set response.
  *
- * Do not attempt to mix this with conflate_add_field -- bad things will happen.
+ * This is used for callbacks that want to build tabular results
+ * (i.e. a list of k/v pairs).
  *
  * @param r the form as handed to the callback
- * @param pair the kvpair to add to the results
  */
-void conflate_add_fieldset(conflate_form_result *r, const kvpair_t *pair)
-    __attribute__ ((nonnull (1, 2)));
+void conflate_next_fieldset(conflate_form_result *r)
+    __attribute__ ((nonnull (1)));
 
 /**
  * Initialize the result form if it's not already initialized.
