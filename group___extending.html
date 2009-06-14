@@ -56,7 +56,9 @@ _conflate_form_result&nbsp;</td><td class="memItemRight" valign="bottom"><a clas
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback invoked to process a management command.  <a href="#g0ee0d37718ae89927b285950eb96a7b9"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Extension functions allow libconflate consumers to easily provide new management functionality specific to their own applications. <hr><h2>Enumeration Type Documentation</h2>
+Extension functions allow libconflate consumers to easily provide new management functionality specific to their own applications. 
+<p>
+Register your callbacks with <a class="el" href="group___extending.html#g1833b2ac8d2172294bf167f49755bf2a" title="Register a management command handler.">conflate_register_mgmt_cb</a> and libconflate will take over from there. <hr><h2>Enumeration Type Documentation</h2>
 <a class="anchor" name="gc4b93e99ae6ad490af10bdbd5eeec144"></a><!-- doxytag: member="conflate.h::conflate_mgmt_cb_result" ref="gc4b93e99ae6ad490af10bdbd5eeec144" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -342,14 +344,14 @@ Callback invoked to process a management command.
     <tr><td valign="top"></td><td valign="top"><em>cmd</em>&nbsp;</td><td>the name of the command being executed </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>direct</em>&nbsp;</td><td>if true, this is a directed command (else issued via pubsub) </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>the form sent with this command (may be NULL) </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the result form being built (see conflate_add_field) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the result form being built (see <a class="el" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a>) </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Jun 14 14:13:23 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Sun Jun 14 15:10:19 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
