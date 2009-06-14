@@ -274,7 +274,7 @@ static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
                                                        const char *cmd,
                                                        bool direct,
                                                        kvpair_t *conf,
-                                                       void **result)
+                                                       conflate_form_result *r)
 {
     /* If we have "config_is_private" set to "yes" we should only
        process this if it's direct (i.e. ignore pubsub) */
@@ -285,7 +285,7 @@ static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
         if (priv && strcmp(priv, "yes") == 0) {
             CONFLATE_LOG(handle, INFO,
                          "Currently using a private config, ignoring update.");
-            return RV_EMPTY;
+            return RV_OK;
         }
         free(priv);
     }
@@ -301,7 +301,7 @@ static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
     /* Send the config to the callback */
     handle->conf->new_config(handle->conf->userdata, conf);
 
-    return RV_EMPTY;
+    return RV_OK;
 }
 
 static void add_form_values(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
@@ -463,7 +463,7 @@ static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
                                                         const char *cmd,
                                                         bool direct,
                                                         kvpair_t *form,
-                                                        void **result)
+                                                        conflate_form_result *r)
 {
     char *subtype = get_form_value(form, "-subtype-");
 
@@ -473,7 +473,7 @@ static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
     handle->conf->reset_stats(handle->conf->userdata, subtype, form);
 
     free(subtype);
-    return RV_EMPTY;
+    return RV_OK;
 }
 
 struct ping_context {
@@ -561,7 +561,7 @@ static enum conflate_mgmt_cb_result process_set_private(void *opaque,
                                                         const char *cmd,
                                                         bool direct,
                                                         kvpair_t *form,
-                                                        void **result)
+                                                        conflate_form_result *r)
 {
     /* Only direct stat requests are handled. */
     assert(direct);
@@ -573,7 +573,7 @@ static enum conflate_mgmt_cb_result process_set_private(void *opaque,
     if (key && value) {
         if (conflate_save_private(handle, key, value,
                                   handle->conf->save_path)) {
-            rv = RV_EMPTY;
+            rv = RV_OK;
         }
     } else {
         rv = RV_BADARG;
@@ -590,7 +590,7 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
                                                         const char *cmd,
                                                         bool direct,
                                                         kvpair_t *form,
-                                                        void **result)
+                                                        conflate_form_result *r)
 {
     /* Only direct stat requests are handled. */
     assert(direct);
@@ -599,15 +599,16 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
     char *key = get_form_value(form, "key");
 
     if (key) {
+        /* Initialize the form so there's always one there */
+        conflate_init_form(r);
         char *value = conflate_get_private(handle, key,
                                            handle->conf->save_path);
         if (value) {
-            char *values[2] = { value, NULL };
-            kvpair_t *out = mk_kvpair(key, values);
-            *result = out;
+            conflate_add_field(r, key, value);
+            free(value);
         }
 
-        rv = RV_KVPAIR;
+        rv = RV_OK;
     } else {
         rv = RV_BADARG;
     }
@@ -622,7 +623,7 @@ static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
                                                            const char *cmd,
                                                            bool direct,
                                                            kvpair_t *form,
-                                                           void **result)
+                                                           conflate_form_result *r)
 {
     /* Only direct stat requests are handled. */
     assert(direct);
@@ -633,7 +634,7 @@ static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
     if (key) {
         if (conflate_delete_private(handle, key,
                                     handle->conf->save_path)) {
-            rv = RV_EMPTY;
+            rv = RV_OK;
         }
     } else {
         rv = RV_BADARG;
@@ -648,31 +649,11 @@ static char* cb_name(enum conflate_mgmt_cb_result r)
 {
     char *rv = "UNKNOWN";
     switch(r) {
+    case RV_OK:     rv = "RV_OK";     break;
     case RV_ERROR:  rv = "RV_ERROR";  break;
     case RV_BADARG: rv = "RV_BADARG"; break;
-    case RV_EMPTY:  rv = "RV_EMPTY";  break;
-    case RV_KVPAIR: rv = "RV_KVPAIR"; break;
-    case RV_LIST:   rv = "RV_LIST";   break;
     }
     return rv;
-}
-
-static xmpp_stanza_t *kvpair_to_form(conflate_handle_t *handle,
-                                     xmpp_ctx_t *ctx, kvpair_t *pair)
-{
-    assert(ctx);
-
-    xmpp_stanza_t *x = xmpp_stanza_new(ctx);
-    assert(x);
-    xmpp_stanza_set_name(x, "x");
-    xmpp_stanza_set_attribute(x, "xmlns", "jabber:x:data");
-    xmpp_stanza_set_type(x, "result");
-
-    for (kvpair_t *p = pair; p; p = p->next) {
-        add_form_values(ctx, x, p->key, (const char **)p->values);
-    }
-
-    return x;
 }
 
 static xmpp_stanza_t* n_handler(const char *cmd,
@@ -685,10 +666,19 @@ static xmpp_stanza_t* n_handler(const char *cmd,
 {
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
-    void *result = NULL;
+    conflate_form_result result = { .conn = conn,
+                                    .ctx = ctx,
+                                    .reply = NULL,
+                                    .cmd_res = NULL,
+                                    .container = NULL };
     kvpair_t *form = NULL;
 
     assert(cb);
+
+    result.reply = create_reply(ctx, stanza);
+    result.cmd_res = create_cmd_response(ctx, cmd_stanza);
+
+    add_and_release(result.reply, result.cmd_res);
 
     xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
     if (x) {
@@ -701,42 +691,27 @@ static xmpp_stanza_t* n_handler(const char *cmd,
     enum conflate_mgmt_cb_result rv = cb(handle->conf->userdata, handle,
                                          cmd, direct, form, &result);
 
-    CONFLATE_LOG(handle, DEBUG, "Result type of %s:  %s", cmd, cb_name(rv));
-
-    xmpp_stanza_t* reply = create_reply(ctx, stanza);
-    xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
-    add_and_release(reply, cmd_res);
+    CONFLATE_LOG(handle, DEBUG, "Result of %s:  %s", cmd, cb_name(rv));
 
     switch (rv) {
     case RV_ERROR:
-        assert(result == NULL);
-        add_cmd_error(ctx, reply, "500",
+        add_cmd_error(ctx, result.reply, "500",
                       "urn:ietf:params:xml:ns:xmpp-stanzas",
                       "internal-server-error", NULL, NULL);
         break;
     case RV_BADARG:
-        assert(result == NULL);
-        add_cmd_error(ctx, reply, "400",
+        add_cmd_error(ctx, result.reply, "400",
                       "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
                       "http://jabber.org/protocol/commands", "bad-payload");
         break;
-    case RV_EMPTY:
-        assert(result == NULL);
-        break;
-    case RV_KVPAIR:
-        add_and_release(cmd_res,
-                        kvpair_to_form(handle, ctx, ((kvpair_t*)result)));
-        free_kvpair(((kvpair_t*)result));
-        break;
-    case RV_LIST:
-        assert(result);
-        assert(false); /* XXX:  Unhandled */
+    case RV_OK:
+        /* Things are good, use the built form */
         break;
     }
 
     free_kvpair(form);
 
-    return reply;
+    return result.reply;
 }
 
 static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,

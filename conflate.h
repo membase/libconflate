@@ -175,11 +175,9 @@ void conflate_init_form(conflate_form_result *r);
  * management callback.
  */
 enum conflate_mgmt_cb_result {
+    RV_OK,     /**< Invocation worked as expected */
     RV_ERROR,  /**< Invocation failed. */
     RV_BADARG, /**< Bad/incomplete arguments */
-    RV_EMPTY,  /**< Invocation succeeded, but no result should be returned. */
-    RV_KVPAIR, /**< Invocation succeeded and a simple kv pair list should be returned. */
-    RV_LIST    /**< Invocation succeeded and a list of kv pair lists should be returned. */
 };
 
 /**
@@ -190,14 +188,14 @@ enum conflate_mgmt_cb_result {
  * @param cmd the name of the command being executed
  * @param direct if true, this is a directed command (else issued via pubsub)
  * @param pair the form sent with this command (may be NULL)
- * @param result pointer to the results
+ * @param r the result form being built (see conflate_add_field)
  */
 typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
                                                            conflate_handle_t *handle,
                                                            const char *cmd,
                                                            bool direct,
                                                            kvpair_t *pair,
-                                                           void **result);
+                                                           conflate_form_result *r);
 
 /**
  * Register a management command handler.
