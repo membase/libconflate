@@ -125,6 +125,45 @@ START_TEST (test_find_missing_item)
 }
 END_TEST
 
+START_TEST (test_simple_find_from_null)
+{
+    fail_unless(get_simple_kvpair_val(NULL, "some_key") == NULL,
+                "Couldn't find from NULL.");
+}
+END_TEST
+
+START_TEST (test_simple_find_first_item)
+{
+    char *val[2] = { "someval", NULL };
+    pair = mk_kvpair("some_key", val);
+    fail_unless(strcmp(get_simple_kvpair_val(pair, "some_key"),
+                       "someval") == 0, "Identity search failed.");
+}
+END_TEST
+
+START_TEST (test_simple_find_second_item)
+{
+    char *val[2] = { "someval", NULL };
+    kvpair_t *pair1 = mk_kvpair("some_key", val );
+    pair = mk_kvpair("some_other_key", NULL);
+    pair->next = pair1;
+
+    fail_unless(strcmp(get_simple_kvpair_val(pair, "some_key"),
+                       "someval") == 0, "Depth search failed.");
+}
+END_TEST
+
+START_TEST (test_simple_find_missing_item)
+{
+    kvpair_t *pair1 = mk_kvpair("some_key", NULL);
+    pair = mk_kvpair("some_other_key", NULL);
+    pair->next = pair1;
+
+    fail_unless(get_simple_kvpair_val(pair, "missing_key") == NULL,
+                "Negative search failed.");
+}
+END_TEST
+
 static void check_pair_equality(kvpair_t *one, kvpair_t *two)
 {
     fail_if(one == NULL, "one is null.");
@@ -232,6 +271,10 @@ static Suite* kvpair_suite (void)
     tcase_add_test (tc_core, test_find_first_item);
     tcase_add_test (tc_core, test_find_second_item);
     tcase_add_test (tc_core, test_find_missing_item);
+    tcase_add_test (tc_core, test_simple_find_from_null);
+    tcase_add_test (tc_core, test_simple_find_first_item);
+    tcase_add_test (tc_core, test_simple_find_second_item);
+    tcase_add_test (tc_core, test_simple_find_missing_item);
     tcase_add_test (tc_core, test_copy_pair);
     tcase_add_test (tc_core, test_walk_true);
     tcase_add_test (tc_core, test_walk_false);

@@ -80,6 +80,19 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
     return pair;
 }
 
+char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
+{
+    assert(key);
+    char *rv = NULL;
+
+    kvpair_t *found = find_kvpair(pair, key);
+    if (found) {
+        rv = found->values[0];
+    }
+
+    return rv;
+}
+
 kvpair_t *dup_kvpair(kvpair_t *pair)
 {
     assert(pair);

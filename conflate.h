@@ -110,6 +110,21 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
     __attribute__ ((warn_unused_result, nonnull (2)));
 
 /**
+ * Find a simple value from a kvpair list.
+ *
+ * If a kvpair_t is found with the given key, return the first value.
+ * This does not duplicate the value, so you should neither free it,
+ * nor free the kvpair containing it as long as you're intending to
+ * use it.
+ *
+ * @param pair the pair to search
+ * @param key the key to find
+ * @return a pointer to the first value found, or NULL if none was found
+ */
+char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
+    __attribute__ ((warn_unused_result, nonnull (2)));
+
+/**
  * Copy a chain of kvpairs.
  *
  * @param pair the pair to duplicate (recursively)
