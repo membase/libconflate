@@ -322,6 +322,18 @@ void init_conflate(conflate_config_t *conf) __attribute__ ((nonnull (1)));
 bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result));
 
 /**
+ * @}
+ */
+
+/**
+ * \defgroup Extending
+ * @{
+ *
+ * Extension functions allow libconflate consumers to easily provide
+ * new management functionality specific to their own applications.
+ */
+
+/**
  * Callback return types indicating status and result type of a
  * management callback.
  */
