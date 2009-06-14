@@ -30,7 +30,7 @@ struct command_def {
 };
 
 bool commands_initialized = false;
-struct command_def *n_commands = NULL;
+struct command_def *commands = NULL;
 
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
                                conflate_mgmt_cb_t cb)
@@ -41,9 +41,9 @@ void conflate_register_mgmt_cb(const char *cmd, const char *desc,
     c->name = safe_strdup(cmd);
     c->description = safe_strdup(desc);
     c->cb = cb;
-    c->next = n_commands;
+    c->next = commands;
 
-    n_commands = c;
+    commands = c;
 }
 
 static char *get_form_value(kvpair_t *form, const char *key)
@@ -612,9 +612,9 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
 
     conflate_mgmt_cb_t cb = NULL;
-    struct command_def *p = n_commands;
+    struct command_def *p = commands;
 
-    for (p = n_commands; p && !cb; p = p->next) {
+    for (p = commands; p && !cb; p = p->next) {
         if (strcmp(cmd, p->name) == 0) {
             cb = p->cb;
         }
@@ -707,7 +707,7 @@ static int disco_items_handler(xmpp_conn_t * const conn,
     xmpp_stanza_set_attribute(query, "node", "http://jabber.org/protocol/commands");
     add_and_release(reply, query);
 
-    for (struct command_def *p = n_commands; p; p = p->next) {
+    for (struct command_def *p = commands; p; p = p->next) {
         add_disco_item(handle->ctx, query, myjid, p->name, p->description);
     }
 
