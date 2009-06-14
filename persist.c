@@ -6,6 +6,7 @@
 #include <sqlite3.h>
 
 #include "conflate.h"
+#include "conflate_internal.h"
 #include "conflate_convenience.h"
 
 #define HAS_KEYS    1

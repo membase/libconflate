@@ -6,6 +6,7 @@
 #include <check.h>
 
 #include <conflate.h>
+#include <conflate_internal.h>
 
 static conflate_handle_t *handle;
 static conflate_config_t conf;
