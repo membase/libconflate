@@ -263,21 +263,21 @@ static Suite* kvpair_suite (void)
 
     tcase_add_checked_fixture(tc_core, setup, teardown);
 
-    tcase_add_test (tc_core, test_mk_pair_with_arg);
-    tcase_add_test (tc_core, test_mk_pair_without_arg);
-    tcase_add_test (tc_core, test_add_value_to_existing_values);
-    tcase_add_test (tc_core, test_add_value_to_empty_values);
-    tcase_add_test (tc_core, test_find_from_null);
-    tcase_add_test (tc_core, test_find_first_item);
-    tcase_add_test (tc_core, test_find_second_item);
-    tcase_add_test (tc_core, test_find_missing_item);
-    tcase_add_test (tc_core, test_simple_find_from_null);
-    tcase_add_test (tc_core, test_simple_find_first_item);
-    tcase_add_test (tc_core, test_simple_find_second_item);
-    tcase_add_test (tc_core, test_simple_find_missing_item);
-    tcase_add_test (tc_core, test_copy_pair);
-    tcase_add_test (tc_core, test_walk_true);
-    tcase_add_test (tc_core, test_walk_false);
+    tcase_add_test(tc_core, test_mk_pair_with_arg);
+    tcase_add_test(tc_core, test_mk_pair_without_arg);
+    tcase_add_test(tc_core, test_add_value_to_existing_values);
+    tcase_add_test(tc_core, test_add_value_to_empty_values);
+    tcase_add_test(tc_core, test_find_from_null);
+    tcase_add_test(tc_core, test_find_first_item);
+    tcase_add_test(tc_core, test_find_second_item);
+    tcase_add_test(tc_core, test_find_missing_item);
+    tcase_add_test(tc_core, test_simple_find_from_null);
+    tcase_add_test(tc_core, test_simple_find_first_item);
+    tcase_add_test(tc_core, test_simple_find_second_item);
+    tcase_add_test(tc_core, test_simple_find_missing_item);
+    tcase_add_test(tc_core, test_copy_pair);
+    tcase_add_test(tc_core, test_walk_true);
+    tcase_add_test(tc_core, test_walk_false);
     suite_add_tcase (s, tc_core);
 
     return s;
