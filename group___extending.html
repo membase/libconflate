@@ -38,9 +38,12 @@ _conflate_form_result&nbsp;</td><td class="memItemRight" valign="bottom"><a clas
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3">conflate_add_field</a> (<a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, const char *k, const char *v)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a single k/v pair in a response form.  <a href="#g6245f741ce87f7ac98ded24c80638da3"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#g92c6980fba247c3e7bfca653763ff7a1">conflate_add_fieldset</a> (<a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, const <a class="el" href="structkvpair.html">kvpair_t</a> *pair)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#gf372ea10e8fcb1b6fe926ca214453746">conflate_add_field_multi</a> (<a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, const char *k, const char **v)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a set of fields to a multi-valued result.  <a href="#g92c6980fba247c3e7bfca653763ff7a1"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a multi-valued key to a response form.  <a href="#gf372ea10e8fcb1b6fe926ca214453746"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#g71c7aaf74d048736999be3ff16ca5fe8">conflate_next_fieldset</a> (<a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create a response container for a multi-set response.  <a href="#g71c7aaf74d048736999be3ff16ca5fe8"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#g671b90efdb76f421276d19fa9673ed88">conflate_init_form</a> (<a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initialize the result form if it's not already initialized.  <a href="#g671b90efdb76f421276d19fa9673ed88"></a><br></td></tr>
@@ -132,17 +135,17 @@ Here is the call graph for this function:</div>
 <div class="dynsection">
 <p><center><img src="group___extending_g6245f741ce87f7ac98ded24c80638da3_cgraph.png" border="0" usemap="#group___extending_g6245f741ce87f7ac98ded24c80638da3_cgraph_map" alt=""></center>
 <map name="group___extending_g6245f741ce87f7ac98ded24c80638da3_cgraph_map">
-<area shape="rect" id="node3" href="group___extending.html#g671b90efdb76f421276d19fa9673ed88" title="Initialize the result form if it&#39;s not already initialized." alt="" coords="192,5,331,35"></map>
+<area shape="rect" id="node3" href="group___extending.html#gf372ea10e8fcb1b6fe926ca214453746" title="Add a multi&#45;valued key to a response form." alt="" coords="192,5,371,35"><area shape="rect" id="node5" href="group___extending.html#g671b90efdb76f421276d19fa9673ed88" title="Initialize the result form if it&#39;s not already initialized." alt="" coords="419,5,557,35"></map>
 </div>
 
 </div>
 </div><p>
-<a class="anchor" name="g92c6980fba247c3e7bfca653763ff7a1"></a><!-- doxytag: member="conflate.h::conflate_add_fieldset" ref="g92c6980fba247c3e7bfca653763ff7a1" args="(conflate_form_result *r, const kvpair_t *pair)" -->
+<a class="anchor" name="gf372ea10e8fcb1b6fe926ca214453746"></a><!-- doxytag: member="conflate.h::conflate_add_field_multi" ref="gf372ea10e8fcb1b6fe926ca214453746" args="(conflate_form_result *r, const char *k, const char **v)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void conflate_add_fieldset           </td>
+          <td class="memname">void conflate_add_field_multi           </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *&nbsp;</td>
           <td class="paramname"> <em>r</em>, </td>
@@ -150,8 +153,14 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structkvpair.html">kvpair_t</a> *&nbsp;</td>
-          <td class="paramname"> <em>pair</em></td><td>&nbsp;</td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>k</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&nbsp;</td>
+          <td class="paramname"> <em>v</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -163,13 +172,13 @@ Here is the call graph for this function:</div>
 <div class="memdoc">
 
 <p>
-Add a set of fields to a multi-valued result. 
+Add a multi-valued key to a response form. 
 <p>
-Do not attempt to mix this with conflate_add_field -- bad things will happen.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the form as handed to the callback </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>the <a class="el" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair</a> to add to the results </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>k</em>&nbsp;</td><td>the form key (may not be NULL) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>v</em>&nbsp;</td><td>the response values (may not be NULL -- NULL terminated) </td></tr>
   </table>
 </dl>
 
@@ -177,9 +186,18 @@ Do not attempt to mix this with conflate_add_field -- bad things will happen.<p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
-<p><center><img src="group___extending_g92c6980fba247c3e7bfca653763ff7a1_cgraph.png" border="0" usemap="#group___extending_g92c6980fba247c3e7bfca653763ff7a1_cgraph_map" alt=""></center>
-<map name="group___extending_g92c6980fba247c3e7bfca653763ff7a1_cgraph_map">
-<area shape="rect" id="node3" href="group___extending.html#g671b90efdb76f421276d19fa9673ed88" title="Initialize the result form if it&#39;s not already initialized." alt="" coords="213,5,352,35"></map>
+<p><center><img src="group___extending_gf372ea10e8fcb1b6fe926ca214453746_cgraph.png" border="0" usemap="#group___extending_gf372ea10e8fcb1b6fe926ca214453746_cgraph_map" alt=""></center>
+<map name="group___extending_gf372ea10e8fcb1b6fe926ca214453746_cgraph_map">
+<area shape="rect" id="node3" href="group___extending.html#g671b90efdb76f421276d19fa9673ed88" title="Initialize the result form if it&#39;s not already initialized." alt="" coords="232,5,371,35"></map>
+</div>
+
+<p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group___extending_gf372ea10e8fcb1b6fe926ca214453746_icgraph.png" border="0" usemap="#group___extending_gf372ea10e8fcb1b6fe926ca214453746_icgraph_map" alt=""></center>
+<map name="group___extending_gf372ea10e8fcb1b6fe926ca214453746_icgraph_map">
+<area shape="rect" id="node3" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form." alt="" coords="232,5,371,35"></map>
 </div>
 
 </div>
@@ -210,7 +228,44 @@ Here is the caller graph for this function:</div>
 <div class="dynsection">
 <p><center><img src="group___extending_g671b90efdb76f421276d19fa9673ed88_icgraph.png" border="0" usemap="#group___extending_g671b90efdb76f421276d19fa9673ed88_icgraph_map" alt=""></center>
 <map name="group___extending_g671b90efdb76f421276d19fa9673ed88_icgraph_map">
-<area shape="rect" id="node3" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form." alt="" coords="203,5,341,35"><area shape="rect" id="node5" href="group___extending.html#g92c6980fba247c3e7bfca653763ff7a1" title="Add a set of fields to a multi&#45;valued result." alt="" coords="193,58,351,89"></map>
+<area shape="rect" id="node3" href="group___extending.html#gf372ea10e8fcb1b6fe926ca214453746" title="Add a multi&#45;valued key to a response form." alt="" coords="192,5,371,35"><area shape="rect" id="node7" href="group___extending.html#g71c7aaf74d048736999be3ff16ca5fe8" title="Create a response container for a multi&#45;set response." alt="" coords="200,58,363,89"><area shape="rect" id="node5" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form." alt="" coords="419,5,557,35"></map>
+</div>
+
+</div>
+</div><p>
+<a class="anchor" name="g71c7aaf74d048736999be3ff16ca5fe8"></a><!-- doxytag: member="conflate.h::conflate_next_fieldset" ref="g71c7aaf74d048736999be3ff16ca5fe8" args="(conflate_form_result *r)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void conflate_next_fieldset           </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *&nbsp;</td>
+          <td class="paramname"> <em>r</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create a response container for a multi-set response. 
+<p>
+This is used for callbacks that want to build tabular results (i.e. a list of k/v pairs).<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the form as handed to the callback </td></tr>
+  </table>
+</dl>
+
+<p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group___extending_g71c7aaf74d048736999be3ff16ca5fe8_cgraph.png" border="0" usemap="#group___extending_g71c7aaf74d048736999be3ff16ca5fe8_cgraph_map" alt=""></center>
+<map name="group___extending_g71c7aaf74d048736999be3ff16ca5fe8_cgraph_map">
+<area shape="rect" id="node3" href="group___extending.html#g671b90efdb76f421276d19fa9673ed88" title="Initialize the result form if it&#39;s not already initialized." alt="" coords="216,5,355,35"></map>
 </div>
 
 </div>
@@ -294,7 +349,7 @@ Callback invoked to process a management command.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Jun 14 01:13:40 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Sun Jun 14 13:39:25 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
