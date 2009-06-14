@@ -33,13 +33,9 @@ static enum conflate_mgmt_cb_result process_stats(void *opaque,
     /* Only direct stat requests are handled. */
     assert(direct);
 
-    char *subtype = NULL;
-    kvpair_t *valnode = find_kvpair(form, "-subtype-");
-    if (valnode) {
-        subtype = valnode->values[0];
-    }
+    char *subtype = get_simple_kvpair_val(form, "-subtype-");
 
-    fprintf(stderr, "Handling stats request with subtype:  %s",
+    fprintf(stderr, "Handling stats request with subtype:  %s\n",
             subtype ? subtype : "(null)");
 
     conflate_add_field(r, "stat1", "val1");
@@ -56,13 +52,9 @@ static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
                                                         kvpair_t *form,
                                                         conflate_form_result *r)
 {
-    char *subtype = NULL;
-    kvpair_t *valnode = find_kvpair(form, "-subtype-");
-    if (valnode) {
-        subtype = valnode->values[0];
-    }
+    char *subtype = get_simple_kvpair_val(form, "-subtype-");
 
-    fprintf(stderr, "Handling stats reset with subtype:  %s",
+    fprintf(stderr, "Handling stats reset with subtype:  %s\n",
             subtype ? subtype : "(null)");
 
     return RV_OK;
