@@ -164,6 +164,16 @@ typedef struct _conflate_form_result conflate_form_result;
 void conflate_add_field(conflate_form_result *r, const char *k, const char *v);
 
 /**
+ * Add a multi-valued key to a response form.
+ *
+ * @param r the form as handed to the callback
+ * @param k the form key (may not be NULL)
+ * @param v the response values (may not be NULL -- NULL terminated)
+ */
+void conflate_add_field_multi(conflate_form_result *r, const char *k,
+                              const char **v);
+
+/**
  * Add a set of fields to a multi-valued result.
  *
  * Do not attempt to mix this with conflate_add_field -- bad things will happen.

@@ -294,13 +294,6 @@ static void add_form_values(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
     }
 }
 
-static void add_form_value(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
-                            const char *key, const char *value)
-{
-    const char *values[2] = {value, NULL};
-    add_form_values(ctx, parent, key, values);
-}
-
 static void add_cmd_error(xmpp_ctx_t *ctx,
                           xmpp_stanza_t * reply, const char *code,
                           const char *ns, const char *name,
@@ -366,12 +359,19 @@ void conflate_init_form(conflate_form_result *r)
     }
 }
 
-void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
+void conflate_add_field_multi(conflate_form_result *r, const char *k,
+                              const char **v)
 {
     conflate_init_form(r);
     if (k) {
-        add_form_value(r->ctx, r->container, k, v);
+        add_form_values(r->ctx, r->container, k, v);
     }
+}
+
+void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
+{
+    const char *vals[2] = { v, NULL };
+    conflate_add_field_multi(r, k, vals);
 }
 
 static enum conflate_mgmt_cb_result process_stats(void *opaque,
