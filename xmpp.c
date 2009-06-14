@@ -48,22 +48,6 @@ void conflate_register_mgmt_cb(const char *cmd, const char *desc,
     commands = c;
 }
 
-static char *get_form_value(kvpair_t *form, const char *key)
-{
-    assert(key);
-
-    char *rv = NULL;
-
-    if (form) {
-        kvpair_t *valnode = find_kvpair(form, key);
-        if (valnode) {
-            rv = safe_strdup(valnode->values[0]);
-        }
-    }
-
-    return rv;
-}
-
 static void add_and_release(xmpp_stanza_t* parent, xmpp_stanza_t* child)
 {
     xmpp_stanza_add_child(parent, child);
@@ -402,8 +386,8 @@ static enum conflate_mgmt_cb_result process_set_private(void *opaque,
     assert(direct);
     enum conflate_mgmt_cb_result rv = RV_ERROR;
 
-    char *key = get_form_value(form, "key");
-    char *value = get_form_value(form, "value");
+    char *key = get_simple_kvpair_val(form, "key");
+    char *value = get_simple_kvpair_val(form, "value");
 
     if (key && value) {
         if (conflate_save_private(handle, key, value,
@@ -413,9 +397,6 @@ static enum conflate_mgmt_cb_result process_set_private(void *opaque,
     } else {
         rv = RV_BADARG;
     }
-
-    free(key);
-    free(value);
 
     return rv;
 }
@@ -431,7 +412,7 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
     assert(direct);
     enum conflate_mgmt_cb_result rv = RV_ERROR;
 
-    char *key = get_form_value(form, "key");
+    char *key = get_simple_kvpair_val(form, "key");
 
     if (key) {
         /* Initialize the form so there's always one there */
@@ -448,8 +429,6 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
         rv = RV_BADARG;
     }
 
-    free(key);
-
     return rv;
 }
 
@@ -464,7 +443,7 @@ static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
     assert(direct);
     enum conflate_mgmt_cb_result rv = RV_ERROR;
 
-    char *key = get_form_value(form, "key");
+    char *key = get_simple_kvpair_val(form, "key");
 
     if (key) {
         if (conflate_delete_private(handle, key,
@@ -474,8 +453,6 @@ static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
     } else {
         rv = RV_BADARG;
     }
-
-    free(key);
 
     return rv;
 }
