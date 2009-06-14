@@ -35,8 +35,8 @@ static void do_reset_stats(void* userdata, char *type, kvpair_t *form)
     printf("Resetting stats...\n");
 }
 
-static void do_ping_test(void* userdata, void* opaque, kvpair_t *form,
-                         conflate_add_ping_report cb)
+static void do_ping_test(void* userdata, conflate_form_result *r,
+                         kvpair_t *form)
 {
     kvpair_t *servers_p = find_kvpair(form, "servers");
     assert(servers_p);
@@ -52,11 +52,13 @@ static void do_ping_test(void* userdata, void* opaque, kvpair_t *form,
         add_kvpair_value(data2, "some val");
         data->next = data2;
 
-        cb(opaque, servers[i], data);
+        kvpair_t *set_name = mk_kvpair("-set-", NULL);
+        add_kvpair_value(set_name, servers[i]);
+        data2->next = set_name;
+
+        conflate_add_fieldset(r, data);
         free_kvpair(data);
     }
-
-    cb(opaque, NULL, NULL);
 }
 
 int main(int argc, char **argv) {

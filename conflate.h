@@ -164,6 +164,16 @@ typedef struct _conflate_form_result conflate_form_result;
 void conflate_add_field(conflate_form_result *r, const char *k, const char *v);
 
 /**
+ * Add a set of fields to a multi-valued result.
+ *
+ * Do not attempt to mix this with conflate_add_field -- bad things will happen.
+ *
+ * @param r the form as handed to the callback
+ * @param pair the kvpair to add to the results
+ */
+void conflate_add_fieldset(conflate_form_result *r, const kvpair_t *pair);
+
+/**
  * Initialize the result form if it's not already initialized.
  *
  * This is useful for the case where an empty form may be desirable.
@@ -346,13 +356,11 @@ typedef struct {
      * against a series of servers.
      *
      * @param userdata user's callback info
-     * @param opaque an opaque that must be given to the callback
-     *        unmodified
-     * @param servers null-terminated list of null-terminated strings
-     * @param cb callback to issue at the end of each test result
+     * @param r the form into which results should be placed.
+     * @param form the form containing the ping test input
      */
-    void (*ping_test)(void* userdata, void* opaque,
-                      kvpair_t *form, conflate_add_ping_report cb);
+    void (*ping_test)(void* userdata, conflate_form_result *r,
+                      kvpair_t *form);
 
     /** \private */
     void *initialization_marker;

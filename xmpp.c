@@ -14,23 +14,6 @@
 /* The private key under which the JID to use is stored */
 #define STORED_JID_KEY "stored_jid"
 
-typedef xmpp_stanza_t *(*adhoc_handler_t)(const char *cmd,
-                                          xmpp_stanza_t* cmd_stanza,
-                                          xmpp_conn_t * const conn,
-                                          xmpp_stanza_t * const stanza,
-                                          void * const userdata,
-                                          bool direct);
-
-#define DECLARE_ADHOC(funcname)                                        \
-    static xmpp_stanza_t* funcname(const char *cmd,                    \
-                                   xmpp_stanza_t* cmd_stanza,          \
-                                   xmpp_conn_t * const conn,           \
-                                   xmpp_stanza_t * const stanza,       \
-                                   void * const userdata,              \
-                                   bool direct);
-
-DECLARE_ADHOC(process_ping_test)
-
 struct _conflate_form_result {
     xmpp_conn_t   *conn;
     xmpp_ctx_t    *ctx;
@@ -48,20 +31,6 @@ struct command_def {
 
 bool commands_initialized = false;
 struct command_def *n_commands = NULL;
-
-/* All commands */
-struct {
-    char *name;
-    char *description;
-    adhoc_handler_t handler;
-} commands[] = {
-    {
-        "ping_test", "Perform a ping test", process_ping_test
-    },
-    {
-        NULL, NULL, NULL
-    }
-};
 
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
                                conflate_mgmt_cb_t cb)
@@ -447,84 +416,32 @@ static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
     return RV_OK;
 }
 
-struct ping_context {
-    xmpp_conn_t*   conn;
-    xmpp_ctx_t*    ctx;
-    xmpp_stanza_t* reply;
-    xmpp_stanza_t* container;
-    bool           complete;
-};
-
-static void ping_adder(void *opaque, const char *set, const kvpair_t *pair)
+void conflate_add_fieldset(conflate_form_result *r, const kvpair_t *pair)
 {
-    struct ping_context *pcontext = (struct ping_context*)opaque;
-
-    if (set) {
-        xmpp_stanza_t *item = xmpp_stanza_new(pcontext->ctx);
+    if (pair) {
+        conflate_init_form(r);
+        xmpp_stanza_t *item = xmpp_stanza_new(r->ctx);
         assert(item);
 
         xmpp_stanza_set_name(item, "item");
-        add_and_release(pcontext->container, item);
+        add_and_release(r->container, item);
 
         for (; pair; pair = pair->next) {
-            add_form_value(pcontext->ctx, item, "-set-", set);
-            add_form_values(pcontext->ctx, item, pair->key,
+            add_form_values(r->ctx, item, pair->key,
                             (const char**)pair->values);
         }
-    } else {
-        pcontext->complete = true;
     }
 }
 
-static xmpp_stanza_t* process_ping_test(const char *cmd,
-                                        xmpp_stanza_t* cmd_stanza,
-                                        xmpp_conn_t * const conn,
-                                        xmpp_stanza_t * const stanza,
-                                        void * const userdata,
-                                        bool direct)
+static enum conflate_mgmt_cb_result process_ping_test(void *opaque,
+                                                      conflate_handle_t *handle,
+                                                      const char *cmd,
+                                                      bool direct,
+                                                      kvpair_t *form,
+                                                      conflate_form_result *r)
 {
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
-    conflate_form_result pcontext = { .conn = conn,
-                                      .ctx = ctx,
-                                      .reply = NULL,
-                                      .container = xmpp_stanza_new(ctx) };
-
-    assert(pcontext.container);
-
-    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
-    if (x) {
-        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
-        assert(fields);
-
-        kvpair_t *form = grok_form(fields);
-
-        pcontext.reply = create_reply(ctx, stanza);
-        xmpp_stanza_t *cmd_res = create_cmd_response(ctx, cmd_stanza);
-
-        add_and_release(pcontext.reply, cmd_res);
-
-        /* X data in the command response */
-        xmpp_stanza_set_name(pcontext.container, "x");
-        xmpp_stanza_set_attribute(pcontext.container, "xmlns", "jabber:x:data");
-        xmpp_stanza_set_type(pcontext.container, "result");
-        add_and_release(cmd_res, pcontext.container);
-
-        handle->conf->ping_test(handle->conf->userdata, &pcontext,
-                                form, ping_adder);
-
-        free_kvpair(form);
-    } else {
-        /* Maybe someday we can drive the other side through the
-           complex task of specifying a ping test. */
-        pcontext.reply = create_reply(ctx, stanza);
-        add_and_release(pcontext.reply, create_cmd_response(ctx, cmd_stanza));
-        add_cmd_error(ctx, pcontext.reply, "400",
-                      "urn:ietf:params:xml:ns:xmpp-stanzas", "bad-request",
-                      "http://jabber.org/protocol/commands", "bad-payload");
-    }
-
-    return pcontext.reply;
+    handle->conf->ping_test(handle->conf->userdata, r, form);
+    return RV_OK;
 }
 
 static enum conflate_mgmt_cb_result process_set_private(void *opaque,
@@ -693,33 +610,20 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
                                        bool direct)
 {
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    adhoc_handler_t handler = error_unknown_command;
 
-    for (int i = 0; commands[i].handler; i++) {
-        if (strcmp(cmd, commands[i].name) == 0) {
-            handler = commands[i].handler;
+    conflate_mgmt_cb_t cb = NULL;
+    struct command_def *p = n_commands;
+
+    for (p = n_commands; p && !cb; p = p->next) {
+        if (strcmp(cmd, p->name) == 0) {
+            cb = p->cb;
         }
     }
 
-    /* If we haven't found an old style command, look for a new style
-       command */
-    if (handler == error_unknown_command) {
-        conflate_mgmt_cb_t cb = NULL;
-        struct command_def *p = n_commands;
-
-        for (p = n_commands; p && !cb; p = p->next) {
-            if (strcmp(cmd, p->name) == 0) {
-                cb = p->cb;
-            }
-        }
-
-        if (cb) {
-            return n_handler(cmd, req, conn, stanza, handle, direct, cb);
-        } else {
-            return handler(cmd, req, conn, stanza, handle, direct);
-        }
+    if (cb) {
+        return n_handler(cmd, req, conn, stanza, handle, direct, cb);
     } else {
-        return handler(cmd, req, conn, stanza, handle, direct);
+        return error_unknown_command(cmd, req, conn, stanza, handle, direct);
     }
 }
 
@@ -803,12 +707,6 @@ static int disco_items_handler(xmpp_conn_t * const conn,
     xmpp_stanza_set_attribute(query, "node", "http://jabber.org/protocol/commands");
     add_and_release(reply, query);
 
-    for (int i = 0; commands[i].name; i++) {
-        add_disco_item(handle->ctx, query, myjid,
-                       commands[i].name, commands[i].description);
-    }
-
-    /* New style commands */
     for (struct command_def *p = n_commands; p; p = p->next) {
         add_disco_item(handle->ctx, query, myjid, p->name, p->description);
     }
@@ -1042,6 +940,9 @@ static void init_commands(void)
                               process_stats);
     conflate_register_mgmt_cb("reset_stats", "Reset stats on the agent",
                               process_reset_stats);
+
+    conflate_register_mgmt_cb("ping_test", "Perform a ping test",
+                              process_ping_test);
 
     conflate_register_mgmt_cb("serverlist", "Configure a server list.",
                               process_serverlist);

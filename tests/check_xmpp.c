@@ -19,8 +19,8 @@ static void reset_stats_cb(void* userdata, char *type, kvpair_t *form)
 {
 }
 
-static void ping_test_cb(void* userdata, void* opaque,
-                         kvpair_t *conf, conflate_add_ping_report cb)
+static void ping_test_cb(void* userdata, conflate_form_result *r,
+                         kvpair_t *conf)
 {
 }
 
