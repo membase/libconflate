@@ -29,7 +29,6 @@ typedef xmpp_stanza_t *(*adhoc_handler_t)(const char *cmd,
                                    void * const userdata,              \
                                    bool direct);
 
-DECLARE_ADHOC(process_stats)
 DECLARE_ADHOC(process_ping_test)
 
 struct _conflate_form_result {
@@ -56,9 +55,6 @@ struct {
     char *description;
     adhoc_handler_t handler;
 } commands[] = {
-    {
-        "client_stats", "Retrieves stats from the agent", process_stats,
-    },
     {
         "ping_test", "Perform a ping test", process_ping_test
     },
@@ -408,54 +404,29 @@ void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
     }
 }
 
-static xmpp_stanza_t* process_stats(const char *cmd,
-                                    xmpp_stanza_t* cmd_stanza,
-                                    xmpp_conn_t * const conn,
-                                    xmpp_stanza_t * const stanza,
-                                    void * const userdata,
-                                    bool direct)
+static enum conflate_mgmt_cb_result process_stats(void *opaque,
+                                                  conflate_handle_t *handle,
+                                                  const char *cmd,
+                                                  bool direct,
+                                                  kvpair_t *form,
+                                                  conflate_form_result *r)
 {
-    conflate_handle_t *handle = (conflate_handle_t*) userdata;
-    xmpp_ctx_t *ctx = handle->ctx;
-
     /* Only direct stat requests are handled. */
     assert(direct);
 
-    conflate_form_result scontext = { .conn = conn,
-                                      .ctx = ctx,
-                                      .reply = NULL,
-                                      .cmd_res = NULL,
-                                      .container = NULL };
-
-    scontext.reply = create_reply(ctx, stanza);
-    scontext.cmd_res = create_cmd_response(ctx, cmd_stanza);
-
-    add_and_release(scontext.reply, scontext.cmd_res);
-
     char *subtype = NULL;
-    kvpair_t *form = NULL;
-
-    xmpp_stanza_t *x = xmpp_stanza_get_child_by_name(cmd_stanza, "x");
-    if (x) {
-        xmpp_stanza_t *fields = xmpp_stanza_get_child_by_name(x, "field");
-        assert(fields);
-
-        kvpair_t *form = grok_form(fields);
-        kvpair_t *valnode = find_kvpair(form, "-subtype-");
-        if (valnode) {
-            subtype = valnode->values[0];
-        }
+    kvpair_t *valnode = find_kvpair(form, "-subtype-");
+    if (valnode) {
+        subtype = valnode->values[0];
     }
 
     CONFLATE_LOG(handle, DEBUG, "Handling stats request with subtype:  %s",
                  subtype ? subtype : "(null)");
 
-    handle->conf->get_stats(handle->conf->userdata, &scontext,
+    handle->conf->get_stats(handle->conf->userdata, r,
                             subtype, form);
 
-    free_kvpair(form);
-
-    return scontext.reply;
+    return RV_OK;
 }
 
 static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
@@ -1067,6 +1038,8 @@ static void init_commands(void)
                               "Delete a private value from the agent.",
                               process_delete_private);
 
+    conflate_register_mgmt_cb("client_stats", "Retrieves stats from the agent",
+                              process_stats);
     conflate_register_mgmt_cb("reset_stats", "Reset stats on the agent",
                               process_reset_stats);
 
