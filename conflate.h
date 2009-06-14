@@ -161,7 +161,8 @@ typedef struct _conflate_form_result conflate_form_result;
  * @param k a form key (may not be NULL)
  * @param v a form value (may not be NULL)
  */
-void conflate_add_field(conflate_form_result *r, const char *k, const char *v);
+void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
+    __attribute__ ((nonnull (1, 2, 3)));
 
 /**
  * Add a multi-valued key to a response form.
@@ -171,7 +172,8 @@ void conflate_add_field(conflate_form_result *r, const char *k, const char *v);
  * @param v the response values (may not be NULL -- NULL terminated)
  */
 void conflate_add_field_multi(conflate_form_result *r, const char *k,
-                              const char **v);
+                              const char **v)
+    __attribute__ ((nonnull (1, 2, 3)));
 
 /**
  * Add a set of fields to a multi-valued result.
@@ -181,7 +183,8 @@ void conflate_add_field_multi(conflate_form_result *r, const char *k,
  * @param r the form as handed to the callback
  * @param pair the kvpair to add to the results
  */
-void conflate_add_fieldset(conflate_form_result *r, const kvpair_t *pair);
+void conflate_add_fieldset(conflate_form_result *r, const kvpair_t *pair)
+    __attribute__ ((nonnull (1, 2)));
 
 /**
  * Initialize the result form if it's not already initialized.
@@ -238,7 +241,8 @@ typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
  * @param cb the callback to issue when this command is invoked
  */
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
-                               conflate_mgmt_cb_t cb);
+                               conflate_mgmt_cb_t cb)
+    __attribute__ ((nonnull (1, 2, 3)));
 
 /**
  * @}
