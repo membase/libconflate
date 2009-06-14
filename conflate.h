@@ -23,8 +23,15 @@
  * Jump right into <a href="modules.html">the modules docs</a> to get started.
  */
 
+/* Forward declaration */
+typedef struct _conflate_handle conflate_handle_t;
+
 /**
  * \defgroup Core
+ */
+
+/**
+ * \defgroup Extending
  */
 
 /**
@@ -135,22 +142,94 @@ void free_kvpair(kvpair_t* pair)
  */
 
 /**
- * \defgroup Core
+ * \defgroup Extending
  * @{
+ *
+ * Extension functions allow libconflate consumers to easily provide
+ * new management functionality specific to their own applications.
  */
 
 /**
- * Callback for conflate stats.
- *
- * The key and value parameters represent the stat name and value that
- * should be reported.
- *
- * @param opaque value given in the stat callback
- * @param k a stat key (may not be NULL)
- * @param v a stat value (may not be NULL)
+ * Callback response form builder.
  */
-typedef void (*conflate_add_stat)(void* opaque, const char *k, const char *v);
+typedef struct _conflate_form_result conflate_form_result;
 
+/**
+ * Add a single k/v pair in a response form.
+ *
+ * @param the form as handed to the callback
+ * @param k a form key (may not be NULL)
+ * @param v a form value (may not be NULL)
+ */
+void conflate_add_field(conflate_form_result *r, const char *k, const char *v);
+
+/**
+ * Initialize the result form if it's not already initialized.
+ *
+ * This is useful for the case where an empty form may be desirable.
+ */
+void conflate_init_form(conflate_form_result *r);
+
+/**
+ * Callback return types indicating status and result type of a
+ * management callback.
+ */
+enum conflate_mgmt_cb_result {
+    RV_ERROR,  /**< Invocation failed. */
+    RV_BADARG, /**< Bad/incomplete arguments */
+    RV_EMPTY,  /**< Invocation succeeded, but no result should be returned. */
+    RV_KVPAIR, /**< Invocation succeeded and a simple kv pair list should be returned. */
+    RV_LIST    /**< Invocation succeeded and a list of kv pair lists should be returned. */
+};
+
+/**
+ * Callback invoked to process a management command.
+ *
+ * @param opaque registered opaque value
+ * @param handle the conflate handle
+ * @param cmd the name of the command being executed
+ * @param direct if true, this is a directed command (else issued via pubsub)
+ * @param pair the form sent with this command (may be NULL)
+ * @param result pointer to the results
+ */
+typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
+                                                           conflate_handle_t *handle,
+                                                           const char *cmd,
+                                                           bool direct,
+                                                           kvpair_t *pair,
+                                                           void **result);
+
+/**
+ * Register a management command handler.
+ *
+ * Callbacks allow applications using libconflate to register
+ * arbitrary callbacks to extend the capabilities of the management
+ * layer.
+ *
+ * There are three major forms of success results:
+ *
+ * - Empty (no specific results necessary)
+ * - A simple key/multi-value list.
+ * - A list of key/multi-value lists.
+ *
+ * See the definition of ::conflate_mgmt_cb_t for more information on
+ * result types.
+ *
+ * @param cmd the node name of the command
+ * @param desc short description of the command
+ * @param cb the callback to issue when this command is invoked
+ */
+void conflate_register_mgmt_cb(const char *cmd, const char *desc,
+                               conflate_mgmt_cb_t cb);
+
+/**
+ * @}
+ */
+
+/**
+ * \defgroup Core
+ * @{
+ */
 
 /**
  * Callback for conflate ping reports.
@@ -248,13 +327,12 @@ typedef struct {
      * opaque, followed by one invocation with two NULLs.
      *
      * @param udata The client's custom user data
-     * @param opaque an opaque value that must be supplied to the callback
+     * @param r the form into which results should be placed.
      * @param type primary stat type (may be NULL)
      * @param form detailed stat request form (may be NULL)
      * @param cb the callback into which stats will be fed
      */
-    void (*get_stats)(void *udata, void *opaque, char *type, kvpair_t *form,
-                      conflate_add_stat cb);
+    void (*get_stats)(void *udata, conflate_form_result *r, char *type, kvpair_t *form);
 
     /**
      * Callback issued when libconflate wants to reset stats.
@@ -287,7 +365,7 @@ typedef struct {
  * @}
  */
 
-typedef struct {
+struct _conflate_handle {
 
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
@@ -296,7 +374,7 @@ typedef struct {
 
     pthread_t thread;
 
-} conflate_handle_t;
+};
 
 /**
  * \defgroup Core
@@ -320,70 +398,6 @@ void init_conflate(conflate_config_t *conf) __attribute__ ((nonnull (1)));
  * @return true if libconflate was able to properly initialize itself
  */
 bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result));
-
-/**
- * @}
- */
-
-/**
- * \defgroup Extending
- * @{
- *
- * Extension functions allow libconflate consumers to easily provide
- * new management functionality specific to their own applications.
- */
-
-/**
- * Callback return types indicating status and result type of a
- * management callback.
- */
-enum conflate_mgmt_cb_result {
-    RV_ERROR,  /**< Invocation failed. */
-    RV_BADARG, /**< Bad/incomplete arguments */
-    RV_EMPTY,  /**< Invocation succeeded, but no result should be returned. */
-    RV_KVPAIR, /**< Invocation succeeded and a simple kv pair list should be returned. */
-    RV_LIST    /**< Invocation succeeded and a list of kv pair lists should be returned. */
-};
-
-/**
- * Callback invoked to process a management command.
- *
- * @param opaque registered opaque value
- * @param handle the conflate handle
- * @param cmd the name of the command being executed
- * @param direct if true, this is a directed command (else issued via pubsub)
- * @param pair the form sent with this command (may be NULL)
- * @param result pointer to the results
- */
-typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
-                                                           conflate_handle_t *handle,
-                                                           const char *cmd,
-                                                           bool direct,
-                                                           kvpair_t *pair,
-                                                           void **result);
-
-/**
- * Register a management command handler.
- *
- * Callbacks allow applications using libconflate to register
- * arbitrary callbacks to extend the capabilities of the management
- * layer.
- *
- * There are three major forms of success results:
- *
- * - Empty (no specific results necessary)
- * - A simple key/multi-value list.
- * - A list of key/multi-value lists.
- *
- * See the definition of ::conflate_mgmt_cb_t for more information on
- * result types.
- *
- * @param cmd the node name of the command
- * @param desc short description of the command
- * @param cb the callback to issue when this command is invoked
- */
-void conflate_register_mgmt_cb(const char *cmd, const char *desc,
-                               conflate_mgmt_cb_t cb);
 
 /**
  * @}

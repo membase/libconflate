@@ -32,6 +32,14 @@ typedef xmpp_stanza_t *(*adhoc_handler_t)(const char *cmd,
 DECLARE_ADHOC(process_stats)
 DECLARE_ADHOC(process_ping_test)
 
+struct _conflate_form_result {
+    xmpp_conn_t   *conn;
+    xmpp_ctx_t    *ctx;
+    xmpp_stanza_t *reply;
+    xmpp_stanza_t *cmd_res;
+    xmpp_stanza_t *container;
+};
+
 struct command_def {
     char *name;
     char *description;
@@ -296,14 +304,6 @@ static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
     return RV_EMPTY;
 }
 
-struct stat_context {
-    xmpp_conn_t*   conn;
-    xmpp_ctx_t*    ctx;
-    xmpp_stanza_t* reply;
-    xmpp_stanza_t* container;
-    bool           complete;
-};
-
 static void add_form_values(xmpp_ctx_t* ctx, xmpp_stanza_t *parent,
                             const char *key, const char **values)
 {
@@ -387,15 +387,24 @@ static xmpp_stanza_t* error_unknown_command(const char *cmd,
     return reply;
 }
 
-static void stat_adder(void* opaque,
-                       const char* key, const char* val)
+void conflate_init_form(conflate_form_result *r)
 {
-    struct stat_context* scontext = (struct stat_context*)opaque;
+    if (!r->container) {
+        r->container = xmpp_stanza_new(r->ctx);
 
-    if (key) {
-        add_form_value(scontext->ctx, scontext->container, key, val);
-    } else {
-        scontext->complete = true;
+        /* X data in the command response */
+        xmpp_stanza_set_name(r->container, "x");
+        xmpp_stanza_set_attribute(r->container, "xmlns", "jabber:x:data");
+        xmpp_stanza_set_type(r->container, "result");
+        add_and_release(r->cmd_res, r->container);
+    }
+}
+
+void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
+{
+    conflate_init_form(r);
+    if (k) {
+        add_form_value(r->ctx, r->container, k, v);
     }
 }
 
@@ -406,31 +415,22 @@ static xmpp_stanza_t* process_stats(const char *cmd,
                                     void * const userdata,
                                     bool direct)
 {
-    xmpp_stanza_t *cmd_res = NULL;
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
 
     /* Only direct stat requests are handled. */
     assert(direct);
 
-    struct stat_context scontext = { .conn = conn,
-                                     .ctx = ctx,
-                                     .reply = NULL,
-                                     .container = xmpp_stanza_new(ctx),
-                                     .complete = false};
-
-    assert(scontext.container);
+    conflate_form_result scontext = { .conn = conn,
+                                      .ctx = ctx,
+                                      .reply = NULL,
+                                      .cmd_res = NULL,
+                                      .container = NULL };
 
     scontext.reply = create_reply(ctx, stanza);
-    cmd_res = create_cmd_response(ctx, cmd_stanza);
+    scontext.cmd_res = create_cmd_response(ctx, cmd_stanza);
 
-    add_and_release(scontext.reply, cmd_res);
-
-    /* X data in the command response */
-    xmpp_stanza_set_name(scontext.container, "x");
-    xmpp_stanza_set_attribute(scontext.container, "xmlns", "jabber:x:data");
-    xmpp_stanza_set_type(scontext.container, "result");
-    add_and_release(cmd_res, scontext.container);
+    add_and_release(scontext.reply, scontext.cmd_res);
 
     char *subtype = NULL;
     kvpair_t *form = NULL;
@@ -451,11 +451,9 @@ static xmpp_stanza_t* process_stats(const char *cmd,
                  subtype ? subtype : "(null)");
 
     handle->conf->get_stats(handle->conf->userdata, &scontext,
-                            subtype, form, stat_adder);
+                            subtype, form);
 
     free_kvpair(form);
-
-    assert(scontext.complete);
 
     return scontext.reply;
 }
@@ -516,11 +514,10 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
 {
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
-    struct ping_context pcontext = { .conn = conn,
-                                     .ctx = ctx,
-                                     .reply = NULL,
-                                     .container = xmpp_stanza_new(ctx),
-                                     .complete = false};
+    conflate_form_result pcontext = { .conn = conn,
+                                      .ctx = ctx,
+                                      .reply = NULL,
+                                      .container = xmpp_stanza_new(ctx) };
 
     assert(pcontext.container);
 
@@ -546,8 +543,6 @@ static xmpp_stanza_t* process_ping_test(const char *cmd,
                                 form, ping_adder);
 
         free_kvpair(form);
-
-        assert(pcontext.complete);
     } else {
         /* Maybe someday we can drive the other side through the
            complex task of specifying a ping test. */

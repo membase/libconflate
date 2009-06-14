@@ -10,8 +10,8 @@ static void conf_cb(void* userdata, kvpair_t* conf)
 {
 }
 
-static void stats_cb(void* userdata, void* opaque,
-                     char *type, kvpair_t *form, conflate_add_stat add_stat)
+static void stats_cb(void* userdata, conflate_form_result *r,
+                     char *type, kvpair_t *form)
 {
 }
 
