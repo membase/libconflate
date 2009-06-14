@@ -240,20 +240,6 @@ void conflate_register_mgmt_cb(const char *cmd, const char *desc,
  */
 
 /**
- * Callback for conflate ping reports.
- *
- * When performing a ping test, results are given back in named sets,
- * one for each input under test.
- *
- * @param opaque value given in the ping report callback
- * @param set a key indicating which of the calling sets is being reported
- * @param pair detailed information about this set's test
- */
-typedef void (*conflate_add_ping_report)(void* opaque,
-                                         const char* set,
-                                         const kvpair_t* pair);
-
-/**
  * Log levels.
  */
 enum conflate_log_level {
