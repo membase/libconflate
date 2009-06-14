@@ -23,23 +23,62 @@ static void display_config(void* userdata, kvpair_t* conf)
     }
 }
 
-static void do_stats(void* userdata, conflate_form_result *r,
-                     char* type, kvpair_t *form)
+static enum conflate_mgmt_cb_result process_stats(void *opaque,
+                                                  conflate_handle_t *handle,
+                                                  const char *cmd,
+                                                  bool direct,
+                                                  kvpair_t *form,
+                                                  conflate_form_result *r)
 {
+    /* Only direct stat requests are handled. */
+    assert(direct);
+
+    char *subtype = NULL;
+    kvpair_t *valnode = find_kvpair(form, "-subtype-");
+    if (valnode) {
+        subtype = valnode->values[0];
+    }
+
+    fprintf(stderr, "Handling stats request with subtype:  %s",
+            subtype ? subtype : "(null)");
+
     conflate_add_field(r, "stat1", "val1");
     conflate_add_field(r, "stat2", "val2");
+
+    return RV_OK;
 }
 
-static void do_reset_stats(void* userdata, char *type, kvpair_t *form)
+
+static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
+                                                        conflate_handle_t *handle,
+                                                        const char *cmd,
+                                                        bool direct,
+                                                        kvpair_t *form,
+                                                        conflate_form_result *r)
 {
-    printf("Resetting stats...\n");
+    char *subtype = NULL;
+    kvpair_t *valnode = find_kvpair(form, "-subtype-");
+    if (valnode) {
+        subtype = valnode->values[0];
+    }
+
+    fprintf(stderr, "Handling stats reset with subtype:  %s",
+            subtype ? subtype : "(null)");
+
+    return RV_OK;
 }
 
-static void do_ping_test(void* userdata, conflate_form_result *r,
-                         kvpair_t *form)
+static enum conflate_mgmt_cb_result process_ping_test(void *opaque,
+                                                      conflate_handle_t *handle,
+                                                      const char *cmd,
+                                                      bool direct,
+                                                      kvpair_t *form,
+                                                      conflate_form_result *r)
 {
     kvpair_t *servers_p = find_kvpair(form, "servers");
-    assert(servers_p);
+    if (!servers_p) {
+        return RV_BADARG;
+    }
     char **servers = servers_p->values;
 
     for (int i = 0; servers[i]; i++) {
@@ -51,6 +90,8 @@ static void do_ping_test(void* userdata, conflate_form_result *r,
 
         conflate_add_field(r, "test2", "some val");
     }
+
+    return RV_OK;
 }
 
 int main(int argc, char **argv) {
@@ -61,6 +102,15 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Usage: bot <jid> <pass> [host]\n");
         exit(EX_USAGE);
     }
+
+    /* Initialize callbacks for provided functionality */
+    conflate_register_mgmt_cb("client_stats", "Retrieves stats from the agent",
+                              process_stats);
+    conflate_register_mgmt_cb("reset_stats", "Reset stats on the agent",
+                              process_reset_stats);
+
+    conflate_register_mgmt_cb("ping_test", "Perform a ping test",
+                              process_ping_test);
 
     init_conflate(&conf);
 
@@ -73,9 +123,6 @@ int main(int argc, char **argv) {
 
     conf.userdata = "something awesome";
     conf.new_config = display_config;
-    conf.get_stats = do_stats;
-    conf.reset_stats = do_reset_stats;
-    conf.ping_test = do_ping_test;
 
     if(!start_conflate(conf)) {
         fprintf(stderr, "Couldn't initialize libconflate.\n");

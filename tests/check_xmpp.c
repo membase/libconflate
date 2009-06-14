@@ -10,20 +10,6 @@ static void conf_cb(void* userdata, kvpair_t* conf)
 {
 }
 
-static void stats_cb(void* userdata, conflate_form_result *r,
-                     char *type, kvpair_t *form)
-{
-}
-
-static void reset_stats_cb(void* userdata, char *type, kvpair_t *form)
-{
-}
-
-static void ping_test_cb(void* userdata, conflate_form_result *r,
-                         kvpair_t *conf)
-{
-}
-
 static void log_cb(void *userdata, enum conflate_log_level level,
                    const char *fmt, ...)
 {
@@ -41,9 +27,6 @@ static void init_config(conflate_config_t* conf)
     conf->userdata = "some user data";
     conf->log = log_cb;
     conf->new_config = conf_cb;
-    conf->get_stats = stats_cb;
-    conf->reset_stats = reset_stats_cb;
-    conf->ping_test = ping_test_cb;
 }
 
 static int count_nulls(conflate_config_t* conf)
@@ -87,8 +70,6 @@ static void verify_conf(conflate_config_t* a, conflate_config_t* b)
 
     fail_unless(a->userdata == b->userdata, "userdata is different.");
     fail_unless(a->new_config == b->new_config, "new_config is different.");
-    fail_unless(a->get_stats == b->get_stats, "get_stats is different.");
-    fail_unless(a->reset_stats == b->reset_stats, "reset_stats is different.");
 }
 
 START_TEST (test_dup_with_null_host)

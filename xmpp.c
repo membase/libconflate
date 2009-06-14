@@ -378,49 +378,6 @@ void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
     conflate_add_field_multi(r, k, vals);
 }
 
-static enum conflate_mgmt_cb_result process_stats(void *opaque,
-                                                  conflate_handle_t *handle,
-                                                  const char *cmd,
-                                                  bool direct,
-                                                  kvpair_t *form,
-                                                  conflate_form_result *r)
-{
-    /* Only direct stat requests are handled. */
-    assert(direct);
-
-    char *subtype = NULL;
-    kvpair_t *valnode = find_kvpair(form, "-subtype-");
-    if (valnode) {
-        subtype = valnode->values[0];
-    }
-
-    CONFLATE_LOG(handle, DEBUG, "Handling stats request with subtype:  %s",
-                 subtype ? subtype : "(null)");
-
-    handle->conf->get_stats(handle->conf->userdata, r,
-                            subtype, form);
-
-    return RV_OK;
-}
-
-static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
-                                                        conflate_handle_t *handle,
-                                                        const char *cmd,
-                                                        bool direct,
-                                                        kvpair_t *form,
-                                                        conflate_form_result *r)
-{
-    char *subtype = get_form_value(form, "-subtype-");
-
-    CONFLATE_LOG(handle, DEBUG, "Handling stats reset with subtype:  %s",
-                 subtype ? subtype : "(null)");
-
-    handle->conf->reset_stats(handle->conf->userdata, subtype, form);
-
-    free(subtype);
-    return RV_OK;
-}
-
 void conflate_next_fieldset(conflate_form_result *r)
 {
         conflate_init_form(r);
@@ -432,17 +389,6 @@ void conflate_next_fieldset(conflate_form_result *r)
 
         xmpp_stanza_set_name(r->current, "item");
         add_and_release(r->container, r->current);
-}
-
-static enum conflate_mgmt_cb_result process_ping_test(void *opaque,
-                                                      conflate_handle_t *handle,
-                                                      const char *cmd,
-                                                      bool direct,
-                                                      kvpair_t *form,
-                                                      conflate_form_result *r)
-{
-    handle->conf->ping_test(handle->conf->userdata, r, form);
-    return RV_OK;
 }
 
 static enum conflate_mgmt_cb_result process_set_private(void *opaque,
@@ -885,9 +831,6 @@ conflate_config_t* dup_conf(conflate_config_t c) {
     rv->userdata = c.userdata;
     rv->log = c.log;
     rv->new_config = c.new_config;
-    rv->get_stats = c.get_stats;
-    rv->reset_stats = c.reset_stats;
-    rv->ping_test = c.ping_test;
 
     rv->initialization_marker = (void*)INITIALIZATION_MAGIC;
 
@@ -936,14 +879,6 @@ static void init_commands(void)
     conflate_register_mgmt_cb("rm_private",
                               "Delete a private value from the agent.",
                               process_delete_private);
-
-    conflate_register_mgmt_cb("client_stats", "Retrieves stats from the agent",
-                              process_stats);
-    conflate_register_mgmt_cb("reset_stats", "Reset stats on the agent",
-                              process_reset_stats);
-
-    conflate_register_mgmt_cb("ping_test", "Perform a ping test",
-                              process_ping_test);
 
     conflate_register_mgmt_cb("serverlist", "Configure a server list.",
                               process_serverlist);

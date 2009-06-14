@@ -327,40 +327,6 @@ typedef struct {
      * up to the client to detect and decide what to do in this case.
      */
     void (*new_config)(void*, kvpair_t*);
-    /**
-     * Callback issued when libconflate wants to report stats.
-     *
-     * The client is expected to call the conflate_add_stat callback
-     * once for every stat it wishes to report along with the given
-     * opaque, followed by one invocation with two NULLs.
-     *
-     * @param udata The client's custom user data
-     * @param r the form into which results should be placed.
-     * @param type primary stat type (may be NULL)
-     * @param form detailed stat request form (may be NULL)
-     * @param cb the callback into which stats will be fed
-     */
-    void (*get_stats)(void *udata, conflate_form_result *r, char *type, kvpair_t *form);
-
-    /**
-     * Callback issued when libconflate wants to reset stats.
-     *
-     * @param udata the client's custom user data
-     * @param type stat type to clear (may be NULL)
-     * @param form detailed stat request form (may be NULL)
-     */
-    void (*reset_stats)(void *udata, char *type, kvpair_t *form);
-
-    /**
-     * Callback issued when libconflate would like to run a ping test
-     * against a series of servers.
-     *
-     * @param userdata user's callback info
-     * @param r the form into which results should be placed.
-     * @param form the form containing the ping test input
-     */
-    void (*ping_test)(void* userdata, conflate_form_result *r,
-                      kvpair_t *form);
 
     /** \private */
     void *initialization_marker;
