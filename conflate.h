@@ -162,6 +162,9 @@ void free_kvpair(kvpair_t* pair)
  *
  * Extension functions allow libconflate consumers to easily provide
  * new management functionality specific to their own applications.
+ *
+ * Register your callbacks with ::conflate_register_mgmt_cb and
+ * libconflate will take over from there.
  */
 
 /**
@@ -226,7 +229,7 @@ enum conflate_mgmt_cb_result {
  * @param cmd the name of the command being executed
  * @param direct if true, this is a directed command (else issued via pubsub)
  * @param pair the form sent with this command (may be NULL)
- * @param r the result form being built (see conflate_add_field)
+ * @param r the result form being built (see ::conflate_add_field)
  */
 typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
                                                            conflate_handle_t *handle,
