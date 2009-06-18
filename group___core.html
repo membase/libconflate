@@ -35,6 +35,13 @@
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Log levels.  <a href="group___core.html#gd731674cf91ee0dae60a8b64e6b5d814">More...</a><br></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#g2041ab7aa51456d25053e8475480bb0a">conflate_syslog_logger</a> (void *, enum <a class="el" href="group___core.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a>, const char *,...)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Logging implementation that logs to syslog.  <a href="#g2041ab7aa51456d25053e8475480bb0a"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="g6a4dd8fd15404e026bed9b1b0ef71b11"></a><!-- doxytag: member="Core::conflate_stderr_logger" ref="g6a4dd8fd15404e026bed9b1b0ef71b11" args="(void *, enum conflate_log_level, const char *,...)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#g6a4dd8fd15404e026bed9b1b0ef71b11">conflate_stderr_logger</a> (void *, enum <a class="el" href="group___core.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a>, const char *,...)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Logging implementation that logs to stderr. <br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___core.html#g01166c7b5298facebdca3e5744ce9ed9">init_conflate</a> (<a class="el" href="structconflate__config__t.html">conflate_config_t</a> *conf)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initilize the given configuration to defaults.  <a href="#g01166c7b5298facebdca3e5744ce9ed9"></a><br></td></tr>
@@ -75,6 +82,58 @@ The rapture is upon us. </td></tr>
 </div>
 </div><p>
 <hr><h2>Function Documentation</h2>
+<a class="anchor" name="g2041ab7aa51456d25053e8475480bb0a"></a><!-- doxytag: member="conflate.h::conflate_syslog_logger" ref="g2041ab7aa51456d25053e8475480bb0a" args="(void *, enum conflate_log_level, const char *,...)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void conflate_syslog_logger           </td>
+          <td>(</td>
+          <td class="paramtype">void *&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum&nbsp;</td>
+          <td class="paramname"> <em>conflate_log_level</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Logging implementation that logs to syslog. 
+<p>
+This is the default logger. 
+<p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group___core_g2041ab7aa51456d25053e8475480bb0a_icgraph.png" border="0" usemap="#group___core_g2041ab7aa51456d25053e8475480bb0a_icgraph_map" alt=""></center>
+<map name="group___core_g2041ab7aa51456d25053e8475480bb0a_icgraph_map">
+<area shape="rect" id="node3" href="group___core.html#g01166c7b5298facebdca3e5744ce9ed9" title="Initilize the given configuration to defaults." alt="" coords="224,5,325,35"></map>
+</div>
+
+</div>
+</div><p>
 <a class="anchor" name="g01166c7b5298facebdca3e5744ce9ed9"></a><!-- doxytag: member="conflate.h::init_conflate" ref="g01166c7b5298facebdca3e5744ce9ed9" args="(conflate_config_t *conf)" -->
 <div class="memitem">
 <div class="memproto">
@@ -100,6 +159,15 @@ This should be called *before* you fill in your config.<p>
     <tr><td valign="top"></td><td valign="top"><em>conf</em>&nbsp;</td><td>configuration to be initialized </td></tr>
   </table>
 </dl>
+
+<p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<p><center><img src="group___core_g01166c7b5298facebdca3e5744ce9ed9_cgraph.png" border="0" usemap="#group___core_g01166c7b5298facebdca3e5744ce9ed9_cgraph_map" alt=""></center>
+<map name="group___core_g01166c7b5298facebdca3e5744ce9ed9_cgraph_map">
+<area shape="rect" id="node3" href="group___core.html#g2041ab7aa51456d25053e8475480bb0a" title="Logging implementation that logs to syslog." alt="" coords="156,5,324,35"></map>
+</div>
 
 </div>
 </div><p>
@@ -132,7 +200,7 @@ The main entry point for starting a conflate agent.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Jun 14 15:10:19 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 18 14:28:14 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
