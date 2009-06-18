@@ -267,7 +267,7 @@ void conflate_register_mgmt_cb(const char *cmd, const char *desc,
  */
 
 /**
- * \defgroup Core Core Functionality
+ * \defgroup Logging Logging Facilities
  * @{
  */
 
@@ -295,6 +295,14 @@ void conflate_syslog_logger(void *, enum conflate_log_level,
  */
 void conflate_stderr_logger(void *, enum conflate_log_level,
                             const char *, ...);
+
+/**
+ * @}
+ */
+
+/**
+ * \defgroup Core Core Functionality
+ */
 
 /**
  * Configuration for a conflatee.
