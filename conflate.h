@@ -283,6 +283,20 @@ enum conflate_log_level {
 };
 
 /**
+ * Logging implementation that logs to syslog.
+ *
+ * This is the default logger.
+ */
+void conflate_syslog_logger(void *, enum conflate_log_level,
+                            const char *, ...);
+
+/**
+ * Logging implementation that logs to stderr.
+ */
+void conflate_stderr_logger(void *, enum conflate_log_level,
+                            const char *, ...);
+
+/**
  * Configuration for a conflatee.
  */
 typedef struct {

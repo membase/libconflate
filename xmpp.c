@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <assert.h>
+#include <syslog.h>
 
 #include "conflate.h"
 #include "conflate_internal.h"
@@ -829,8 +830,35 @@ static char* lvl_name(enum conflate_log_level lvl)
     return rv;
 }
 
-static void default_logger(void *userdata, enum conflate_log_level lvl,
-                           const char *msg, ...)
+static int prio_map(enum conflate_log_level lvl)
+{
+    int rv = LOG_EMERG;
+
+    switch(lvl) {
+    case FATAL: rv = LOG_CRIT; break;
+    case ERROR: rv = LOG_ERR; break;
+    case WARN: rv = LOG_WARNING; break;
+    case INFO: rv = LOG_INFO; break;
+    case DEBUG: rv = LOG_DEBUG; break;
+    }
+
+    return rv;
+}
+
+void conflate_syslog_logger(void *userdata, enum conflate_log_level lvl,
+                            const char *msg, ...)
+{
+    char fmt[strlen(msg) + 16];
+    snprintf(fmt, sizeof(fmt), "%s: %s\n", lvl_name(lvl), msg);
+
+    va_list ap;
+    va_start(ap, msg);
+    vsyslog(prio_map(lvl), msg, ap);
+    va_end(ap);
+}
+
+void conflate_stderr_logger(void *userdata, enum conflate_log_level lvl,
+                            const char *msg, ...)
 {
     char fmt[strlen(msg) + 16];
     snprintf(fmt, sizeof(fmt), "%s: %s\n", lvl_name(lvl), msg);
@@ -867,7 +895,7 @@ void init_conflate(conflate_config_t *conf)
 {
     assert(conf);
     memset(conf, 0x00, sizeof(conflate_config_t));
-    conf->log = default_logger;
+    conf->log = conflate_syslog_logger;
     conf->initialization_marker = (void*)INITIALIZATION_MAGIC;
 
     init_commands();
