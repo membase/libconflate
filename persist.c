@@ -37,6 +37,7 @@ static int run_mod_steps(conflate_handle_t *handle, sqlite3 *db,
                          sqlite3_stmt *statement)
     __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 
+/** \private */
 struct table_mask_userdata {
     int found;
     conflate_handle_t *handle;

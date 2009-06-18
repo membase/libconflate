@@ -14,6 +14,7 @@
 /* The private key under which the JID to use is stored */
 #define STORED_JID_KEY "stored_jid"
 
+/** \private */
 struct _conflate_form_result {
     xmpp_conn_t   *conn;
     xmpp_ctx_t    *ctx;
@@ -23,6 +24,7 @@ struct _conflate_form_result {
     xmpp_stanza_t *current;
 };
 
+/** \private */
 struct command_def {
     char *name;
     char *description;

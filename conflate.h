@@ -27,15 +27,15 @@
 typedef struct _conflate_handle conflate_handle_t;
 
 /**
- * \defgroup Core
+ * \defgroup Core Core Functionality
  */
 
 /**
- * \defgroup Extending
+ * \defgroup Extending Adding Management Commands
  */
 
 /**
- * \defgroup kvpairs
+ * \defgroup kvpairs Simple lisp-style Associative Lists
  * @{
  */
 
@@ -157,7 +157,7 @@ void free_kvpair(kvpair_t* pair)
  */
 
 /**
- * \defgroup Extending
+ * \defgroup Extending Adding Management Commands
  * @{
  *
  * Extension functions allow libconflate consumers to easily provide
@@ -267,7 +267,7 @@ void conflate_register_mgmt_cb(const char *cmd, const char *desc,
  */
 
 /**
- * \defgroup Core
+ * \defgroup Core Core Functionality
  * @{
  */
 
@@ -370,7 +370,7 @@ typedef struct {
  */
 
 /**
- * \defgroup Core
+ * \defgroup Core Core Functionality
  * @{
  */
 
@@ -410,7 +410,7 @@ void free_string_list(char **);
 conflate_config_t* dup_conf(conflate_config_t c);
 
 /**
- * \defgroup Persistence
+ * \defgroup Persistence Long-term Persistence API
  * @{
  */
 
