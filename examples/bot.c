@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
     conf.software = "conflate sample bot";
     conf.version = "1.0";
     conf.save_path = "/tmp/conflate.db";
+    conf.log = conflate_stderr_logger;
 
     conf.userdata = "something awesome";
     conf.new_config = display_config;
