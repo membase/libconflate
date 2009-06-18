@@ -9,3 +9,6 @@ struct _conflate_handle {
 
     pthread_t thread;
 };
+
+void conflate_init_commands(void);
+
