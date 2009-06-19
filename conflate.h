@@ -292,6 +292,10 @@ void conflate_syslog_logger(void *, enum conflate_log_level,
 
 /**
  * Logging implementation that logs to stderr.
+ *
+ * The stderr logger is somewhat primitive in that it does not have
+ * any sort of level filter, but useful for running apps on console
+ * with verbosity.
  */
 void conflate_stderr_logger(void *, enum conflate_log_level,
                             const char *, ...);
