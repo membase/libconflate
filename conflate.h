@@ -306,6 +306,12 @@ void conflate_stderr_logger(void *, enum conflate_log_level,
 
 /**
  * \addtogroup Core
+ *
+ * Core consists of two simple functions.  ::init_conflate is used to
+ * provide default values to a configuration and ::start_conflate
+ * launches the communication loop.
+ *
+ * \example examples/bot.c
  */
 
 /**
