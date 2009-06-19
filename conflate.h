@@ -169,6 +169,10 @@ void free_kvpair(kvpair_t* pair)
 
 /**
  * Callback response form builder.
+ *
+ * \sa ::conflate_add_field
+ * \sa ::conflate_add_field_multi
+ * \sa ::conflate_next_fieldset
  */
 typedef struct _conflate_form_result conflate_form_result;
 
@@ -208,6 +212,12 @@ void conflate_next_fieldset(conflate_form_result *r)
  * Initialize the result form if it's not already initialized.
  *
  * This is useful for the case where an empty form may be desirable.
+ *
+ * If a callback is issued that returns without adding fields or
+ * calling conflate_init_form, no form will be returned.
+ *
+ * If conflate_init_form is called and no fields are added, an
+ * \e empty form will be returned.
  */
 void conflate_init_form(conflate_form_result *r);
 
@@ -229,7 +239,7 @@ enum conflate_mgmt_cb_result {
  * @param cmd the name of the command being executed
  * @param direct if true, this is a directed command (else issued via pubsub)
  * @param pair the form sent with this command (may be NULL)
- * @param r the result form being built (see ::conflate_add_field)
+ * @param r the result form being built
  */
 typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
                                                            conflate_handle_t *handle,
