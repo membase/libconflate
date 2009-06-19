@@ -16,5 +16,5 @@ libconflate_a_SOURCES = conflate.h conflate_internal.h conflate_convenience.h \
 
 .PHONY: docs
 docs:
-	(cat Doxyfile ; echo "PROJECT_NUMBER=`cat version.num`") | doxygen -
+	(cat Doxyfile ; echo "PROJECT_NUMBER=`git describe`") | doxygen -
 
