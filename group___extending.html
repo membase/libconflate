@@ -23,11 +23,10 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="ga3df9625cac322a698fa48cf539eb6c9"></a><!-- doxytag: member="Extending::conflate_form_result" ref="ga3df9625cac322a698fa48cf539eb6c9" args="" -->
-typedef struct <br class="typebreak">
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
 _conflate_form_result&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback response form builder. <br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback response form builder.  <a href="#ga3df9625cac322a698fa48cf539eb6c9"></a><br></td></tr>
 <tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#gc4b93e99ae6ad490af10bdbd5eeec144">conflate_mgmt_cb_result</a> { <a class="el" href="group___extending.html#ggc4b93e99ae6ad490af10bdbd5eeec1443217c519ecb382f18b2476e2f27c7908">RV_OK</a>, 
 <a class="el" href="group___extending.html#ggc4b93e99ae6ad490af10bdbd5eeec144c54f87ca2e468c2f8b9af5eab5015c37">RV_ERROR</a>, 
@@ -59,7 +58,28 @@ _conflate_form_result&nbsp;</td><td class="memItemRight" valign="bottom"><a clas
 <hr><a name="_details"></a><h2>Detailed Description</h2>
 Extension functions allow libconflate consumers to easily provide new management functionality specific to their own applications. 
 <p>
-Register your callbacks with <a class="el" href="group___extending.html#g1833b2ac8d2172294bf167f49755bf2a" title="Register a management command handler.">conflate_register_mgmt_cb</a> and libconflate will take over from there. <hr><h2>Enumeration Type Documentation</h2>
+Register your callbacks with <a class="el" href="group___extending.html#g1833b2ac8d2172294bf167f49755bf2a" title="Register a management command handler.">conflate_register_mgmt_cb</a> and libconflate will take over from there. <hr><h2>Typedef Documentation</h2>
+<a class="anchor" name="ga3df9625cac322a698fa48cf539eb6c9"></a><!-- doxytag: member="conflate.h::conflate_form_result" ref="ga3df9625cac322a698fa48cf539eb6c9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct _conflate_form_result <a class="el" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Callback response form builder. 
+<p>
+<dl class="see" compact><dt><b>See also:</b></dt><dd><a class="el" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a> <p>
+<a class="el" href="group___extending.html#gf372ea10e8fcb1b6fe926ca214453746" title="Add a multi-valued key to a response form.">conflate_add_field_multi</a> <p>
+<a class="el" href="group___extending.html#g71c7aaf74d048736999be3ff16ca5fe8" title="Create a response container for a multi-set response.">conflate_next_fieldset</a> </dd></dl>
+
+</div>
+</div><p>
+<hr><h2>Enumeration Type Documentation</h2>
 <a class="anchor" name="gc4b93e99ae6ad490af10bdbd5eeec144"></a><!-- doxytag: member="conflate.h::conflate_mgmt_cb_result" ref="gc4b93e99ae6ad490af10bdbd5eeec144" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +152,7 @@ Add a single k/v pair in a response form.
   </table>
 </dl>
 <dl compact><dt><b>Examples: </b></dt><dd>
-<a class="el" href="examples_2bot_8c-example.html#a5">examples/bot.c</a>.</dl>
+<a class="el" href="examples_2bot_8c-example.html#a3">examples/bot.c</a>.</dl>
 <p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
@@ -186,7 +206,7 @@ Add a multi-valued key to a response form.
   </table>
 </dl>
 <dl compact><dt><b>Examples: </b></dt><dd>
-<a class="el" href="examples_2bot_8c-example.html#a10">examples/bot.c</a>.</dl>
+<a class="el" href="examples_2bot_8c-example.html#a9">examples/bot.c</a>.</dl>
 <p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
@@ -226,7 +246,9 @@ Here is the caller graph for this function:</div>
 <p>
 Initialize the result form if it's not already initialized. 
 <p>
-This is useful for the case where an empty form may be desirable. 
+This is useful for the case where an empty form may be desirable.<p>
+If a callback is issued that returns without adding fields or calling conflate_init_form, no form will be returned.<p>
+If conflate_init_form is called and no fields are added, an <em>empty</em> form will be returned. 
 <p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -264,7 +286,7 @@ This is used for callbacks that want to build tabular results (i.e. a list of k/
   </table>
 </dl>
 <dl compact><dt><b>Examples: </b></dt><dd>
-<a class="el" href="examples_2bot_8c-example.html#a9">examples/bot.c</a>.</dl>
+<a class="el" href="examples_2bot_8c-example.html#a8">examples/bot.c</a>.</dl>
 <p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
@@ -324,7 +346,7 @@ See the definition of <a class="el" href="group___extending.html#g0ee0d37718ae89
   </table>
 </dl>
 <dl compact><dt><b>Examples: </b></dt><dd>
-<a class="el" href="examples_2bot_8c-example.html#a11">examples/bot.c</a>.</dl>
+<a class="el" href="examples_2bot_8c-example.html#a10">examples/bot.c</a>.</dl>
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
@@ -349,14 +371,14 @@ Callback invoked to process a management command.
     <tr><td valign="top"></td><td valign="top"><em>cmd</em>&nbsp;</td><td>the name of the command being executed </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>direct</em>&nbsp;</td><td>if true, this is a directed command (else issued via pubsub) </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>the form sent with this command (may be NULL) </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the result form being built (see <a class="el" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a>) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the result form being built </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Jun 19 00:05:13 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Jun 19 00:25:59 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

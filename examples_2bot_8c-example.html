@@ -33,6 +33,20 @@
 <span class="comment">/* ************************************************************ */</span>
 
 <span class="comment">/*</span>
+<span class="comment"> * kvpair visitor callback to display a received config parameter.</span>
+<span class="comment"> */</span>
+<span class="keyword">static</span> <span class="keywordtype">bool</span> config_visitor(<span class="keywordtype">void</span> *opaque, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keyword">const</span> <span class="keywordtype">char</span> **values)
+{
+    printf(<span class="stringliteral">"\t%s\n"</span>, key);
+
+    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; values[i]; i++) {
+        printf(<span class="stringliteral">"\t\t%s\n"</span>, values[i]);
+    }
+
+    <span class="keywordflow">return</span> <span class="keyword">true</span>;
+}
+
+<span class="comment">/*</span>
 <span class="comment"> * Example callback to handle a newly receive configuration.</span>
 <span class="comment"> */</span>
 <span class="keyword">static</span> <span class="keywordtype">void</span> display_config(<span class="keywordtype">void</span>* userdata, <a name="_a0"></a><a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a>* conf)
@@ -40,16 +54,7 @@
     printf(<span class="stringliteral">"Hey.  I received a new config (userdata: %s):\n"</span>,
            (<span class="keywordtype">char</span>*)userdata);
 
-    <span class="keywordflow">while</span> (conf) {
-        <span class="keywordtype">int</span> i = 0;
-        printf(<span class="stringliteral">"\t%s\n"</span>, conf-&gt;<a name="a1"></a><a class="code" href="structkvpair.html#30daf9e514ca735a0d5677fffa0868b9" title="The key in this kv pair.">key</a>);
-
-        <span class="keywordflow">for</span> (i = 0; conf-&gt;<a name="a2"></a><a class="code" href="structkvpair.html#d8a08d9e9e112ad79295362f27485d36" title="A NULL-terminated list of values.">values</a>[i]; i++) {
-            printf(<span class="stringliteral">"\t\t%s\n"</span>, conf-&gt;<a class="code" href="structkvpair.html#d8a08d9e9e112ad79295362f27485d36" title="A NULL-terminated list of values.">values</a>[i]);
-        }
-
-        conf = conf-&gt;<a name="a3"></a><a class="code" href="structkvpair.html#5d734e06894d8d15cac31bb04017998a" title="The next kv pair in this list.">next</a>;
-    }
+    <a name="a1"></a><a class="code" href="group__kvpairs.html#g897182a91291ee670be08ce26321a1c2" title="Walk a kvpair.">walk_kvpair</a>(conf, NULL, config_visitor);
 }
 
 <span class="comment">/*</span>
@@ -65,15 +70,15 @@
     <span class="comment">/* Only direct stat requests are handled. */</span>
     assert(direct);
 
-    <span class="keywordtype">char</span> *subtype = <a name="a4"></a><a class="code" href="group__kvpairs.html#gf31a08c98c6700d2b0c556ccb1f6f935" title="Find a simple value from a kvpair list.">get_simple_kvpair_val</a>(form, <span class="stringliteral">"-subtype-"</span>);
+    <span class="keywordtype">char</span> *subtype = <a name="a2"></a><a class="code" href="group__kvpairs.html#gf31a08c98c6700d2b0c556ccb1f6f935" title="Find a simple value from a kvpair list.">get_simple_kvpair_val</a>(form, <span class="stringliteral">"-subtype-"</span>);
 
     fprintf(stderr, <span class="stringliteral">"Handling stats request with subtype:  %s\n"</span>,
             subtype ? subtype : <span class="stringliteral">"(null)"</span>);
 
-    <a name="a5"></a><a class="code" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a>(r, <span class="stringliteral">"stat1"</span>, <span class="stringliteral">"val1"</span>);
+    <a name="a3"></a><a class="code" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a>(r, <span class="stringliteral">"stat1"</span>, <span class="stringliteral">"val1"</span>);
     <a class="code" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a>(r, <span class="stringliteral">"stat2"</span>, <span class="stringliteral">"val2"</span>);
 
-    <span class="keywordflow">return</span> <a name="a6"></a><a class="code" href="group___extending.html#ggc4b93e99ae6ad490af10bdbd5eeec1443217c519ecb382f18b2476e2f27c7908" title="Invocation worked as expected.">RV_OK</a>;
+    <span class="keywordflow">return</span> <a name="a4"></a><a class="code" href="group___extending.html#ggc4b93e99ae6ad490af10bdbd5eeec1443217c519ecb382f18b2476e2f27c7908" title="Invocation worked as expected.">RV_OK</a>;
 }
 
 <span class="comment">/*</span>
@@ -104,21 +109,21 @@
                                                       <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *form,
                                                       <a class="code" href="group___extending.html#ga3df9625cac322a698fa48cf539eb6c9" title="Callback response form builder.">conflate_form_result</a> *r)
 {
-    <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *servers_p = <a name="a7"></a><a class="code" href="group__kvpairs.html#gfe43e55c132b92581f442543f03fd181" title="Find a kvpair with the given key.">find_kvpair</a>(form, <span class="stringliteral">"servers"</span>);
+    <a class="code" href="structkvpair.html" title="A linked list of keys each which may have zero or more values.">kvpair_t</a> *servers_p = <a name="a5"></a><a class="code" href="group__kvpairs.html#gfe43e55c132b92581f442543f03fd181" title="Find a kvpair with the given key.">find_kvpair</a>(form, <span class="stringliteral">"servers"</span>);
     <span class="keywordflow">if</span> (!servers_p) {
-        <span class="keywordflow">return</span> <a name="a8"></a><a class="code" href="group___extending.html#ggc4b93e99ae6ad490af10bdbd5eeec144af19a682bd219006c3bcc5aed59c9f69" title="Bad/incomplete arguments.">RV_BADARG</a>;
+        <span class="keywordflow">return</span> <a name="a6"></a><a class="code" href="group___extending.html#ggc4b93e99ae6ad490af10bdbd5eeec144af19a682bd219006c3bcc5aed59c9f69" title="Bad/incomplete arguments.">RV_BADARG</a>;
     }
-    <span class="keywordtype">char</span> **servers = servers_p-&gt;<a class="code" href="structkvpair.html#d8a08d9e9e112ad79295362f27485d36" title="A NULL-terminated list of values.">values</a>;
+    <span class="keywordtype">char</span> **servers = servers_p-&gt;<a name="a7"></a><a class="code" href="structkvpair.html#d8a08d9e9e112ad79295362f27485d36" title="A NULL-terminated list of values.">values</a>;
 
     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; servers[i]; i++) {
         <span class="comment">/* For each result we wish to send back, we begin a field set */</span>
-        <a name="a9"></a><a class="code" href="group___extending.html#g71c7aaf74d048736999be3ff16ca5fe8" title="Create a response container for a multi-set response.">conflate_next_fieldset</a>(r);
+        <a name="a8"></a><a class="code" href="group___extending.html#g71c7aaf74d048736999be3ff16ca5fe8" title="Create a response container for a multi-set response.">conflate_next_fieldset</a>(r);
 
         <span class="comment">/* All fields added now fall within the current fieldset */</span>
         <a class="code" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a>(r, <span class="stringliteral">"-set-"</span>, servers[i]);
 
         <span class="keyword">const</span> <span class="keywordtype">char</span> *vals[3] = { <span class="stringliteral">"val1"</span>, <span class="stringliteral">"val2"</span>, NULL };
-        <a name="a10"></a><a class="code" href="group___extending.html#gf372ea10e8fcb1b6fe926ca214453746" title="Add a multi-valued key to a response form.">conflate_add_field_multi</a>(r, <span class="stringliteral">"test1"</span>, vals);
+        <a name="a9"></a><a class="code" href="group___extending.html#gf372ea10e8fcb1b6fe926ca214453746" title="Add a multi-valued key to a response form.">conflate_add_field_multi</a>(r, <span class="stringliteral">"test1"</span>, vals);
 
         <a class="code" href="group___extending.html#g6245f741ce87f7ac98ded24c80638da3" title="Add a single k/v pair in a response form.">conflate_add_field</a>(r, <span class="stringliteral">"test2"</span>, <span class="stringliteral">"some val"</span>);
     }
@@ -138,7 +143,7 @@
 <span class="comment">     * These callbacks are global and thus initialized once for your</span>
 <span class="comment">     * entire application.</span>
 <span class="comment">     */</span>
-    <a name="a11"></a><a class="code" href="group___extending.html#g1833b2ac8d2172294bf167f49755bf2a" title="Register a management command handler.">conflate_register_mgmt_cb</a>(<span class="stringliteral">"client_stats"</span>, <span class="stringliteral">"Retrieves stats from the agent"</span>,
+    <a name="a10"></a><a class="code" href="group___extending.html#g1833b2ac8d2172294bf167f49755bf2a" title="Register a management command handler.">conflate_register_mgmt_cb</a>(<span class="stringliteral">"client_stats"</span>, <span class="stringliteral">"Retrieves stats from the agent"</span>,
                               process_stats);
     <a class="code" href="group___extending.html#g1833b2ac8d2172294bf167f49755bf2a" title="Register a management command handler.">conflate_register_mgmt_cb</a>(<span class="stringliteral">"reset_stats"</span>, <span class="stringliteral">"Reset stats on the agent"</span>,
                               process_reset_stats);
@@ -147,23 +152,23 @@
                               process_ping_test);
 
     <span class="comment">/* Perform default configuration initialization. */</span>
-    <a name="_a12"></a><a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> conf;
-    <a name="a13"></a><a class="code" href="group___core.html#g01166c7b5298facebdca3e5744ce9ed9" title="Initilize the given configuration to defaults.">init_conflate</a>(&amp;conf);
+    <a name="_a11"></a><a class="code" href="structconflate__config__t.html" title="Configuration for a conflatee.">conflate_config_t</a> conf;
+    <a name="a12"></a><a class="code" href="group___core.html#g01166c7b5298facebdca3e5744ce9ed9" title="Initilize the given configuration to defaults.">init_conflate</a>(&amp;conf);
 
     <span class="comment">/* Specify application-specific configuration parameters. */</span>
-    conf.<a name="a14"></a><a class="code" href="structconflate__config__t.html#f50d437d55588dee8bfae48b50df3472" title="The XMPP JID (typically excludes a resource definition).">jid</a> = argv[1];
-    conf.<a name="a15"></a><a class="code" href="structconflate__config__t.html#30ac9525a98b1a37acc6876101729d58" title="The XMPP Password.">pass</a> = argv[2];
-    conf.<a name="a16"></a><a class="code" href="structconflate__config__t.html#8a17cef47ef8338189845f2f490791b9" title="The XMPP server address (may be NULL).">host</a> = (argc == 4 ? argv[3] : NULL);
-    conf.<a name="a17"></a><a class="code" href="structconflate__config__t.html#8375f4440596f25cb44554a9430ab5cc" title="Name of the software using libconflate.">software</a> = <span class="stringliteral">"conflate sample bot"</span>;
-    conf.<a name="a18"></a><a class="code" href="structconflate__config__t.html#dd8b76f27e59ca5bac58f8e156f2085a" title="Version number of the software running libconflate.">version</a> = <span class="stringliteral">"1.0"</span>;
-    conf.<a name="a19"></a><a class="code" href="structconflate__config__t.html#ba88b8d50e4cbd4491f8de469bba49a0" title="Path to persist configuration for faster/more reliable restarts.">save_path</a> = <span class="stringliteral">"/tmp/conflate.db"</span>;
-    conf.<a name="a20"></a><a class="code" href="structconflate__config__t.html#0b60e40c4df699b1e03f53f62a5777ba" title="Logging callback (optional).">log</a> = <a name="a21"></a><a class="code" href="group___logging.html#g6a4dd8fd15404e026bed9b1b0ef71b11" title="Logging implementation that logs to stderr.">conflate_stderr_logger</a>;
+    conf.<a name="a13"></a><a class="code" href="structconflate__config__t.html#f50d437d55588dee8bfae48b50df3472" title="The XMPP JID (typically excludes a resource definition).">jid</a> = argv[1];
+    conf.<a name="a14"></a><a class="code" href="structconflate__config__t.html#30ac9525a98b1a37acc6876101729d58" title="The XMPP Password.">pass</a> = argv[2];
+    conf.<a name="a15"></a><a class="code" href="structconflate__config__t.html#8a17cef47ef8338189845f2f490791b9" title="The XMPP server address (may be NULL).">host</a> = (argc == 4 ? argv[3] : NULL);
+    conf.<a name="a16"></a><a class="code" href="structconflate__config__t.html#8375f4440596f25cb44554a9430ab5cc" title="Name of the software using libconflate.">software</a> = <span class="stringliteral">"conflate sample bot"</span>;
+    conf.<a name="a17"></a><a class="code" href="structconflate__config__t.html#dd8b76f27e59ca5bac58f8e156f2085a" title="Version number of the software running libconflate.">version</a> = <span class="stringliteral">"1.0"</span>;
+    conf.<a name="a18"></a><a class="code" href="structconflate__config__t.html#ba88b8d50e4cbd4491f8de469bba49a0" title="Path to persist configuration for faster/more reliable restarts.">save_path</a> = <span class="stringliteral">"/tmp/conflate.db"</span>;
+    conf.<a name="a19"></a><a class="code" href="structconflate__config__t.html#0b60e40c4df699b1e03f53f62a5777ba" title="Logging callback (optional).">log</a> = <a name="a20"></a><a class="code" href="group___logging.html#g6a4dd8fd15404e026bed9b1b0ef71b11" title="Logging implementation that logs to stderr.">conflate_stderr_logger</a>;
 
-    conf.<a name="a22"></a><a class="code" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7" title="User defined data to be passed to callbacks.">userdata</a> = <span class="stringliteral">"something awesome"</span>;
-    conf.<a name="a23"></a><a class="code" href="structconflate__config__t.html#aa35807ba919761d514fc6e7a758018c" title="Callback issued when a new configuration is to be activated.">new_config</a> = display_config;
+    conf.<a name="a21"></a><a class="code" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7" title="User defined data to be passed to callbacks.">userdata</a> = <span class="stringliteral">"something awesome"</span>;
+    conf.<a name="a22"></a><a class="code" href="structconflate__config__t.html#aa35807ba919761d514fc6e7a758018c" title="Callback issued when a new configuration is to be activated.">new_config</a> = display_config;
 
     <span class="comment">/* Begin the connection. */</span>
-    <span class="keywordflow">if</span>(!<a name="a24"></a><a class="code" href="group___core.html#g1a3cec80d219a90587142dd6af14ed61" title="The main entry point for starting a conflate agent.">start_conflate</a>(conf)) {
+    <span class="keywordflow">if</span>(!<a name="a23"></a><a class="code" href="group___core.html#g1a3cec80d219a90587142dd6af14ed61" title="The main entry point for starting a conflate agent.">start_conflate</a>(conf)) {
         fprintf(stderr, <span class="stringliteral">"Couldn't initialize libconflate.\n"</span>);
         exit(1);
     }
@@ -174,7 +179,7 @@
     pause();
 }
 </pre></div> </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Jun 19 00:05:11 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Jun 19 00:25:57 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
