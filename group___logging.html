@@ -12,6 +12,7 @@
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
     </ul>
   </div>
 </div>
@@ -34,10 +35,9 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___logging.html#g2041ab7aa51456d25053e8475480bb0a">conflate_syslog_logger</a> (void *, enum <a class="el" href="group___logging.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a>, const char *,...)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Logging implementation that logs to syslog.  <a href="#g2041ab7aa51456d25053e8475480bb0a"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="g6a4dd8fd15404e026bed9b1b0ef71b11"></a><!-- doxytag: member="Logging::conflate_stderr_logger" ref="g6a4dd8fd15404e026bed9b1b0ef71b11" args="(void *, enum conflate_log_level, const char *,...)" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___logging.html#g6a4dd8fd15404e026bed9b1b0ef71b11">conflate_stderr_logger</a> (void *, enum <a class="el" href="group___logging.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a>, const char *,...)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___logging.html#g6a4dd8fd15404e026bed9b1b0ef71b11">conflate_stderr_logger</a> (void *, enum <a class="el" href="group___logging.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a>, const char *,...)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Logging implementation that logs to stderr. <br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Logging implementation that logs to stderr.  <a href="#g6a4dd8fd15404e026bed9b1b0ef71b11"></a><br></td></tr>
 </table>
 <hr><h2>Enumeration Type Documentation</h2>
 <a class="anchor" name="gd731674cf91ee0dae60a8b64e6b5d814"></a><!-- doxytag: member="conflate.h::conflate_log_level" ref="gd731674cf91ee0dae60a8b64e6b5d814" args="" -->
@@ -72,6 +72,50 @@ The rapture is upon us. </td></tr>
 </div>
 </div><p>
 <hr><h2>Function Documentation</h2>
+<a class="anchor" name="g6a4dd8fd15404e026bed9b1b0ef71b11"></a><!-- doxytag: member="conflate.h::conflate_stderr_logger" ref="g6a4dd8fd15404e026bed9b1b0ef71b11" args="(void *, enum conflate_log_level, const char *,...)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void conflate_stderr_logger           </td>
+          <td>(</td>
+          <td class="paramtype">void *&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum&nbsp;</td>
+          <td class="paramname"> <em>conflate_log_level</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Logging implementation that logs to stderr. 
+<p>
+The stderr logger is somewhat primitive in that it does not have any sort of level filter, but useful for running apps on console with verbosity. <dl compact><dt><b>Examples: </b></dt><dd>
+<a class="el" href="examples_2bot_8c-example.html#a21">examples/bot.c</a>.</dl>
+</div>
+</div><p>
 <a class="anchor" name="g2041ab7aa51456d25053e8475480bb0a"></a><!-- doxytag: member="conflate.h::conflate_syslog_logger" ref="g2041ab7aa51456d25053e8475480bb0a" args="(void *, enum conflate_log_level, const char *,...)" -->
 <div class="memitem">
 <div class="memproto">
@@ -125,7 +169,7 @@ Here is the caller graph for this function:</div>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 18 22:55:59 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 18 23:36:33 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
