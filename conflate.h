@@ -149,8 +149,7 @@ void walk_kvpair(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)
  *
  * @param pair the pair to free (recursively)
  */
-void free_kvpair(kvpair_t* pair)
-    __attribute__ ((nonnull (1)));
+void free_kvpair(kvpair_t* pair);
 
 /**
  * @}
