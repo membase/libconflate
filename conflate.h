@@ -402,7 +402,7 @@ typedef struct {
  */
 
 /**
- * Initilize the given configuration to defaults.
+ * Initialize the given configuration to defaults.
  *
  * This should be called *before* you fill in your config.
  *
