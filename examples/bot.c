@@ -14,6 +14,20 @@
 /* ************************************************************ */
 
 /*
+ * kvpair visitor callback to display a received config parameter.
+ */
+static bool config_visitor(void *opaque, const char *key, const char **values)
+{
+    printf("\t%s\n", key);
+
+    for (int i = 0; values[i]; i++) {
+        printf("\t\t%s\n", values[i]);
+    }
+
+    return true;
+}
+
+/*
  * Example callback to handle a newly receive configuration.
  */
 static void display_config(void* userdata, kvpair_t* conf)
@@ -21,16 +35,7 @@ static void display_config(void* userdata, kvpair_t* conf)
     printf("Hey.  I received a new config (userdata: %s):\n",
            (char*)userdata);
 
-    while (conf) {
-        int i = 0;
-        printf("\t%s\n", conf->key);
-
-        for (i = 0; conf->values[i]; i++) {
-            printf("\t\t%s\n", conf->values[i]);
-        }
-
-        conf = conf->next;
-    }
+    walk_kvpair(conf, NULL, config_visitor);
 }
 
 /*
