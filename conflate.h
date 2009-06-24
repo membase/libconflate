@@ -346,6 +346,7 @@ typedef struct {
      * For example:  awesomeproxy
      */
     char *software;
+
     /**
      * Version number of the software running libconflate.
      *
