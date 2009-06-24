@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/utsname.h>
 #include <assert.h>
 
 #include "conflate.h"
@@ -112,6 +113,7 @@ static int version_handler(xmpp_conn_t * const conn,
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
     char *ns;
+    struct utsname un = {};
 
     printf("Received version request from %s\n", xmpp_stanza_get_attribute(stanza, "from"));
 
@@ -149,6 +151,22 @@ static int version_handler(xmpp_conn_t * const conn,
     assert(text);
     xmpp_stanza_set_text(text, handle->conf->version);
     add_and_release(version, text);
+
+    if (uname(&un) == 0) {
+        char os_buf[128];
+        snprintf(os_buf, sizeof(os_buf), "%s/%s/%s",
+                 un.machine, un.sysname, un.release);
+
+        xmpp_stanza_t *os = xmpp_stanza_new(ctx);
+        assert(os);
+        xmpp_stanza_set_name(os, "os");
+        add_and_release(query, os);
+
+        text = xmpp_stanza_new(ctx);
+        assert(text);
+        xmpp_stanza_set_text(text, os_buf);
+        add_and_release(os, text);
+    }
 
     add_and_release(reply, query);
 
