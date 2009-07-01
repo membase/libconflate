@@ -44,11 +44,11 @@ AC_SEARCH_LIBS([res_query], resolv)
 AC_SEARCH_LIBS(sqlite3_open, sqlite3)
 AC_SEARCH_LIBS(XML_ParserCreate, expat)
 AC_SEARCH_LIBS(SSL_connect, ssl)
-AC_SEARCH_LIBS(xmpp_initialize, strophe,
-                                [], AC_MSG_ERROR([Can't find libstrophe.]), [-lresolv -lssl])
 AC_SEARCH_LIBS(res_9_query, resolv)
 dnl Linux needs resolv for the above, but doesn't seem to know it
 AC_SEARCH_LIBS(__res_query, resolv)
+AC_SEARCH_LIBS(xmpp_initialize, strophe,
+                                [], AC_MSG_ERROR([Can't find libstrophe.]))
 
 AC_SEARCH_LIBS(pthread_create, pthread,
                                [], AC_MSG_ERROR([Can't enable pthreads.]))
