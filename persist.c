@@ -70,7 +70,8 @@ static char* get_table_name(int flag) {
     case HAS_PRIVATE:
         return "private";
     default:
-        assert(false);
+        fprintf(stderr, "Unhandled flag:  %x\n", flag);
+        abort();
     }
 }
 
