@@ -23,6 +23,14 @@
  * Jump right into <a href="modules.html">the modules docs</a> to get started.
  */
 
+/* Deal with an ICC annoyance.  It tries hard to pretend to be GCC<
+   but doesn't understand its attributes properly. */
+#ifdef __ICC
+# define __gcc_attribute__(x)
+#else
+# define __gcc_attribute__ __attribute__
+#endif
+
 /* Forward declaration */
 typedef struct _conflate_handle conflate_handle_t;
 
@@ -375,7 +383,7 @@ typedef struct {
      * @param msg the message to log
      */
     void (*log)(void *udata, enum conflate_log_level level, const char *msg, ...)
-        __attribute__ ((format (printf, 3, 4)));
+        __gcc_attribute__ ((format (printf, 3, 4)));
 
     /**
      * Callback issued when a new configuration is to be activated.
