@@ -171,11 +171,10 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
                   const char *filename)
 {
     bool rv = false;
-    int err = 0;
     sqlite3 *db = NULL;
     sqlite3_stmt *ins_keys = NULL, *ins_vals = NULL;
 
-    if ((err = open_and_initialize_db(handle, filename, &db)) != SQLITE_OK) {
+    if ( open_and_initialize_db(handle, filename, &db) != SQLITE_OK) {
         goto finished;
     }
 
@@ -354,7 +353,7 @@ bool conflate_delete_private(conflate_handle_t *handle,
                              const char *k, const char *filename)
 {
     bool rv = false;
-    int err = 0;
+    int err = 0, deleted = 0;
     sqlite3 *db = NULL;
     sqlite3_stmt *del = NULL;
 
@@ -371,7 +370,7 @@ bool conflate_delete_private(conflate_handle_t *handle,
 
     sqlite3_bind_text(del, 1, k, strlen(k), SQLITE_TRANSIENT);
 
-    int deleted = run_mod_steps(handle, db, del);
+    deleted = run_mod_steps(handle, db, del);
     CONFLATE_LOG(handle, DEBUG, "Removed %d records", deleted);
     rv = deleted >= 0;
 

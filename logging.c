@@ -1,5 +1,11 @@
 #include <string.h>
 #include <stdarg.h>
+
+/* Need __USE_BSD for vsyslog on linux */
+#ifndef __USE_BSD
+# define __USE_BSD
+#endif
+
 #include <syslog.h>
 
 #include "conflate.h"
