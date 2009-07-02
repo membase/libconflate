@@ -5,6 +5,7 @@
 #include <sys/utsname.h>
 #include <assert.h>
 
+#include "alarm.h"
 #include "conflate.h"
 #include "conflate_internal.h"
 #include "conflate_convenience.h"
@@ -484,6 +485,77 @@ static int keepalive_handler(xmpp_conn_t * const conn, void * const userdata)
     return 1;
 }
 
+static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
+{
+    conflate_handle_t *handle = (conflate_handle_t*) userdata;
+	alarm_t alarm;
+    const char* myjid = xmpp_conn_get_bound_jid(conn);
+	char id[256];
+	char open[2];
+	char runonce[2];
+	char level[2];
+	char levelmax[2];
+	char num[256];
+	char freq[256];
+	char escfreq[256];
+	char amsg[256];
+	char body[1500];
+	while (handle->alarms->size > 0)
+	{
+		alarm = get_alarm(handle->alarms);
+		sprintf(open, "%d", alarm.open);
+		sprintf(runonce, "%d", alarm.runonce);
+		sprintf(level, "%d", alarm.level);
+		sprintf(levelmax, "%d", alarm.levelmax);
+		sprintf(num, "%d", alarm.num);
+		sprintf(freq, "%ld", alarm.freq);
+		sprintf(escfreq, "%ld", alarm.escfreq);
+		sprintf(amsg, "%s", alarm.msg);
+		/* if we got a legitimate alarm, send off alert */
+		if(alarm.open == 1)
+		{
+			sprintf(id, "_alarm%d", alarm.num);
+			//handler_add_id(conn, alarm_response_handler, id, handle);
+			//handler_add_timed(conn, alarm_missing_handler, 120000, handle);
+			xmpp_stanza_t* msg = xmpp_stanza_new(handle->ctx);
+			assert(msg);
+			xmpp_stanza_set_name(msg, "message");
+			//xmpp_stanza_set_type(iq, "set");
+			xmpp_stanza_set_id(msg, id);
+			//xmpp_stanza_set_attribute(iq, "to", xmpp_stanza_get_attribute(stanza, "from"));
+			/* TODO: This needs to have a config on where to report to */
+			xmpp_stanza_set_attribute(msg, "to", "mcp@memscale.ec2.northscale.net");
+			xmpp_stanza_set_attribute(msg, "from", myjid);
+
+			xmpp_stanza_t* mbody = xmpp_stanza_new(handle->ctx);
+			assert(mbody);
+			xmpp_stanza_set_name(mbody, "body");
+			sprintf(body, "Alert\nRun once: %s\nLevel: %s\n%s", runonce, level, amsg);
+			xmpp_stanza_set_text(mbody, body);
+			add_and_release(msg, mbody);
+
+			xmpp_stanza_t* alert = xmpp_stanza_new(handle->ctx);
+			assert(alert);
+			xmpp_stanza_set_name(alert, "alert");
+			xmpp_stanza_set_attribute(alert, "xmlns", XMPP_NS_DISCO_ITEMS);
+			xmpp_stanza_set_attribute(alert, "node", "http://nortscale.net/protocol/alerts");
+			xmpp_stanza_set_attribute(alert, "open", open);
+			xmpp_stanza_set_attribute(alert, "runonce", runonce);
+			xmpp_stanza_set_attribute(alert, "level", level);
+			xmpp_stanza_set_attribute(alert, "levelmax", levelmax);
+			xmpp_stanza_set_attribute(alert, "num", num);
+			xmpp_stanza_set_attribute(alert, "freq", freq);
+			xmpp_stanza_set_attribute(alert, "escfreq", escfreq);
+			xmpp_stanza_set_attribute(alert, "msg", amsg);
+			add_and_release(msg, alert);
+
+			xmpp_send(conn, msg);
+			xmpp_stanza_release(msg);
+		}
+	}
+	return 1;
+}
+
 static void add_disco_item(xmpp_ctx_t* ctx, xmpp_stanza_t* query,
                            const char* jid, char* node, char* name)
 {
@@ -595,6 +667,7 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
                          "http://jabber.org/protocol/disco#items", "iq", NULL, handle);
         xmpp_handler_add(conn, message_handler, NULL, "message", NULL, handle);
         xmpp_timed_handler_add(conn, keepalive_handler, 60000, handle);
+		xmpp_timed_handler_add(conn, alarmqueue_handler, 10000, handle);
 
         /* Send initial <presence/> so that we appear online to contacts */
         pres = xmpp_stanza_new(handle->ctx);
@@ -736,6 +809,8 @@ bool start_conflate(conflate_config_t conf) {
     assert(handle);
 
     xmpp_initialize();
+
+	init_alarmqueue(handle->alarms);
 
     handle->conf = dup_conf(conf);
 

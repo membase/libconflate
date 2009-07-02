@@ -11,6 +11,7 @@
 typedef struct alarm_s
 {
 	int open;
+	int num;
 	int runonce;
 	int level;
 	int levelmax;
@@ -27,10 +28,15 @@ typedef struct alarm_queue_s
 	int in;
 	int out;
 	int size;
+	int num;
 	pthread_mutex_t mutex;
 	pthread_cond_t full;
 	pthread_cond_t empty;
 } alarm_queue_t;
 
 //typedef struct alarm_queue_s alarm_queue_t;
+
+alarm_t get_alarm(alarm_queue_t *);
+void add_alarm(alarm_queue_t *, int, int, int, int, char []);
+void init_alarmqueue(alarm_queue_t *);
 #endif

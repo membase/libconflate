@@ -8,6 +8,7 @@
 
 #include <syslog.h>
 
+#include "alarm.h"
 #include "conflate.h"
 #include "conflate_internal.h"
 #include "conflate_convenience.h"

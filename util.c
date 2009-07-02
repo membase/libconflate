@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "alarm.h"
 #include "conflate.h"
 
 char* safe_strdup(const char* in) {

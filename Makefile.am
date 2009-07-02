@@ -11,8 +11,8 @@ examples_bot_SOURCES = examples/bot.c
 examples_bot_LDADD = -L. -lconflate @PROFILER_LDFLAGS@
 
 libconflate_a_CFLAGS = @PROFILER_FLAGS@
-libconflate_a_SOURCES = conflate.h conflate_internal.h conflate_convenience.h \
-	kvpair.c util.c persist.c xmpp.c logging.c adhoc_commands.c
+libconflate_a_SOURCES = conflate.h conflate_internal.h conflate_convenience.h alarm.h\
+	alarm.c kvpair.c util.c persist.c xmpp.c logging.c adhoc_commands.c
 
 .PHONY: docs
 docs:
