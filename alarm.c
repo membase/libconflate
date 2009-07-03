@@ -6,68 +6,68 @@
 /* read alarm from queue, if there is none simply return an empty alert with ->open = 0 */
 alarm_t get_alarm(alarm_queue_t *queue)
 {
-	pthread_mutex_lock(&(queue->mutex));
-	alarm_t alarm;
-	//while (queue->size == 0)
-			//pthread_cond_wait(&(queue->empty), &(queue->mutex));
-	if(queue->size == 0)
-	{
-		alarm.open = 0;
-		strcpy(alarm.msg, "");
-	} else {
-		alarm = *queue->queue[queue->out];
-		queue->size--;
-		queue->out++;
-		queue->out %= 100;
-	}
-	pthread_mutex_unlock(&(queue->mutex));
-	pthread_cond_broadcast(&(queue->full));
-	return alarm;
+    pthread_mutex_lock(&(queue->mutex));
+    alarm_t alarm;
+    //while (queue->size == 0)
+            //pthread_cond_wait(&(queue->empty), &(queue->mutex));
+    if(queue->size == 0)
+    {
+        alarm.open = 0;
+        strncpy(alarm.msg, "", 255);
+    } else {
+        alarm = *queue->queue[queue->out];
+        queue->size--;
+        queue->out++;
+        queue->out %= 100;
+    }
+    pthread_mutex_unlock(&(queue->mutex));
+    pthread_cond_broadcast(&(queue->full));
+    return alarm;
 }
 
 /* add an alarm to the queue */
 void add_alarm(alarm_queue_t *queue, int runonce, int level, int freq, int escfreq, char msg[256])
 {
-	pthread_mutex_lock(&(queue->mutex));
-	while (queue->size == 100)
-		pthread_cond_wait(&(queue->full), &(queue->mutex));
-	printf("Added message: %s\n", msg);
-	alarm_t *alarm = queue->queue[queue->in];
-	alarm->open = 1;
-	alarm->runonce = runonce;
-	alarm->level = level;
-	alarm->levelmax = 5;
-	memcpy((int *)alarm->num, (int *)queue->num, sizeof(queue->num));
-	alarm->freq = freq;
-	alarm->escfreq = escfreq;
-	strcpy(alarm->msg, msg);
-	queue->size++;
-	queue->in++;
-	queue->num++;
-	queue->in %= 100;
-	pthread_mutex_unlock(&(queue->mutex));
-	pthread_cond_broadcast(&(queue->empty));
+    pthread_mutex_lock(&(queue->mutex));
+    while (queue->size == 100)
+        pthread_cond_wait(&(queue->full), &(queue->mutex));
+    printf("Added message: %s\n", msg);
+    alarm_t *alarm = queue->queue[queue->in];
+    alarm->open = 1;
+    alarm->runonce = runonce;
+    alarm->level = level;
+    alarm->levelmax = 5;
+    memcpy((int *)alarm->num, (int *)queue->num, sizeof(queue->num));
+    alarm->freq = freq;
+    alarm->escfreq = escfreq;
+    strncpy(alarm->msg, msg, 255);
+    queue->size++;
+    queue->in++;
+    queue->num++;
+    queue->in %= 100;
+    pthread_mutex_unlock(&(queue->mutex));
+    pthread_cond_broadcast(&(queue->empty));
 }
 
 /* set up thread safe FIFO queue for alarm structs */
 void init_alarmqueue(alarm_queue_t *queue)
 {
-	alarm_t *alarmbuffer[100];
-	alarm_queue_t *alarmqueue;
-	/* init all 100 available alarms */
-	int i;
-	for (i = 0; i < 100; i++)
-	{
-		alarmbuffer[i] = malloc(sizeof(alarm_t));
-	}
-	alarmqueue = malloc(sizeof(alarm_queue_t) * 100);
-	alarmqueue->num = 0;
-	alarmqueue->in = 0;
-	alarmqueue->out = 0;
-	alarmqueue->size = 0;
-	//alarmqueue->empty = PTHREAD_COND_INITIALIZER();
-	//alarmqueue->full = PTHREAD_COND_INITIALIZER();
-	//alarmqueue->mutex = PTHREAD_MUTEX_INITIALIZER();
-	/* add the buffer to the alarmqueue */
-	memcpy(alarmqueue->queue, alarmbuffer, sizeof(alarmbuffer));
+    alarm_t *alarmbuffer[100];
+    alarm_queue_t *alarmqueue;
+    /* init all 100 available alarms */
+    int i;
+    for (i = 0; i < 100; i++)
+    {
+        alarmbuffer[i] = malloc(sizeof(alarm_t));
+    }
+    alarmqueue = malloc(sizeof(alarm_queue_t) * 100);
+    alarmqueue->num = 0;
+    alarmqueue->in = 0;
+    alarmqueue->out = 0;
+    alarmqueue->size = 0;
+    //alarmqueue->empty = PTHREAD_COND_INITIALIZER();
+    //alarmqueue->full = PTHREAD_COND_INITIALIZER();
+    //alarmqueue->mutex = PTHREAD_MUTEX_INITIALIZER();
+    /* add the buffer to the alarmqueue */
+    memcpy(alarmqueue->queue, alarmbuffer, sizeof(alarmbuffer));
 }

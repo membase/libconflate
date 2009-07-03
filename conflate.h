@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <pthread.h>
 
+#include "alarm.h"
 #include <strophe.h>
 
 /*! \mainpage libconflate

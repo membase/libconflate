@@ -3,7 +3,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "alarm.h"
 #include "conflate.h"
 
 kvpair_t* mk_kvpair(const char* k, char** v)

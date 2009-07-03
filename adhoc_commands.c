@@ -4,7 +4,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "alarm.h"
 #include "conflate.h"
 #include "conflate_internal.h"
 #include "conflate_convenience.h"

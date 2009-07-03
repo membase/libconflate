@@ -5,7 +5,6 @@
 #include <sys/utsname.h>
 #include <assert.h>
 
-#include "alarm.h"
 #include "conflate.h"
 #include "conflate_internal.h"
 #include "conflate_convenience.h"
@@ -490,7 +489,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
 	alarm_t alarm;
     const char* myjid = xmpp_conn_get_bound_jid(conn);
-	char id[256];
+	char id[262];
 	char open[2];
 	char runonce[2];
 	char level[2];
@@ -503,18 +502,18 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
 	while (handle->alarms->size > 0)
 	{
 		alarm = get_alarm(handle->alarms);
-		sprintf(open, "%d", alarm.open);
-		sprintf(runonce, "%d", alarm.runonce);
-		sprintf(level, "%d", alarm.level);
-		sprintf(levelmax, "%d", alarm.levelmax);
-		sprintf(num, "%d", alarm.num);
-		sprintf(freq, "%ld", alarm.freq);
-		sprintf(escfreq, "%ld", alarm.escfreq);
-		sprintf(amsg, "%s", alarm.msg);
+		snprintf(open, 2, "%d", alarm.open);
+		snprintf(runonce, 2, "%d", alarm.runonce);
+		snprintf(level, 2, "%d", alarm.level);
+		snprintf(levelmax, 2, "%d", alarm.levelmax);
+		snprintf(num, 256, "%d", alarm.num);
+		snprintf(freq, 256, "%ld", alarm.freq);
+		snprintf(escfreq, 256, "%ld", alarm.escfreq);
+		snprintf(amsg, 256, "%s", alarm.msg);
 		/* if we got a legitimate alarm, send off alert */
 		if(alarm.open == 1)
 		{
-			sprintf(id, "_alarm%d", alarm.num);
+			snprintf(id, 262, "_alarm%d", alarm.num);
 			//handler_add_id(conn, alarm_response_handler, id, handle);
 			//handler_add_timed(conn, alarm_missing_handler, 120000, handle);
 			xmpp_stanza_t* msg = xmpp_stanza_new(handle->ctx);
@@ -530,7 +529,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
 			xmpp_stanza_t* mbody = xmpp_stanza_new(handle->ctx);
 			assert(mbody);
 			xmpp_stanza_set_name(mbody, "body");
-			sprintf(body, "Alert\nRun once: %s\nLevel: %s\n%s", runonce, level, amsg);
+			snprintf(body, 1500, "Alert\nRun once: %s\nLevel: %s\n%s", runonce, level, amsg);
 			xmpp_stanza_set_text(mbody, body);
 			add_and_release(msg, mbody);
 
