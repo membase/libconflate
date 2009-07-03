@@ -31,13 +31,13 @@ void add_alarm(alarm_queue_t *queue, int runonce, int level, int freq, int escfr
     pthread_mutex_lock(&(queue->mutex));
     while (queue->size == 100)
         pthread_cond_wait(&(queue->full), &(queue->mutex));
-    printf("Added message: %s\n", msg);
     alarm_t *alarm = queue->queue[queue->in];
     alarm->open = 1;
     alarm->runonce = runonce;
     alarm->level = level;
     alarm->levelmax = 5;
-    memcpy((int *)alarm->num, (int *)queue->num, sizeof(queue->num));
+    //memcpy((int *)alarm->num, (int *)queue->num, sizeof(queue->num));
+	alarm->num = queue->num;
     alarm->freq = freq;
     alarm->escfreq = escfreq;
     strncpy(alarm->msg, msg, 255);
@@ -50,17 +50,16 @@ void add_alarm(alarm_queue_t *queue, int runonce, int level, int freq, int escfr
 }
 
 /* set up thread safe FIFO queue for alarm structs */
-void init_alarmqueue(alarm_queue_t *queue)
+void init_alarmqueue(alarm_queue_t *alarmqueue)
 {
     alarm_t *alarmbuffer[100];
-    alarm_queue_t *alarmqueue;
+    //alarm_queue_t *alarmqueue;
     /* init all 100 available alarms */
     int i;
     for (i = 0; i < 100; i++)
     {
         alarmbuffer[i] = malloc(sizeof(alarm_t));
     }
-    alarmqueue = malloc(sizeof(alarm_queue_t) * 100);
     alarmqueue->num = 0;
     alarmqueue->in = 0;
     alarmqueue->out = 0;
