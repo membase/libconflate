@@ -11,7 +11,8 @@
 /*! \mainpage conflate-alarm
  * \section intro_sec Introduction
  *
- * conflate-alarm is a FIFO queue for passing alarms between threads
+ * conflate-alarm is a FIFO queue for passing alarms between threads. Alarms
+ * can be one shot alerts, or require acknowledgement and escalate over time.
  */
 
 /**
