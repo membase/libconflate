@@ -8,6 +8,8 @@
 /* read alarm from queue, if there is none simply return an empty alert with ->open = 0 */
 alarm_t get_alarm(alarm_queue_t *queue)
 {
+    assert(queue);
+
     pthread_mutex_lock(&(queue->mutex));
     alarm_t alarm;
     if(queue->size == 0) {
@@ -27,6 +29,9 @@ alarm_t get_alarm(alarm_queue_t *queue)
 /* add an alarm to the queue */
 void add_alarm(alarm_queue_t *queue, const char *msg)
 {
+    assert(queue);
+    assert(msg);
+
     pthread_mutex_lock(&(queue->mutex));
     while (queue->size == 100) {
         pthread_cond_wait(&(queue->full), &(queue->mutex));
