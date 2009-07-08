@@ -1,5 +1,6 @@
-#include <pthread.h>
 #include <stdio.h>
+#include <pthread.h>
+#include <stdbool.h>
 
 #ifndef _ALARM_H
 #define _ALARM_H
@@ -7,6 +8,9 @@
 #define ALARM_INITIALIZER() { 1,1,1,1,0,0,"something"}
 #define ALARM_QUEUE_INIT(queue) { queue, 0, 0, 0, PTHREAD_MUTEX_INITIALIZER, \
             PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER }
+
+#define ALARM_QUEUE_SIZE 100
+#define ALARM_MSG_MAXLEN 255
 
 /*! \mainpage conflate-alarm
  * \section intro_sec Introduction
@@ -31,9 +35,9 @@
 typedef struct alarm_s
 {
     /**
-     * 1 for an active alarm, 0 is closed
+     * true for an active alarm, false when inactive
      */
-    int open;
+    bool open;
     /**
      * effectively the alarm id and running tally of alarms
      */
@@ -61,7 +65,7 @@ typedef struct alarm_s
     /**
      * alarm message
      */
-    char msg[256];
+    char msg[ALARM_MSG_MAXLEN + 1];
 } alarm_t;
 
 /**
@@ -73,7 +77,7 @@ typedef struct alarm_queue_s
      * array of alarms, prepopulated by mallocing 100 alarm_t structs
      */
     /** \private */
-    alarm_t *queue[100];
+    alarm_t *queue[ALARM_QUEUE_SIZE];
     /** \private */
     int in;
     /** \private */
@@ -111,7 +115,9 @@ typedef struct alarm_queue_s
  */
 
 /**
- * Get alarm from alarm queue. Will return alarm with alarm->open=0 if no alarms available.
+ * Get alarm from alarm queue. Will return alarm with alarm->open =
+ * false if no alarms available.
+ *
  * To block until alarm is available to pull, wait on queue->empty
  *
  * @param queue Alarm Queue to pull alert from.
@@ -126,10 +132,10 @@ alarm_t get_alarm(alarm_queue_t *queue);
  * @param level initial level of alarm
  * @param freq number of seconds between alerts given runonce=0
  * @param escfreq number of alerts before escalating alarm 1 level
- * @param msg message of <255 characters for alarm
+ * @param msg message of <=255 characters for alarm
  */
 void add_alarm(alarm_queue_t *queue, int runonce, int level, int freq,
-               int escfreq, char msg[]);
+               int escfreq, char msg[ALARM_MSG_MAXLEN]);
 
 /**
  * Intializes an alarm_queue_t structure.
