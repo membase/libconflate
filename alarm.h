@@ -108,14 +108,9 @@ alarm_t get_alarm(alarm_queue_t *queue);
  * Insert new alarm into queue.
  *
  * @param queue The queue to add to.
- * @param runonce 0 for alarms that send multiple alerts and potentially escalate
- * @param level initial level of alarm
- * @param freq number of seconds between alerts given runonce=0
- * @param escfreq number of alerts before escalating alarm 1 level
  * @param msg message of <=255 characters for alarm
  */
-void add_alarm(alarm_queue_t *queue, int runonce, int level, int freq,
-               int escfreq, char msg[ALARM_MSG_MAXLEN]);
+void add_alarm(alarm_queue_t *queue, char msg[ALARM_MSG_MAXLEN]);
 
 /**
  * Create and initialize an alarm queue.

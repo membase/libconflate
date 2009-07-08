@@ -23,14 +23,14 @@ START_TEST(test_simple_alarm)
 {
     alarm_t in_alarm;
 
-    add_alarm(alarmqueue, 0, 1, 0, 0, "This is a test message 1");
+    add_alarm(alarmqueue, "This is a test message 1");
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 1, "Didn't receive alarm message 1.");
     fail_unless(strcmp(in_alarm.msg, "This is a test message 1") == 0,
                 "Didn't get the right message for message 1.");
 
-    add_alarm(alarmqueue, 0, 1, 0, 0, "This is a test message 2");
-    add_alarm(alarmqueue, 0, 1, 0, 0, "This is a test message 3");
+    add_alarm(alarmqueue, "This is a test message 2");
+    add_alarm(alarmqueue, "This is a test message 3");
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 1, "Didn't receive alarm message 2.");
     fail_unless(strcmp(in_alarm.msg, "This is a test message 2") == 0,
