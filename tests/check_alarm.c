@@ -7,9 +7,20 @@
 #include <check.h>
 #include <alarm.h>
 
+static alarm_queue_t *alarmqueue = NULL;
+
+static void handle_setup(void) {
+	alarmqueue = init_alarmqueue();
+    fail_if(alarmqueue == NULL, "Failed to set up alarm queue");
+}
+
+static void handle_teardown(void) {
+    destroy_alarmqueue(alarmqueue);
+    alarmqueue = NULL;
+}
+
 START_TEST(test_simple_alarm)
 {
-	alarm_queue_t *alarmqueue = init_alarmqueue();
 	alarm_t in_alarm;
 
 	add_alarm(alarmqueue, 0, 1, 0, 0, "This is a test message 1");
@@ -31,18 +42,19 @@ START_TEST(test_simple_alarm)
                 "Didn't get the right message for message 3.");
 	in_alarm = get_alarm(alarmqueue);
 	fail_unless(in_alarm.open == 0, "Shouldn't have recieved open alarm.");
-
-	destroy_alarmqueue(alarmqueue);
 }
 END_TEST
 
 static Suite* alarm_suite(void)
 {
 	Suite *s = suite_create("alarm");
+	TCase *tc = tcase_create("Core");
 
-	TCase *tc_core = tcase_create("Core");
-	tcase_add_test(tc_core, test_simple_alarm);
-	suite_add_tcase(s, tc_core);
+    tcase_add_checked_fixture(tc, handle_setup, handle_teardown);
+
+	tcase_add_test(tc, test_simple_alarm);
+
+	suite_add_tcase(s, tc);
 	return s;
 }
 
