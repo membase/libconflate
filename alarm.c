@@ -49,18 +49,26 @@ void add_alarm(alarm_queue_t *queue, int runonce, int level,
 }
 
 /* set up thread safe FIFO queue for alarm structs */
-void init_alarmqueue(alarm_queue_t *alarmqueue)
+alarm_queue_t *init_alarmqueue(void)
 {
-    alarm_t *alarmbuffer[ALARM_QUEUE_SIZE];
+    alarm_queue_t *rv = calloc(1, sizeof(alarm_queue_t));
+    assert(rv);
+
     /* init all 100 available alarms */
-    int i;
-    for (i = 0; i < 100; i++) {
-        alarmbuffer[i] = malloc(sizeof(alarm_t));
+    for (int i = 0; i < ALARM_QUEUE_SIZE; i++) {
+        rv->queue[i] = calloc(1, sizeof(alarm_t));
     }
-    alarmqueue->num = 0;
-    alarmqueue->in = 0;
-    alarmqueue->out = 0;
-    alarmqueue->size = 0;
-    /* add the buffer to the alarmqueue */
-    memcpy(alarmqueue->queue, alarmbuffer, sizeof(alarmbuffer));
+
+    return rv;
+}
+
+void destroy_alarmqueue(alarm_queue_t *queue)
+{
+    if(queue) {
+        for(int i = 0; i < ALARM_QUEUE_SIZE; i++) {
+            free(queue->queue[i]);
+            queue->queue[i] = NULL;
+        }
+        free(queue);
+    }
 }

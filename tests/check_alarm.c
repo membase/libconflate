@@ -9,10 +9,8 @@
 
 START_TEST(test_simple_alarm)
 {
-	alarm_queue_t *alarmqueue;
+	alarm_queue_t *alarmqueue = init_alarmqueue();
 	alarm_t in_alarm;
-	alarmqueue = calloc(1, sizeof(alarm_queue_t));
-	init_alarmqueue(alarmqueue);
 
 	add_alarm(alarmqueue, 0, 1, 0, 0, "This is a test message 1");
 	in_alarm = get_alarm(alarmqueue);
@@ -34,7 +32,7 @@ START_TEST(test_simple_alarm)
 	in_alarm = get_alarm(alarmqueue);
 	fail_unless(in_alarm.open == 0, "Shouldn't have recieved open alarm.");
 
-	free(alarmqueue);
+	destroy_alarmqueue(alarmqueue);
 }
 END_TEST
 

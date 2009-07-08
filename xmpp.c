@@ -809,8 +809,7 @@ bool start_conflate(conflate_config_t conf) {
 
     xmpp_initialize();
 
-	handle->alarms = calloc(1, sizeof(alarm_queue_t));
-    init_alarmqueue(handle->alarms);
+	handle->alarms = init_alarmqueue();
 
     handle->conf = dup_conf(conf);
 

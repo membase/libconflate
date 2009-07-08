@@ -138,11 +138,18 @@ void add_alarm(alarm_queue_t *queue, int runonce, int level, int freq,
                int escfreq, char msg[ALARM_MSG_MAXLEN]);
 
 /**
- * Intializes an alarm_queue_t structure.
+ * Create and initialize an alarm queue.
  *
- * @param queue Alarm queue to initialize.
+ * @return the new alarm queue
  */
-void init_alarmqueue(alarm_queue_t *queue);
+alarm_queue_t *init_alarmqueue(void);
+
+/**
+ * Destroy an alarm queue.
+ *
+ * @param queue the alarm queue to tear down
+ */
+void destroy_alarmqueue(alarm_queue_t *queue);
 
 /**
  * @}
