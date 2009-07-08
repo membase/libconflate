@@ -14,7 +14,7 @@ alarm_t get_alarm(alarm_queue_t *queue)
         alarm.open = false;
         alarm.msg[0] = 0x00;
     } else {
-        alarm = *queue->queue[queue->out];
+        alarm = queue->queue[queue->out];
         queue->size--;
         queue->out++;
         queue->out %= 100;
@@ -31,7 +31,7 @@ void add_alarm(alarm_queue_t *queue, int runonce, int level,
     pthread_mutex_lock(&(queue->mutex));
     while (queue->size == 100)
         pthread_cond_wait(&(queue->full), &(queue->mutex));
-    alarm_t *alarm = queue->queue[queue->in];
+    alarm_t *alarm = &queue->queue[queue->in];
     alarm->open = true;
     alarm->runonce = runonce;
     alarm->level = level;
@@ -53,22 +53,12 @@ alarm_queue_t *init_alarmqueue(void)
 {
     alarm_queue_t *rv = calloc(1, sizeof(alarm_queue_t));
     assert(rv);
-
-    /* init all 100 available alarms */
-    for (int i = 0; i < ALARM_QUEUE_SIZE; i++) {
-        rv->queue[i] = calloc(1, sizeof(alarm_t));
-    }
-
     return rv;
 }
 
 void destroy_alarmqueue(alarm_queue_t *queue)
 {
     if(queue) {
-        for(int i = 0; i < ALARM_QUEUE_SIZE; i++) {
-            free(queue->queue[i]);
-            queue->queue[i] = NULL;
-        }
         free(queue);
     }
 }

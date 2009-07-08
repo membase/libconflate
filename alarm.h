@@ -77,7 +77,7 @@ typedef struct alarm_queue_s
      * array of alarms, prepopulated by mallocing 100 alarm_t structs
      */
     /** \private */
-    alarm_t *queue[ALARM_QUEUE_SIZE];
+    alarm_t queue[ALARM_QUEUE_SIZE];
     /** \private */
     int in;
     /** \private */
