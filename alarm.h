@@ -4,9 +4,9 @@
 #ifndef _ALARM_H
 #define _ALARM_H
 
-//#define ALARM_QUEUE_INITIALIZER {  0, 0, 0, PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER  }
 #define ALARM_INITIALIZER() { 1,1,1,1,0,0,"something"}
-#define ALARM_QUEUE_INIT(queue) {queue, 0, 0, 0, PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER}
+#define ALARM_QUEUE_INIT(queue) { queue, 0, 0, 0, PTHREAD_MUTEX_INITIALIZER, \
+            PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER }
 
 /*! \mainpage conflate-alarm
  * \section intro_sec Introduction
@@ -113,14 +113,14 @@ typedef struct alarm_queue_s
 /**
  * Get alarm from alarm queue. Will return alarm with alarm->open=0 if no alarms available.
  * To block until alarm is available to pull, wait on queue->empty
- * 
+ *
  * @param queue Alarm Queue to pull alert from.
  */
-alarm_t get_alarm(alarm_queue_t *);
+alarm_t get_alarm(alarm_queue_t *queue);
 
 /**
  * Insert new alarm into queue.
- * 
+ *
  * @param queue The queue to add to.
  * @param runonce 0 for alarms that send multiple alerts and potentially escalate
  * @param level initial level of alarm
@@ -128,14 +128,15 @@ alarm_t get_alarm(alarm_queue_t *);
  * @param escfreq number of alerts before escalating alarm 1 level
  * @param msg message of <255 characters for alarm
  */
-void add_alarm(alarm_queue_t *, int, int, int, int, char []);
+void add_alarm(alarm_queue_t *queue, int runonce, int level, int freq,
+               int escfreq, char msg[]);
 
 /**
  * Intializes an alarm_queue_t structure.
  *
  * @param queue Alarm queue to initialize.
- */ 
-void init_alarmqueue(alarm_queue_t *);
+ */
+void init_alarmqueue(alarm_queue_t *queue);
 
 /**
  * @}
