@@ -490,30 +490,18 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
     alarm_t alarm;
     const char* myjid = xmpp_conn_get_bound_jid(conn);
     char id[262];
-    char open[2];
-    char runonce[2];
-    char level[2];
-    char levelmax[2];
-    char num[256];
-    char freq[256];
-    char escfreq[256];
+    char open[2] = { 0, 0 };
     char amsg[256];
     char body[1500];
     while (handle->alarms->size > 0)
     {
         alarm = get_alarm(handle->alarms);
-        snprintf(open, 2, "%d", alarm.open);
-        snprintf(runonce, 2, "%d", alarm.runonce);
-        snprintf(level, 2, "%d", alarm.level);
-        snprintf(levelmax, 2, "%d", alarm.levelmax);
-        snprintf(num, 256, "%d", alarm.num);
-        snprintf(freq, 256, "%ld", alarm.freq);
-        snprintf(escfreq, 256, "%ld", alarm.escfreq);
-        snprintf(amsg, 256, "%s", alarm.msg);
+        open[0] = alarm.open ? '1' : '2';
+        snprintf(amsg, sizeof(amsg), "%s", alarm.msg);
         /* if we got a legitimate alarm, send off alert */
         if(alarm.open == 1)
         {
-            snprintf(id, 262, "_alarm%d", alarm.num);
+            snprintf(id, sizeof(id), "_alarm%d", alarm.num);
             //handler_add_id(conn, alarm_response_handler, id, handle);
             //handler_add_timed(conn, alarm_missing_handler, 120000, handle);
             xmpp_stanza_t* msg = xmpp_stanza_new(handle->ctx);
@@ -529,7 +517,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
             xmpp_stanza_t* mbody = xmpp_stanza_new(handle->ctx);
             assert(mbody);
             xmpp_stanza_set_name(mbody, "body");
-            snprintf(body, 1500, "Alert\nRun once: %s\nLevel: %s\n%s", runonce, level, amsg);
+            snprintf(body, sizeof(body), "Alert\n%s", amsg);
             xmpp_stanza_set_text(mbody, body);
             add_and_release(msg, mbody);
 
@@ -539,12 +527,6 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
             xmpp_stanza_set_attribute(alert, "xmlns", XMPP_NS_DISCO_ITEMS);
             xmpp_stanza_set_attribute(alert, "node", "http://nortscale.net/protocol/alerts");
             xmpp_stanza_set_attribute(alert, "open", open);
-            xmpp_stanza_set_attribute(alert, "runonce", runonce);
-            xmpp_stanza_set_attribute(alert, "level", level);
-            xmpp_stanza_set_attribute(alert, "levelmax", levelmax);
-            xmpp_stanza_set_attribute(alert, "num", num);
-            xmpp_stanza_set_attribute(alert, "freq", freq);
-            xmpp_stanza_set_attribute(alert, "escfreq", escfreq);
             xmpp_stanza_set_attribute(alert, "msg", amsg);
             add_and_release(msg, alert);
 

@@ -43,26 +43,6 @@ typedef struct alarm_s
      */
     int num;
     /**
-     * 0 for an alarm that can escalate and send multiple notices, 1 otherwise
-     */
-    int runonce;
-    /**
-     * initial level
-     */
-    int level;
-    /**
-     * maximum level this alarm can escalate to
-     */
-    int levelmax;
-    /**
-     * number of seconds between sending alerts given runonce=0
-     */
-    long freq;
-    /**
-     * number of alerts sent between escalation
-     */
-    long escfreq;
-    /**
      * alarm message
      */
     char msg[ALARM_MSG_MAXLEN + 1];

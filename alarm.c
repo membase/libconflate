@@ -33,12 +33,7 @@ void add_alarm(alarm_queue_t *queue, int runonce, int level,
         pthread_cond_wait(&(queue->full), &(queue->mutex));
     alarm_t *alarm = &queue->queue[queue->in];
     alarm->open = true;
-    alarm->runonce = runonce;
-    alarm->level = level;
-    alarm->levelmax = 5;
 	alarm->num = queue->num;
-    alarm->freq = freq;
-    alarm->escfreq = escfreq;
     strncpy(alarm->msg, msg, ALARM_MSG_MAXLEN);
     queue->size++;
     queue->in++;
