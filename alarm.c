@@ -25,7 +25,7 @@ alarm_t get_alarm(alarm_queue_t *queue)
 }
 
 /* add an alarm to the queue */
-void add_alarm(alarm_queue_t *queue, char msg[ALARM_MSG_MAXLEN])
+void add_alarm(alarm_queue_t *queue, const char *msg)
 {
     pthread_mutex_lock(&(queue->mutex));
     while (queue->size == 100) {

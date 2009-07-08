@@ -110,7 +110,7 @@ alarm_t get_alarm(alarm_queue_t *queue);
  * @param queue The queue to add to.
  * @param msg message of <=255 characters for alarm
  */
-void add_alarm(alarm_queue_t *queue, char msg[ALARM_MSG_MAXLEN]);
+void add_alarm(alarm_queue_t *queue, const char *msg);
 
 /**
  * Create and initialize an alarm queue.
