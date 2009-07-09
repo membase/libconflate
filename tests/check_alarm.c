@@ -45,6 +45,30 @@ START_TEST(test_simple_alarm)
 }
 END_TEST
 
+START_TEST(test_giant_alarm)
+{
+    char *msg="This is a really large message that exceeds the 256 or "
+        "so bytes allocated for messages to see what happens when a "
+        "message is too big.  Hopefully it's fine.  "
+        "It turns out that 256 bytes or whatever the current value is ends "
+        "up being quite a bit of bytes.  I suppose that makes sense if "
+        "I do a bit of math, but I'm too lazy to do anything other than assert.";
+
+    fail_unless(strlen(msg) > ALARM_MSG_MAXLEN,
+                "Message string was too short to blow up.");
+    add_alarm(alarmqueue, msg);
+
+    alarm_t in_alarm = get_alarm(alarmqueue);
+    fail_unless(in_alarm.open, "Didn't receive a large alarm.");
+
+    fail_unless(strlen(in_alarm.msg) == ALARM_MSG_MAXLEN,
+            "Alarm message is too long.");
+
+    fail_unless(strncmp(msg, in_alarm.msg, ALARM_MSG_MAXLEN) == 0,
+                "Alarm message didn't match.");
+}
+END_TEST
+
 static Suite* alarm_suite(void)
 {
     Suite *s = suite_create("alarm");
@@ -53,6 +77,7 @@ static Suite* alarm_suite(void)
     tcase_add_checked_fixture(tc, handle_setup, handle_teardown);
 
     tcase_add_test(tc, test_simple_alarm);
+    tcase_add_test(tc, test_giant_alarm);
 
     suite_add_tcase(s, tc);
     return s;
