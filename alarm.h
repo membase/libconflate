@@ -12,21 +12,10 @@
 #define ALARM_QUEUE_SIZE 100
 #define ALARM_MSG_MAXLEN 255
 
-/*! \mainpage conflate-alarm
- * \section intro_sec Introduction
- *
- * conflate-alarm is a FIFO queue for passing alarms between threads. Alarms
- * can be one shot alerts, or require acknowledgement and escalate over time.
- */
-
 /**
- * \defgroup Structs Queue and Alarm Structures
- * \defgroup Functions Queue management functions
- */
-
-/**
- * \addtogroup Structs
+ * \addtogroup Alarm
  * @{
+ * conflate-alarm is a FIFO queue for passing alarms between threads.
  */
 
 /**
@@ -84,15 +73,6 @@ typedef struct alarm_queue_s
      */
     pthread_cond_t empty;
 } alarm_queue_t;
-
-/**
- * @}
- */
-
-/**
- * \addtogroup Functions
- * @{
- */
 
 /**
  * Get alarm from alarm queue. Will return alarm with alarm->open =

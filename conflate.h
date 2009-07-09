@@ -5,7 +5,6 @@
 #include <sys/types.h>
 #include <pthread.h>
 
-#include "alarm.h"
 #include <strophe.h>
 
 /*! \mainpage libconflate
@@ -41,7 +40,10 @@ typedef struct _conflate_handle conflate_handle_t;
  * \defgroup kvpairs Simple lisp-style Associative Lists
  * \defgroup Logging Logging Facilities
  * \defgroup Persistence Long-Term Persistence API
+ * \defgroup Alarm Alarm Functionality
  */
+
+#include "alarm.h"
 
 /**
 * \addtogroup kvpairs
