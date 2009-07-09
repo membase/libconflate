@@ -162,10 +162,10 @@
     conf.<a name="a16"></a><a class="code" href="structconflate__config__t.html#8375f4440596f25cb44554a9430ab5cc" title="Name of the software using libconflate.">software</a> = <span class="stringliteral">"conflate sample bot"</span>;
     conf.<a name="a17"></a><a class="code" href="structconflate__config__t.html#dd8b76f27e59ca5bac58f8e156f2085a" title="Version number of the software running libconflate.">version</a> = <span class="stringliteral">"1.0"</span>;
     conf.<a name="a18"></a><a class="code" href="structconflate__config__t.html#ba88b8d50e4cbd4491f8de469bba49a0" title="Path to persist configuration for faster/more reliable restarts.">save_path</a> = <span class="stringliteral">"/tmp/conflate.db"</span>;
-    conf.<a name="a19"></a><a class="code" href="structconflate__config__t.html#0b60e40c4df699b1e03f53f62a5777ba" title="Logging callback (optional).">log</a> = <a name="a20"></a><a class="code" href="group___logging.html#g6a4dd8fd15404e026bed9b1b0ef71b11" title="Logging implementation that logs to stderr.">conflate_stderr_logger</a>;
+    conf.<a name="a19"></a><a class="code" href="structconflate__config__t.html#666bbad041858eb48c11b0b58778f6ab" title="Logging callback (optional).">log</a> = <a name="a20"></a><a class="code" href="group___logging.html#g6a4dd8fd15404e026bed9b1b0ef71b11" title="Logging implementation that logs to stderr.">conflate_stderr_logger</a>;
 
     conf.<a name="a21"></a><a class="code" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7" title="User defined data to be passed to callbacks.">userdata</a> = <span class="stringliteral">"something awesome"</span>;
-    conf.<a name="a22"></a><a class="code" href="structconflate__config__t.html#aa35807ba919761d514fc6e7a758018c" title="Callback issued when a new configuration is to be activated.">new_config</a> = display_config;
+    conf.<a name="a22"></a><a class="code" href="structconflate__config__t.html#5c8c20f7cfe6278592b91cb80cc95de3" title="Callback issued when a new configuration is to be activated.">new_config</a> = display_config;
 
     <span class="comment">/* Begin the connection. */</span>
     <span class="keywordflow">if</span>(!<a name="a23"></a><a class="code" href="group___core.html#g1a3cec80d219a90587142dd6af14ed61" title="The main entry point for starting a conflate agent.">start_conflate</a>(conf)) {
@@ -179,7 +179,7 @@
     pause();
 }
 </pre></div> </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Jun 19 12:12:59 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jul 8 17:53:59 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

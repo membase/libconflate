@@ -58,12 +58,12 @@ char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="st
 void *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#ecdefd1fa8e21edf33ca435e34fdcba7">userdata</a></td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">User defined data to be passed to callbacks. <br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#0b60e40c4df699b1e03f53f62a5777ba">log</a> )(void *udata, enum <a class="el" href="group___logging.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a> level, const char *msg,...)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#666bbad041858eb48c11b0b58778f6ab">log</a> )(void *udata, enum <a class="el" href="group___logging.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a> level, const char *msg,...) __gcc_attribute__((format(printf</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Logging callback (optional).  <a href="#0b60e40c4df699b1e03f53f62a5777ba"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#aa35807ba919761d514fc6e7a758018c">new_config</a> )(void *, <a class="el" href="structkvpair.html">kvpair_t</a> *)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Logging callback (optional).  <a href="#666bbad041858eb48c11b0b58778f6ab"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void(*) void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconflate__config__t.html#5c8c20f7cfe6278592b91cb80cc95de3">new_config</a> )(void *, <a class="el" href="structkvpair.html">kvpair_t</a> *)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when a new configuration is to be activated.  <a href="#aa35807ba919761d514fc6e7a758018c"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback issued when a new configuration is to be activated.  <a href="#5c8c20f7cfe6278592b91cb80cc95de3"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
 Configuration for a conflatee. <dl compact><dt><b>Examples: </b></dt><dd>
@@ -88,12 +88,12 @@ This is optional -- setting this to NULL will allow for normal XMPP SRV lookups 
 <a class="el" href="examples_2bot_8c-example.html#a15">examples/bot.c</a>.</dl>
 </div>
 </div><p>
-<a class="anchor" name="0b60e40c4df699b1e03f53f62a5777ba"></a><!-- doxytag: member="conflate_config_t::log" ref="0b60e40c4df699b1e03f53f62a5777ba" args=")(void *udata, enum conflate_log_level level, const char *msg,...)" -->
+<a class="anchor" name="666bbad041858eb48c11b0b58778f6ab"></a><!-- doxytag: member="conflate_config_t::log" ref="666bbad041858eb48c11b0b58778f6ab" args=")(void *udata, enum conflate_log_level level, const char *msg,...) __gcc_attribute__((format(printf" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void(* <a class="el" href="structconflate__config__t.html#0b60e40c4df699b1e03f53f62a5777ba">conflate_config_t::log</a>)(void *udata, enum <a class="el" href="group___logging.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a> level, const char *msg,...)          </td>
+          <td class="memname">void(* <a class="el" href="structconflate__config__t.html#666bbad041858eb48c11b0b58778f6ab">conflate_config_t::log</a>)(void *udata, enum <a class="el" href="group___logging.html#gd731674cf91ee0dae60a8b64e6b5d814">conflate_log_level</a> level, const char *msg,...) __gcc_attribute__((format(printf          </td>
         </tr>
       </table>
 </div>
@@ -114,12 +114,12 @@ If you do not specify a logger, one will be suplied for you that sends a lot of 
 <a class="el" href="examples_2bot_8c-example.html#a19">examples/bot.c</a>.</dl>
 </div>
 </div><p>
-<a class="anchor" name="aa35807ba919761d514fc6e7a758018c"></a><!-- doxytag: member="conflate_config_t::new_config" ref="aa35807ba919761d514fc6e7a758018c" args=")(void *, kvpair_t *)" -->
+<a class="anchor" name="5c8c20f7cfe6278592b91cb80cc95de3"></a><!-- doxytag: member="conflate_config_t::new_config" ref="5c8c20f7cfe6278592b91cb80cc95de3" args=")(void *, kvpair_t *)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void(* <a class="el" href="structconflate__config__t.html#aa35807ba919761d514fc6e7a758018c">conflate_config_t::new_config</a>)(void *, <a class="el" href="structkvpair.html">kvpair_t</a> *)          </td>
+          <td class="memname">void(*) void(* <a class="el" href="structconflate__config__t.html#5c8c20f7cfe6278592b91cb80cc95de3">conflate_config_t::new_config</a>)(void *, <a class="el" href="structkvpair.html">kvpair_t</a> *)          </td>
         </tr>
       </table>
 </div>
@@ -172,7 +172,7 @@ For example: 1.3.3-8-gee0c3d5 <dl compact><dt><b>Examples: </b></dt><dd>
 <hr>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="conflate_8h-source.html">conflate.h</a></ul>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Jun 19 12:13:00 2009 for LibConflate by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jul 8 17:54:01 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>
