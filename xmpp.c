@@ -530,6 +530,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
             xmpp_stanza_set_attribute(alert, "open", open);
             xmpp_stanza_set_attribute(alert, "msg", amsg);
 			xmpp_stanza_set_attribute(alert, "num", num);
+			xmpp_stanza_set_attribute(alert, "name", alarm.name);
             add_and_release(msg, alert);
 
             xmpp_send(conn, msg);
