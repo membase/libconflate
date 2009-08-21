@@ -1,10 +1,13 @@
 ACLOCAL_AMFLAGS=-I m4
 SHELL=/bin/sh
 lib_LTLIBRARIES = libconflate.la
-include_HEADERS = conflate.h alarm.h
+pkginclude_HEADERS = conflate.h alarm.h
 noinst_PROGRAMS = examples/bot
 
-EXTRA_DIST=LICENSE.txt README.markdown Doxyfile
+EXTRA_DIST=LICENSE.txt README.markdown Doxyfile libconflate.pc.in
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libconflate.pc
 
 BUILT_SOURCES=
 

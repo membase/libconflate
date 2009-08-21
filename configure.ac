@@ -69,5 +69,5 @@ then
         CFLAGS="$CFLAGS -Wall -Werror -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls"
 fi
 
-AC_CONFIG_FILES(Makefile tests/Makefile)
+AC_CONFIG_FILES(Makefile tests/Makefile libconflate.pc)
 AC_OUTPUT
