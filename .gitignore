@@ -1,5 +1,7 @@
 *.o
+*.lo
 *.a
+*.la
 *.Po
 *~
 /TAGS
@@ -7,6 +9,8 @@
 /examples/bot
 /docs
 .deps/
+.libs/
+/m4/
 .dirstamp
 COPYING
 INSTALL
@@ -15,6 +19,8 @@ Makefile.in
 aclocal.m4
 autom4te.cache/
 compile
+libtool
+ltmain.sh
 config.guess
 config.h
 config.h.in
