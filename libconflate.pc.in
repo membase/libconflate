@@ -6,5 +6,6 @@ includedir=@includedir@
 Name: libconflate
 Description: A library for managing configuration of clustered applications -- Bringing it all together.
 Version: @VERSION@
-Libs: -L${libdir} -lconflate -lstrophe
+Requires.private: libstrophe
+Libs: -L${libdir} -lconflate
 Cflags: -I${includedir}/libconflate

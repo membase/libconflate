@@ -40,26 +40,25 @@ if test "x$enable_coverage" == "xyes"; then
 fi
 AC_SUBST(PROFILER_FLAGS)
 
-AC_SEARCH_LIBS([socket], [socket])
-AC_SEARCH_LIBS([res_query], resolv)
-AC_SEARCH_LIBS(sqlite3_open, sqlite3, [],
-                             AC_MSG_ERROR([Can't find sqlite3]))
-AC_SEARCH_LIBS(XML_ParserCreate, expat)
-AC_SEARCH_LIBS(SSL_connect, ssl)
-AC_SEARCH_LIBS(res_9_query, resolv)
-dnl Linux needs resolv for the above, but doesn't seem to know it
-AC_SEARCH_LIBS(__res_query, resolv)
-AC_SEARCH_LIBS(xmpp_initialize, strophe,
-                                [], AC_MSG_ERROR([Can't find libstrophe.]))
-
 AC_SEARCH_LIBS(pthread_create, pthread,
                                [], AC_MSG_ERROR([Can't enable pthreads.]))
+AC_SEARCH_LIBS(sqlite3_open, sqlite3, [],
+                             AC_MSG_ERROR([Can't find sqlite3]))
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 AC_HEADER_STDBOOL
 
-AC_CHECK_HEADER(strophe.h,
-        [], AC_MSG_ERROR([Ensure strophe.h is available.]))
+PKG_CHECK_MODULES([libstrophe], [libstrophe], [
+  LIBS="$LIBS $libstrophe_LIBS"
+  CFLAGS="$libstrophe_CFLAGS $CFLAGS"
+], [
+  AC_MSG_CHECKING([for old version of libstrophe
+])
+  AC_CHECK_HEADER(strophe.h,
+          [], AC_MSG_ERROR([Ensure strophe.h is available.]))
+  AC_SEARCH_LIBS(xmpp_initialize, strophe,
+                                [], AC_MSG_ERROR([Can't find libstrophe.]))
+])
 
 AC_C_CONST
 
