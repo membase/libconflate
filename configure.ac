@@ -48,10 +48,7 @@ PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 AC_HEADER_STDBOOL
 
-PKG_CHECK_MODULES([libstrophe], [libstrophe], [
-  LIBS="$LIBS $libstrophe_LIBS"
-  CFLAGS="$libstrophe_CFLAGS $CFLAGS"
-], [
+PKG_CHECK_MODULES([libstrophe], [libstrophe], [], [
   AC_MSG_CHECKING([for old version of libstrophe
 ])
   AC_CHECK_HEADER(strophe.h,

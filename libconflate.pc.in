@@ -8,4 +8,5 @@ Description: A library for managing configuration of clustered applications -- B
 Version: @VERSION@
 Requires.private: libstrophe
 Libs: -L${libdir} -lconflate
+Libs.private: @LIBS@
 Cflags: -I${includedir}/libconflate
