@@ -4,6 +4,7 @@
 *.la
 *.Po
 *~
+/libconflate.pc
 /TAGS
 /python/twistd.pid
 /examples/bot
