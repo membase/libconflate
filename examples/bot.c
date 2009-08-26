@@ -5,6 +5,9 @@
 #include <sysexits.h>
 
 #include "conflate.h"
+#include "alarm.h"
+#include "conflate_internal.h"
+
 
 /*
  * This program is both an example of most of the public API of
@@ -112,6 +115,21 @@ static enum conflate_mgmt_cb_result process_ping_test(void *opaque,
     return RV_OK;
 }
 
+static enum conflate_mgmt_cb_result process_alarm_create(void *opaque,
+                                                         conflate_handle_t *handle,
+                                                         const char *cmd,
+                                                         bool direct,
+                                                         kvpair_t *form,
+                                                         conflate_form_result *r)
+{
+	if(add_alarm(handle->alarms, "This is a test alarm!")) {
+        fprintf(stderr, "Created alarm!\n");
+    } else {
+        fprintf(stderr, "Error queueing an alarm.\n");
+    }
+	return RV_OK;
+}
+
 int main(int argc, char **argv) {
 
     if (argc < 3) {
@@ -131,6 +149,9 @@ int main(int argc, char **argv) {
 
     conflate_register_mgmt_cb("ping_test", "Perform a ping test",
                               process_ping_test);
+
+	conflate_register_mgmt_cb("alarm", "Create an alarm",
+                              process_alarm_create);
 
     /* Perform default configuration initialization. */
     conflate_config_t conf;
