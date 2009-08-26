@@ -58,7 +58,5 @@ alarm_queue_t *init_alarmqueue(void)
 
 void destroy_alarmqueue(alarm_queue_t *queue)
 {
-    if(queue) {
-        free(queue);
-    }
+    free(queue);
 }
