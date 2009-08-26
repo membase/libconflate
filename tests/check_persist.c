@@ -8,6 +8,8 @@
 #include <conflate.h>
 #include <conflate_internal.h>
 
+#include "test_common.h"
+
 static conflate_handle_t *handle;
 static conflate_config_t conf;
 
@@ -79,6 +81,32 @@ START_TEST (test_private_retrieve)
 }
 END_TEST
 
+START_TEST (test_kvpair_storage)
+{
+    char* args[] = {"arg1", "arg2", NULL};
+    kvpair_t *pair = mk_kvpair("some_key", args);
+
+    fail_if(pair == NULL, "Didn't create a pair.");
+    fail_unless(strcmp(pair->key, "some_key") == 0, "Key is broken.");
+    fail_unless(strcmp(pair->values[0], "arg1") == 0, "First value is broken.");
+    fail_unless(strcmp(pair->values[1], "arg2") == 0, "Second value is broken.");
+    fail_unless(pair->used_values == 2, "Wrong number of used values.");
+    fail_unless(pair->allocated_values >= pair->used_values,
+                "Allocated values can't be smaller than used values.");
+    fail_unless(pair->next == NULL, "Next pointer is non-null.");
+
+    fail_unless(save_kvpairs(handle, pair, db_loc),
+                "Failed to save kv pairs.");
+
+    kvpair_t *dbpair = load_kvpairs(handle, db_loc);
+
+    check_pair_equality(pair, dbpair);
+
+    free_kvpair(pair);
+    free_kvpair(dbpair);
+}
+END_TEST
+
 static Suite* persist_suite(void)
 {
     Suite *s = suite_create("persist");
@@ -90,6 +118,7 @@ static Suite* persist_suite(void)
 
     tcase_add_test(tc, test_empty_private_get);
     tcase_add_test(tc, test_empty_private_delete);
+    tcase_add_test(tc, test_kvpair_storage);
     tcase_add_test(tc, test_private_save);
     tcase_add_test(tc, test_private_delete);
     tcase_add_test(tc, test_private_retrieve);
