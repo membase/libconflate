@@ -21,8 +21,7 @@
 /**
  * Alarm stucture for storage of a single alarm's parameters
  */
-typedef struct alarm_s
-{
+typedef struct {
     /**
      * true for an active alarm, false when inactive
      */
@@ -40,8 +39,7 @@ typedef struct alarm_s
 /**
  * FIFO queue for alarms
  */
-typedef struct alarm_queue_s
-{
+typedef struct {
     /**
      * array of alarms, prepopulated by mallocing 100 alarm_t structs
      */
