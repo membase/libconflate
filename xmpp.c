@@ -524,8 +524,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
             xmpp_stanza_t* alert = xmpp_stanza_new(handle->ctx);
             assert(alert);
             xmpp_stanza_set_name(alert, "alert");
-            xmpp_stanza_set_attribute(alert, "xmlns", XMPP_NS_DISCO_ITEMS);
-            xmpp_stanza_set_attribute(alert, "node", "http://nortscale.net/protocol/alerts");
+            xmpp_stanza_set_attribute(alert, "xmlns", "http://northscale.net/protocol/alerts");
             xmpp_stanza_set_attribute(alert, "open", open);
             xmpp_stanza_set_attribute(alert, "msg", amsg);
             add_and_release(msg, alert);
