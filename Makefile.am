@@ -21,3 +21,5 @@ MOSTLYCLEANFILES = *.gcov *.gcno *.gcda *.tcov
 docs:
 	(cat Doxyfile ; echo "PROJECT_NUMBER=`git describe`") | doxygen -
 
+test: check
+	@for f in *.gcda; do gcov $$f; done | egrep -v ':creating'
