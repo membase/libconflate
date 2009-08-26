@@ -19,7 +19,7 @@ alarm_t get_alarm(alarm_queue_t *queue)
         alarm = queue->queue[queue->out];
         queue->size--;
         queue->out++;
-        queue->out %= 100;
+        queue->out %= ALARM_QUEUE_SIZE;
     }
     pthread_mutex_unlock(&(queue->mutex));
     return alarm;
@@ -33,7 +33,7 @@ bool add_alarm(alarm_queue_t *queue, const char *msg)
     bool rv = false;
 
     pthread_mutex_lock(&(queue->mutex));
-    if (queue->size < 100) {
+    if (queue->size < ALARM_QUEUE_SIZE) {
         alarm_t *alarm = &queue->queue[queue->in];
         alarm->open = true;
         alarm->num = queue->num;

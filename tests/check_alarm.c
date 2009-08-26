@@ -75,7 +75,7 @@ END_TEST
 
 START_TEST(test_full_queue)
 {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < ALARM_QUEUE_SIZE; i++) {
         fail_unless(add_alarm(alarmqueue, "Test alarm message."),
                     "Failed to add alarm.");
     }
