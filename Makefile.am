@@ -15,6 +15,8 @@ libconflate_a_CFLAGS = @PROFILER_FLAGS@
 libconflate_a_SOURCES = conflate.h conflate_internal.h conflate_convenience.h alarm.h\
 	alarm.c kvpair.c util.c persist.c xmpp.c logging.c adhoc_commands.c
 
+MOSTLYCLEANFILES = *.gcov *.gcno *.gcda *.tcov
+
 .PHONY: docs
 docs:
 	(cat Doxyfile ; echo "PROJECT_NUMBER=`git describe`") | doxygen -
