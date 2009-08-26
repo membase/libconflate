@@ -11,6 +11,7 @@
 
 #define ALARM_QUEUE_SIZE 100
 #define ALARM_MSG_MAXLEN 255
+#define ALARM_NAME_MAXLEN 25
 
 /**
  * \addtogroup Alarm
@@ -34,6 +35,10 @@ typedef struct {
      * alarm message
      */
     char msg[ALARM_MSG_MAXLEN + 1];
+	/**
+	 * alarm name
+	 */
+	char name[ALARM_NAME_MAXLEN + 1];
 } alarm_t;
 
 /**
@@ -80,7 +85,7 @@ alarm_t get_alarm(alarm_queue_t *queue);
  * @param msg message of <=255 characters for alarm
  * @return true iff the alarm was enqueued
  */
-bool add_alarm(alarm_queue_t *queue, const char *msg)
+bool add_alarm(alarm_queue_t *queue, const char *name, const char *msg)
     __attribute__ ((warn_unused_result));
 
 /**

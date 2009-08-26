@@ -122,7 +122,7 @@ static enum conflate_mgmt_cb_result process_alarm_create(void *opaque,
                                                          kvpair_t *form,
                                                          conflate_form_result *r)
 {
-	if(add_alarm(handle->alarms, "This is a test alarm!")) {
+	if(add_alarm(handle->alarms, "test", "This is a test alarm!")) {
         fprintf(stderr, "Created alarm!\n");
     } else {
         fprintf(stderr, "Error queueing an alarm.\n");

@@ -24,24 +24,27 @@ START_TEST(test_simple_alarm)
 {
     alarm_t in_alarm;
 
-    fail_unless(add_alarm(alarmqueue, "This is a test message 1"),
+    fail_unless(add_alarm(alarmqueue, "test", "This is a test message 1"),
                 "Failed to alarm.");
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 1, "Didn't receive alarm message 1.");
+    fail_unless(strcmp(in_alarm.name, "test") == 0, "Alarm name didn't match");
     fail_unless(strcmp(in_alarm.msg, "This is a test message 1") == 0,
                 "Didn't get the right message for message 1.");
 
-    fail_unless(add_alarm(alarmqueue, "This is a test message 2"),
+    fail_unless(add_alarm(alarmqueue, "test2", "This is a test message 2"),
                 "Failed to alarm.");
-    fail_unless(add_alarm(alarmqueue, "This is a test message 3"),
+    fail_unless(add_alarm(alarmqueue, "test3", "This is a test message 3"),
                 "Failed to alarm.");
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 1, "Didn't receive alarm message 2.");
+    fail_unless(strcmp(in_alarm.name, "test2") == 0, "test2 didn't match");
     fail_unless(strcmp(in_alarm.msg, "This is a test message 2") == 0,
                 "Didn't get the right message for message 2.");
 
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 1, "Didn't receive alarm message 1.");
+    fail_unless(strcmp(in_alarm.name, "test3") == 0, "test3 didn't match");
     fail_unless(strcmp(in_alarm.msg, "This is a test message 3") == 0,
                 "Didn't get the right message for message 3.");
     in_alarm = get_alarm(alarmqueue);
@@ -60,7 +63,7 @@ START_TEST(test_giant_alarm)
 
     fail_unless(strlen(msg) > ALARM_MSG_MAXLEN,
                 "Message string was too short to blow up.");
-    fail_unless(add_alarm(alarmqueue, msg), "Failed to alarm.");
+    fail_unless(add_alarm(alarmqueue, "bigass", msg), "Failed to alarm.");
 
     alarm_t in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open, "Didn't receive a large alarm.");
@@ -68,7 +71,30 @@ START_TEST(test_giant_alarm)
     fail_unless(strlen(in_alarm.msg) == ALARM_MSG_MAXLEN,
             "Alarm message is too long.");
 
+    fail_unless(strcmp("bigass", in_alarm.name) == 0,
+                "Alarm name didn't match.");
     fail_unless(strncmp(msg, in_alarm.msg, ALARM_MSG_MAXLEN) == 0,
+                "Alarm message didn't match.");
+}
+END_TEST
+
+START_TEST(test_giant_name)
+{
+    const char *name = "this name should exceed the max length";
+    fail_unless(strlen(name) > ALARM_NAME_MAXLEN,
+                "Name wasn't too big enough.");
+
+    fail_unless(add_alarm(alarmqueue, name, "some message"),
+                "Failed to alarm.");
+
+    alarm_t in_alarm = get_alarm(alarmqueue);
+    fail_unless(in_alarm.open, "Didn't receive an alarm.");
+
+    fail_unless(strlen(in_alarm.name) == ALARM_NAME_MAXLEN,
+                "Alarm name is too long.");
+    fail_unless(strncmp(name, in_alarm.name, ALARM_NAME_MAXLEN) == 0,
+                "Alarm name didn't match.");
+    fail_unless(strcmp("some message", in_alarm.msg) == 0,
                 "Alarm message didn't match.");
 }
 END_TEST
@@ -76,10 +102,10 @@ END_TEST
 START_TEST(test_full_queue)
 {
     for (int i = 0; i < ALARM_QUEUE_SIZE; i++) {
-        fail_unless(add_alarm(alarmqueue, "Test alarm message."),
+        fail_unless(add_alarm(alarmqueue, "add", "Test alarm message."),
                     "Failed to add alarm.");
     }
-    fail_if(add_alarm(alarmqueue, "Test failing alarm."),
+    fail_if(add_alarm(alarmqueue, "fail", "Test failing alarm."),
             "Should have failed to add another alarm.");
 }
 END_TEST
@@ -93,6 +119,7 @@ static Suite* alarm_suite(void)
 
     tcase_add_test(tc, test_simple_alarm);
     tcase_add_test(tc, test_giant_alarm);
+    tcase_add_test(tc, test_giant_name);
     tcase_add_test(tc, test_full_queue);
 
     suite_add_tcase(s, tc);

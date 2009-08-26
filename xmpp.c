@@ -493,6 +493,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
     char open[2] = { 0, 0 };
     char amsg[256];
     char body[1500];
+	char num[255];
     while (handle->alarms->size > 0)
     {
         alarm = get_alarm(handle->alarms);
@@ -518,6 +519,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
             assert(mbody);
             xmpp_stanza_set_name(mbody, "body");
             snprintf(body, sizeof(body), "Alert\n%s", amsg);
+			snprintf(num, sizeof(num), "%d", alarm.num);
             xmpp_stanza_set_text(mbody, body);
             add_and_release(msg, mbody);
 
@@ -527,6 +529,7 @@ static int alarmqueue_handler(xmpp_conn_t * const conn, void * const userdata)
             xmpp_stanza_set_attribute(alert, "xmlns", "http://northscale.net/protocol/alerts");
             xmpp_stanza_set_attribute(alert, "open", open);
             xmpp_stanza_set_attribute(alert, "msg", amsg);
+			xmpp_stanza_set_attribute(alert, "num", num);
             add_and_release(msg, alert);
 
             xmpp_send(conn, msg);

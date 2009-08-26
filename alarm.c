@@ -26,9 +26,10 @@ alarm_t get_alarm(alarm_queue_t *queue)
 }
 
 /* add an alarm to the queue */
-bool add_alarm(alarm_queue_t *queue, const char *msg)
+bool add_alarm(alarm_queue_t *queue, const char *name, const char *msg)
 {
     assert(queue);
+    assert(name);
     assert(msg);
     bool rv = false;
 
@@ -37,6 +38,7 @@ bool add_alarm(alarm_queue_t *queue, const char *msg)
         alarm_t *alarm = &queue->queue[queue->in];
         alarm->open = true;
         alarm->num = queue->num;
+        strncpy(alarm->name, name, ALARM_NAME_MAXLEN);
         strncpy(alarm->msg, msg, ALARM_MSG_MAXLEN);
         queue->size++;
         queue->in++;
