@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 
 #include <pthread.h>
@@ -69,6 +70,39 @@ START_TEST(test_giant_alarm)
 }
 END_TEST
 
+static void* test_get_alarm(void *arg)
+{
+    int *counter_p = ((int*)arg);
+    /* Just enough to get a bit of contention */
+    sleep(1);
+
+    for (*counter_p = 0; *counter_p < 101; (*counter_p)++) {
+        get_alarm(alarmqueue);
+    }
+    return counter_p;
+}
+
+START_TEST(test_full_queue)
+{
+    for (int i = 0; i < 100; i++) {
+        add_alarm(alarmqueue, "Test alarm message.");
+    }
+
+    pthread_t thread;
+    int counter = 0;
+    fail_unless(pthread_create(&thread, NULL, test_get_alarm, &counter) == 0,
+                "Failed to start thread.");
+
+    /* At this point, the queue should be full, and now we should
+       block on insertion. */
+    add_alarm(alarmqueue, "Overflow!");
+
+    fail_unless(pthread_join(thread, NULL) == 0, "Failed to join thread.");
+
+    fail_unless(counter == 101, "Didn't count the right number of alarms.");
+}
+END_TEST
+
 static Suite* alarm_suite(void)
 {
     Suite *s = suite_create("alarm");
@@ -78,6 +112,7 @@ static Suite* alarm_suite(void)
 
     tcase_add_test(tc, test_simple_alarm);
     tcase_add_test(tc, test_giant_alarm);
+    tcase_add_test(tc, test_full_queue);
 
     suite_add_tcase(s, tc);
     return s;
