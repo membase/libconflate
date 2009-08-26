@@ -82,7 +82,8 @@ alarm_t get_alarm(alarm_queue_t *queue);
  * @param msg message of <=255 characters for alarm
  * @return true iff the alarm was enqueued
  */
-bool add_alarm(alarm_queue_t *queue, const char *msg);
+bool add_alarm(alarm_queue_t *queue, const char *msg)
+    __attribute__ ((warn_unused_result));
 
 /**
  * Create and initialize an alarm queue.

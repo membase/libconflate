@@ -24,14 +24,17 @@ START_TEST(test_simple_alarm)
 {
     alarm_t in_alarm;
 
-    add_alarm(alarmqueue, "This is a test message 1");
+    fail_unless(add_alarm(alarmqueue, "This is a test message 1"),
+                "Failed to alarm.");
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 1, "Didn't receive alarm message 1.");
     fail_unless(strcmp(in_alarm.msg, "This is a test message 1") == 0,
                 "Didn't get the right message for message 1.");
 
-    add_alarm(alarmqueue, "This is a test message 2");
-    add_alarm(alarmqueue, "This is a test message 3");
+    fail_unless(add_alarm(alarmqueue, "This is a test message 2"),
+                "Failed to alarm.");
+    fail_unless(add_alarm(alarmqueue, "This is a test message 3"),
+                "Failed to alarm.");
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 1, "Didn't receive alarm message 2.");
     fail_unless(strcmp(in_alarm.msg, "This is a test message 2") == 0,
@@ -57,7 +60,7 @@ START_TEST(test_giant_alarm)
 
     fail_unless(strlen(msg) > ALARM_MSG_MAXLEN,
                 "Message string was too short to blow up.");
-    add_alarm(alarmqueue, msg);
+    fail_unless(add_alarm(alarmqueue, msg), "Failed to alarm.");
 
     alarm_t in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open, "Didn't receive a large alarm.");
