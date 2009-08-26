@@ -22,30 +22,30 @@ alarm_t get_alarm(alarm_queue_t *queue)
         queue->out %= 100;
     }
     pthread_mutex_unlock(&(queue->mutex));
-    pthread_cond_broadcast(&(queue->full));
     return alarm;
 }
 
 /* add an alarm to the queue */
-void add_alarm(alarm_queue_t *queue, const char *msg)
+bool add_alarm(alarm_queue_t *queue, const char *msg)
 {
     assert(queue);
     assert(msg);
+    bool rv = false;
 
     pthread_mutex_lock(&(queue->mutex));
-    while (queue->size == 100) {
-        pthread_cond_wait(&(queue->full), &(queue->mutex));
+    if (queue->size < 100) {
+        alarm_t *alarm = &queue->queue[queue->in];
+        alarm->open = true;
+        alarm->num = queue->num;
+        strncpy(alarm->msg, msg, ALARM_MSG_MAXLEN);
+        queue->size++;
+        queue->in++;
+        queue->num++;
+        queue->in %= ALARM_QUEUE_SIZE;
+        rv = true;
     }
-    alarm_t *alarm = &queue->queue[queue->in];
-    alarm->open = true;
-	alarm->num = queue->num;
-    strncpy(alarm->msg, msg, ALARM_MSG_MAXLEN);
-    queue->size++;
-    queue->in++;
-    queue->num++;
-    queue->in %= ALARM_QUEUE_SIZE;
     pthread_mutex_unlock(&(queue->mutex));
-    pthread_cond_broadcast(&(queue->empty));
+    return rv;
 }
 
 /* set up thread safe FIFO queue for alarm structs */

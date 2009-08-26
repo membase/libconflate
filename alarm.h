@@ -63,15 +63,6 @@ typedef struct alarm_queue_s
      * thread locking mutex to use whenever reading/wrintg to this structure
      */
     pthread_mutex_t mutex;
-    /**
-     * thread condition indicating the queue is full. block on this before adding alert
-     */
-    pthread_cond_t full;
-    /**
-     * thread condition indicating the queue is empty. optionally lock on this
-	 * before reading from queue
-     */
-    pthread_cond_t empty;
 } alarm_queue_t;
 
 /**
@@ -89,8 +80,9 @@ alarm_t get_alarm(alarm_queue_t *queue);
  *
  * @param queue The queue to add to.
  * @param msg message of <=255 characters for alarm
+ * @return true iff the alarm was enqueued
  */
-void add_alarm(alarm_queue_t *queue, const char *msg);
+bool add_alarm(alarm_queue_t *queue, const char *msg);
 
 /**
  * Create and initialize an alarm queue.

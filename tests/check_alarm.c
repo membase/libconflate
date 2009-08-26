@@ -70,36 +70,14 @@ START_TEST(test_giant_alarm)
 }
 END_TEST
 
-static void* test_get_alarm(void *arg)
-{
-    int *counter_p = ((int*)arg);
-    /* Just enough to get a bit of contention */
-    sleep(1);
-
-    for (*counter_p = 0; *counter_p < 101; (*counter_p)++) {
-        get_alarm(alarmqueue);
-    }
-    return counter_p;
-}
-
 START_TEST(test_full_queue)
 {
     for (int i = 0; i < 100; i++) {
-        add_alarm(alarmqueue, "Test alarm message.");
+        fail_unless(add_alarm(alarmqueue, "Test alarm message."),
+                    "Failed to add alarm.");
     }
-
-    pthread_t thread;
-    int counter = 0;
-    fail_unless(pthread_create(&thread, NULL, test_get_alarm, &counter) == 0,
-                "Failed to start thread.");
-
-    /* At this point, the queue should be full, and now we should
-       block on insertion. */
-    add_alarm(alarmqueue, "Overflow!");
-
-    fail_unless(pthread_join(thread, NULL) == 0, "Failed to join thread.");
-
-    fail_unless(counter == 101, "Didn't count the right number of alarms.");
+    fail_if(add_alarm(alarmqueue, "Test failing alarm."),
+            "Should have failed to add another alarm.");
 }
 END_TEST
 
