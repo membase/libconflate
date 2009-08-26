@@ -1,3 +1,4 @@
+SHELL=/bin/sh
 lib_LIBRARIES = libconflate.a
 pkginclude_HEADERS = conflate.h
 noinst_PROGRAMS = examples/bot
