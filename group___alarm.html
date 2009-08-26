@@ -32,8 +32,8 @@
 <tr><td colspan="2"><h2>Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="structalarm__t.html">alarm_t</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___alarm.html#ga131150801ae2dbab969289b121b0efbe">get_alarm</a> (<a class="el" href="structalarm__queue__t.html">alarm_queue_t</a> *queue)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get alarm from alarm queue.  <a href="#ga131150801ae2dbab969289b121b0efbe"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___alarm.html#gad48974b586747164407c5cde8e44c157">add_alarm</a> (<a class="el" href="structalarm__queue__t.html">alarm_queue_t</a> *queue, const char *msg)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Insert new alarm into queue.  <a href="#gad48974b586747164407c5cde8e44c157"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___alarm.html#ga9ab25250e71bcaadaa017353cf9f98ac">add_alarm</a> (<a class="el" href="structalarm__queue__t.html">alarm_queue_t</a> *queue, const char *name, const char *msg)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Insert new alarm into queue.  <a href="#ga9ab25250e71bcaadaa017353cf9f98ac"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="structalarm__queue__t.html">alarm_queue_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___alarm.html#ga2e46f6dd27d7618bab6bc0e42be97243">init_alarmqueue</a> (void)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create and initialize an alarm queue.  <a href="#ga2e46f6dd27d7618bab6bc0e42be97243"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___alarm.html#ga15e85e3e50747875a9aab5da8d791b7d">destroy_alarmqueue</a> (<a class="el" href="structalarm__queue__t.html">alarm_queue_t</a> *queue)</td></tr>
@@ -42,7 +42,7 @@
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>conflate-alarm is a FIFO queue for passing alarms between threads. </p>
 <hr/><h2>Function Documentation</h2>
-<a class="anchor" id="gad48974b586747164407c5cde8e44c157"></a><!-- doxytag: member="alarm.h::add_alarm" ref="gad48974b586747164407c5cde8e44c157" args="(alarm_queue_t *queue, const char *msg)" -->
+<a class="anchor" id="ga9ab25250e71bcaadaa017353cf9f98ac"></a><!-- doxytag: member="alarm.h::add_alarm" ref="ga9ab25250e71bcaadaa017353cf9f98ac" args="(alarm_queue_t *queue, const char *name, const char *msg)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -51,6 +51,12 @@
           <td>(</td>
           <td class="paramtype"><a class="el" href="structalarm__queue__t.html">alarm_queue_t</a> *&nbsp;</td>
           <td class="paramname"> <em>queue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>name</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -164,7 +170,7 @@ Here is the caller graph for this function:</div>
 </div>
 </div>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Wed Aug 26 01:49:38 2009 for LibConflate by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Wed Aug 26 02:50:13 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>
