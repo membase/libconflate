@@ -9,4 +9,4 @@ Version: @VERSION@
 Requires.private: libstrophe
 Libs: -L${libdir} -lconflate
 Libs.private: @LIBS@
-Cflags: -I${includedir}/libconflate
+Cflags: -I${includedir}/libconflate @libstrophe_CFLAGS@

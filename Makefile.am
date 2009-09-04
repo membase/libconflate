@@ -15,6 +15,7 @@ SUBDIRS= . tests
 
 examples_bot_DEPENDENCIES = libconflate.la
 examples_bot_SOURCES = examples/bot.c
+examples_bot_CFLAGS = $(libstrophe_CFLAGS)
 examples_bot_LDADD = -L. -lconflate @PROFILER_LDFLAGS@
 
 libconflate_la_CFLAGS = @PROFILER_FLAGS@ $(libstrophe_CFLAGS)
