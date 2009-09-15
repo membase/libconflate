@@ -48,14 +48,30 @@ PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 AC_HEADER_STDBOOL
 
-PKG_CHECK_MODULES([libstrophe], [libstrophe], [], [
-  AC_MSG_CHECKING([for old version of libstrophe
+PKG_CHECK_MODULES([libstrophe], [libstrophe], [pkgconfig_libstrophe_CFLAGS=$libstrophe_CFLAGS], [
+  libstrophe_pkg_missing=yes
 ])
-  AC_CHECK_HEADER(strophe.h,
-          [], AC_MSG_ERROR([Ensure strophe.h is available.]))
-  AC_SEARCH_LIBS(xmpp_initialize, strophe,
-                                [], AC_MSG_ERROR([Can't find libstrophe.]))
-])
+if test "x$libstrophe_pkg_missing"="xyes"; then
+  if test -f "$srcdir/libstrophe/configure"; then
+    AC_MSG_NOTICE([will use bundled libstrophe])
+    AC_CONFIG_SUBDIRS([libstrophe])
+    libstrophe_CFLAGS="-Ilibstrophe"
+    libstrophe_LIBS="-Llibstrophe -lstrophe"
+    dnl here we're relying on a bit of knowledge of libstrophe internals (i.e. where it installs headers)
+    dnl this is required for writing correct pkgconfig spec
+    dnl I think that's ok for _bundled_ libstrophe
+    pkgconfig_libstrophe_CFLAGS="-I\${includedir}"
+    build_bundled_libstrophe=yes
+  else
+    AC_MSG_CHECKING([for old version of libstrophe])
+    AC_CHECK_HEADER(strophe.h,
+            [], AC_MSG_ERROR([Ensure strophe.h is available.]))
+    AC_SEARCH_LIBS(xmpp_initialize, strophe,
+                                  [], AC_MSG_ERROR([Can't find libstrophe.]))
+  fi
+fi
+AM_CONDITIONAL([BUILD_BUNDLED_LIBSTROPHE], [test "x$build_bundled_libstrophe" = xyes])
+AC_SUBST([pkgconfig_libstrophe_CFLAGS])
 
 AC_C_CONST
 

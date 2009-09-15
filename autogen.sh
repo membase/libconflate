@@ -17,3 +17,7 @@ $AUTOMAKE --foreign --add-missing || automake --gnu --add-missing || exit 1
 AUTOCONF=${AUTOCONF:-autoconf}
 $AUTOCONF || exit 1
 
+if (test -d libstrophe) && !(test -f libstrophe/configure); then
+    echo "libstrophe..."
+    (cd libstrophe; ./bootstrap.sh)
+fi
