@@ -51,7 +51,7 @@ AC_HEADER_STDBOOL
 PKG_CHECK_MODULES([libstrophe], [libstrophe], [pkgconfig_libstrophe_CFLAGS=$libstrophe_CFLAGS], [
   libstrophe_pkg_missing=yes
 ])
-if test "x$libstrophe_pkg_missing"="xyes"; then
+if test "x$libstrophe_pkg_missing" = "xyes"; then
   if test -f "$srcdir/libstrophe/configure"; then
     AC_MSG_NOTICE([will use bundled libstrophe])
     AC_CONFIG_SUBDIRS([libstrophe])
