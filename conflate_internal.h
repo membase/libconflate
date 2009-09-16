@@ -1,4 +1,5 @@
 /* Internal data structures that should be opaque to outside viewers */
+#include <strophe.h>
 
 struct _conflate_handle {
 

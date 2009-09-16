@@ -48,7 +48,7 @@ PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 AC_HEADER_STDBOOL
 
-PKG_CHECK_MODULES([libstrophe], [libstrophe], [pkgconfig_libstrophe_CFLAGS=$libstrophe_CFLAGS], [
+PKG_CHECK_MODULES([libstrophe], [libstrophe], [], [
   libstrophe_pkg_missing=yes
 ])
 if test "x$libstrophe_pkg_missing" = "xyes"; then
@@ -57,10 +57,6 @@ if test "x$libstrophe_pkg_missing" = "xyes"; then
     AC_CONFIG_SUBDIRS([libstrophe])
     libstrophe_CFLAGS="-Ilibstrophe"
     libstrophe_LIBS="-Llibstrophe -lstrophe"
-    dnl here we're relying on a bit of knowledge of libstrophe internals (i.e. where it installs headers)
-    dnl this is required for writing correct pkgconfig spec
-    dnl I think that's ok for _bundled_ libstrophe
-    pkgconfig_libstrophe_CFLAGS="-I\${includedir}"
     build_bundled_libstrophe=yes
   else
     AC_MSG_CHECKING([for old version of libstrophe])
@@ -71,7 +67,6 @@ if test "x$libstrophe_pkg_missing" = "xyes"; then
   fi
 fi
 AM_CONDITIONAL([BUILD_BUNDLED_LIBSTROPHE], [test "x$build_bundled_libstrophe" = xyes])
-AC_SUBST([pkgconfig_libstrophe_CFLAGS])
 
 AC_C_CONST
 
