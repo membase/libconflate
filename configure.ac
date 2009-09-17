@@ -55,7 +55,7 @@ if test "x$libstrophe_pkg_missing" = "xyes"; then
   if test -f "$srcdir/libstrophe/configure"; then
     AC_MSG_NOTICE([will use bundled libstrophe])
     AC_CONFIG_SUBDIRS([libstrophe])
-    libstrophe_CFLAGS="-Ilibstrophe"
+    libstrophe_CFLAGS='-I$(top_srcdir)/libstrophe'
     libstrophe_LIBS="-Llibstrophe -lstrophe"
     AC_SUBST([MAYBE_LIBSTROPHE], [libstrophe])
   else
