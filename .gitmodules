@@ -1,0 +1,3 @@
+[submodule "libstrophe"]
+	path = libstrophe
+	url = git://github.com/alk/libconflate.git
