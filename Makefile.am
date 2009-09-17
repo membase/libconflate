@@ -11,11 +11,8 @@ pkgconfig_DATA = libconflate.pc
 
 BUILT_SOURCES=
 
-if BUILD_BUNDLED_LIBSTROPHE
-  SUBDIRS= libstrophe . tests
-else
-  SUBDIRS= . tests
-endif
+SUBDIRS= $(MAYBE_LIBSTROPHE) . tests
+DIST_SUBDIRS = $(MAYBE_LIBSTROPHE) . tests
 
 examples_bot_DEPENDENCIES = libconflate.la
 examples_bot_SOURCES = examples/bot.c

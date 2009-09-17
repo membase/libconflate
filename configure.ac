@@ -57,7 +57,7 @@ if test "x$libstrophe_pkg_missing" = "xyes"; then
     AC_CONFIG_SUBDIRS([libstrophe])
     libstrophe_CFLAGS="-Ilibstrophe"
     libstrophe_LIBS="-Llibstrophe -lstrophe"
-    build_bundled_libstrophe=yes
+    AC_SUBST([MAYBE_LIBSTROPHE], [libstrophe])
   else
     AC_MSG_CHECKING([for old version of libstrophe])
     AC_CHECK_HEADER(strophe.h,
