@@ -48,17 +48,31 @@ PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 AC_HEADER_STDBOOL
 
-PKG_CHECK_MODULES([libstrophe], [libstrophe], [], [
+AC_ARG_WITH([bundled-libstrophe],
+        [AS_HELP_STRING([--with-bundled-libstrophe], [force building with bundled libstrophe])])
+
+if test "x$with_bundled_libstrophe" = "xyes"; then
   libstrophe_pkg_missing=yes
-])
+else
+  PKG_CHECK_MODULES([libstrophe], [libstrophe], [], [
+    libstrophe_pkg_missing=yes
+  ])
+fi
 if test "x$libstrophe_pkg_missing" = "xyes"; then
   if test -f "$srcdir/libstrophe/configure"; then
-    AC_MSG_NOTICE([will use bundled libstrophe])
+    if test "x$with_bundled_libstrophe" = "xyes"; then
+      AC_MSG_NOTICE([forced use of bundled libstrophe])
+    else
+      AC_MSG_NOTICE([will use bundled libstrophe])
+    fi
     AC_CONFIG_SUBDIRS([libstrophe])
     libstrophe_CFLAGS='-I$(top_srcdir)/libstrophe'
     libstrophe_LIBS="-Llibstrophe -lstrophe"
     AC_SUBST([MAYBE_LIBSTROPHE], [libstrophe])
   else
+    if test "x$with_bundled_libstrophe" = "xyes"; then
+      AC_MSG_FAILURE([use of bundled libstrophe is requested, but libstrophe/configure is missing])
+    fi
     AC_MSG_CHECKING([for old version of libstrophe])
     AC_CHECK_HEADER(strophe.h,
             [], AC_MSG_ERROR([Ensure strophe.h is available.]))
