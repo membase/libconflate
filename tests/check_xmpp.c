@@ -32,8 +32,14 @@ static void init_config(conflate_config_t* conf)
 static int count_nulls(conflate_config_t* conf)
 {
     int num = sizeof(conflate_config_t) / sizeof(void*);
+    void *buf[num];
     int rv = 0, i = 0;
-    void** p = (void**) conf;
+    // cannot simply cast conf to (void **),
+    // 'cause it breaks pointer aliasing rules
+    // memcpy to temporary buffer seems to be the best solution for
+    // this not peformance-critical place
+    memcpy(buf, conf, sizeof(conflate_config_t));
+    void** p = buf;
 
     for (i = 0; i < num; i++, p++) {
         if (*p == NULL) {
@@ -77,7 +83,8 @@ START_TEST (test_dup_with_null_host)
     conflate_config_t conf;
 
     init_config(&conf);
-    fail_unless(count_nulls(&conf) == 1, "Expected exactly one null.");
+    int count = count_nulls(&conf);
+    fail_unless(count == 1, "Expected exactly one null. Got: %d", count);
 
     verify_conf(&conf, dup_conf(conf));
 }
@@ -89,7 +96,8 @@ START_TEST (test_dup_with_host)
 
     init_config(&conf);
     conf.host = "example.com";
-    fail_unless(count_nulls(&conf) == 0, "Expected exactly one null.");
+    int count = count_nulls(&conf);
+    fail_unless(count == 0, "Expected exactly one null. Got: %d", count);
 
     verify_conf(&conf, dup_conf(conf));
 }
