@@ -44,15 +44,15 @@ _conflate_form_result&nbsp;</td><td class="memItemRight" valign="bottom"><a clas
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create a response container for a multi-set response.  <a href="#ga71c7aaf74d048736999be3ff16ca5fe8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#ga671b90efdb76f421276d19fa9673ed88">conflate_init_form</a> (<a class="el" href="group___extending.html#gaa3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initialize the result form if it's not already initialized.  <a href="#ga671b90efdb76f421276d19fa9673ed88"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#ga1833b2ac8d2172294bf167f49755bf2a">conflate_register_mgmt_cb</a> (const char *cmd, const char *desc, <a class="el" href="group___extending.html#ga0ee0d37718ae89927b285950eb96a7b9">conflate_mgmt_cb_t</a> cb)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Register a management command handler.  <a href="#ga1833b2ac8d2172294bf167f49755bf2a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#ga333df77f5e502e3cce18c8bfdab3a4e1">conflate_register_mgmt_cb</a> (const char *cmd, const char *desc, <a class="el" href="group___extending.html#ga2187ed1e91acf0235d679a4eaef7ec28">conflate_mgmt_cb_t</a> cb, void *userdata)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Register a management command handler.  <a href="#ga333df77f5e502e3cce18c8bfdab3a4e1"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="group___extending.html#gac4b93e99ae6ad490af10bdbd5eeec144">conflate_mgmt_cb_result</a>(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#ga0ee0d37718ae89927b285950eb96a7b9">conflate_mgmt_cb_t</a> )(void *opaque, conflate_handle_t *handle, const char *cmd, bool direct, <a class="el" href="structkvpair.html">kvpair_t</a> *pair, <a class="el" href="group___extending.html#gaa3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback invoked to process a management command.  <a href="#ga0ee0d37718ae89927b285950eb96a7b9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="group___extending.html#gac4b93e99ae6ad490af10bdbd5eeec144">conflate_mgmt_cb_result</a>(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___extending.html#ga2187ed1e91acf0235d679a4eaef7ec28">conflate_mgmt_cb_t</a> )(void *opaque, conflate_handle_t *handle, const char *cmd, bool direct, <a class="el" href="structkvpair.html">kvpair_t</a> *pair, <a class="el" href="group___extending.html#gaa3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, void *userdata)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Callback invoked to process a management command.  <a href="#ga2187ed1e91acf0235d679a4eaef7ec28"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Extension functions allow libconflate consumers to easily provide new management functionality specific to their own applications. </p>
-<p>Register your callbacks with <a class="el" href="group___extending.html#ga1833b2ac8d2172294bf167f49755bf2a" title="Register a management command handler.">conflate_register_mgmt_cb</a> and libconflate will take over from there. </p>
+<p>Register your callbacks with <a class="el" href="group___extending.html#ga333df77f5e502e3cce18c8bfdab3a4e1" title="Register a management command handler.">conflate_register_mgmt_cb</a> and libconflate will take over from there. </p>
 <hr/><h2>Typedef Documentation</h2>
 <a class="anchor" id="gaa3df9625cac322a698fa48cf539eb6c9"></a><!-- doxytag: member="conflate.h::conflate_form_result" ref="gaa3df9625cac322a698fa48cf539eb6c9" args="" -->
 <div class="memitem">
@@ -288,7 +288,7 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a class="anchor" id="ga1833b2ac8d2172294bf167f49755bf2a"></a><!-- doxytag: member="conflate.h::conflate_register_mgmt_cb" ref="ga1833b2ac8d2172294bf167f49755bf2a" args="(const char *cmd, const char *desc, conflate_mgmt_cb_t cb)" -->
+<a class="anchor" id="ga333df77f5e502e3cce18c8bfdab3a4e1"></a><!-- doxytag: member="conflate.h::conflate_register_mgmt_cb" ref="ga333df77f5e502e3cce18c8bfdab3a4e1" args="(const char *cmd, const char *desc, conflate_mgmt_cb_t cb, void *userdata)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -307,8 +307,14 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___extending.html#ga0ee0d37718ae89927b285950eb96a7b9">conflate_mgmt_cb_t</a>&nbsp;</td>
-          <td class="paramname"> <em>cb</em></td><td>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="group___extending.html#ga2187ed1e91acf0235d679a4eaef7ec28">conflate_mgmt_cb_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&nbsp;</td>
+          <td class="paramname"> <em>userdata</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -327,12 +333,13 @@ Here is the call graph for this function:</div>
 <li>A simple key/multi-value list.</li>
 <li>A list of key/multi-value lists.</li>
 </ul>
-<p>See the definition of <a class="el" href="group___extending.html#ga0ee0d37718ae89927b285950eb96a7b9" title="Callback invoked to process a management command.">conflate_mgmt_cb_t</a> for more information on result types.</p>
+<p>See the definition of <a class="el" href="group___extending.html#ga2187ed1e91acf0235d679a4eaef7ec28" title="Callback invoked to process a management command.">conflate_mgmt_cb_t</a> for more information on result types.</p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>cmd</em>&nbsp;</td><td>the node name of the command </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>desc</em>&nbsp;</td><td>short description of the command </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>cb</em>&nbsp;</td><td>the callback to issue when this command is invoked </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>userdata</em>&nbsp;</td><td>user data to be supplied to the callback </td></tr>
   </table>
   </dd>
 </dl>
@@ -341,12 +348,12 @@ Here is the call graph for this function:</div>
 </div>
 </div>
 <hr/><h2>Variable Documentation</h2>
-<a class="anchor" id="ga0ee0d37718ae89927b285950eb96a7b9"></a><!-- doxytag: member="conflate.h::conflate_mgmt_cb_t" ref="ga0ee0d37718ae89927b285950eb96a7b9" args=")(void *opaque, conflate_handle_t *handle, const char *cmd, bool direct, kvpair_t *pair, conflate_form_result *r)" -->
+<a class="anchor" id="ga2187ed1e91acf0235d679a4eaef7ec28"></a><!-- doxytag: member="conflate.h::conflate_mgmt_cb_t" ref="ga2187ed1e91acf0235d679a4eaef7ec28" args=")(void *opaque, conflate_handle_t *handle, const char *cmd, bool direct, kvpair_t *pair, conflate_form_result *r, void *userdata)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="group___extending.html#gac4b93e99ae6ad490af10bdbd5eeec144">conflate_mgmt_cb_result</a>(* <a class="el" href="group___extending.html#ga0ee0d37718ae89927b285950eb96a7b9">conflate_mgmt_cb_t</a>)(void *opaque, conflate_handle_t *handle, const char *cmd, bool direct, <a class="el" href="structkvpair.html">kvpair_t</a> *pair, <a class="el" href="group___extending.html#gaa3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r)</td>
+          <td class="memname">enum <a class="el" href="group___extending.html#gac4b93e99ae6ad490af10bdbd5eeec144">conflate_mgmt_cb_result</a>(* <a class="el" href="group___extending.html#ga2187ed1e91acf0235d679a4eaef7ec28">conflate_mgmt_cb_t</a>)(void *opaque, conflate_handle_t *handle, const char *cmd, bool direct, <a class="el" href="structkvpair.html">kvpair_t</a> *pair, <a class="el" href="group___extending.html#gaa3df9625cac322a698fa48cf539eb6c9">conflate_form_result</a> *r, void *userdata)</td>
         </tr>
       </table>
 </div>
@@ -361,6 +368,7 @@ Here is the call graph for this function:</div>
     <tr><td valign="top"></td><td valign="top"><em>direct</em>&nbsp;</td><td>if true, this is a directed command (else issued via pubsub) </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>pair</em>&nbsp;</td><td>the form sent with this command (may be NULL) </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>the result form being built </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>userdata</em>&nbsp;</td><td>the user data registerd with this callback </td></tr>
   </table>
   </dd>
 </dl>
@@ -368,7 +376,7 @@ Here is the call graph for this function:</div>
 </div>
 </div>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Sep 29 01:26:23 2009 for LibConflate by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Fri Oct 2 00:14:20 2009 for LibConflate by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>
