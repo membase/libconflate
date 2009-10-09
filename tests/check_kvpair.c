@@ -187,14 +187,16 @@ START_TEST (test_copy_pair)
 END_TEST
 
 static bool walk_incr_count_true(void *opaque,
-                                 const char *key, const char **values)
+                                 __attribute__((unused))const char *key,
+                                 __attribute__((unused))const char **values)
 {
     (*(int*)opaque)++;
     return true;
 }
 
 static bool walk_incr_count_false(void *opaque,
-                                  const char *key, const char **values)
+                                  __attribute__((unused))const char *key,
+                                  __attribute__((unused))const char **values)
 {
     (*(int*)opaque)++;
     return false;

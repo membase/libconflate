@@ -6,12 +6,13 @@
 
 #include <conflate.h>
 
-static void conf_cb(void* userdata, kvpair_t* conf)
+static void conf_cb(__attribute__((unused))void* userdata, kvpair_t* __attribute__((unused))conf)
 {
 }
 
-static void log_cb(void *userdata, enum conflate_log_level level,
-                   const char *fmt, ...)
+static void log_cb(__attribute__((unused))void *userdata,
+                   __attribute__((unused))enum conflate_log_level level,
+                   __attribute__((unused))const char *fmt, ...)
 {
 }
 
@@ -52,7 +53,11 @@ static int count_nulls(conflate_config_t* conf)
 
 static void verify_conf(conflate_config_t* a, conflate_config_t* b)
 {
-    fail_unless(count_nulls(a) == count_nulls(b),
+    int ncount1, ncount2;
+
+    ncount1 = count_nulls(a);
+    ncount2 = count_nulls(b);
+    fail_unless(ncount1 == ncount2,
                 "Differing number of NULLs between a and b");
 
     fail_unless(strcmp(a->jid, b->jid) == 0,

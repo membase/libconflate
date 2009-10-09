@@ -15,8 +15,9 @@ static conflate_config_t conf;
 
 char db_loc[L_tmpnam];
 
-static void null_logger(void *userdata, enum conflate_log_level lvl,
-                        const char *msg, ...)
+static void null_logger(__attribute__((unused))void *userdata,
+                        __attribute__((unused)) enum conflate_log_level lvl,
+                        __attribute__((unused))const char *msg, ...)
 {
     /* Don't log during tests. */
 }
