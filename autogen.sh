@@ -2,7 +2,7 @@
 
 mkdir -p m4
 UNAME=`uname -s`
-set -x
+
 if [ $UNAME = "Darwin" ]; then
 glibtoolize --automake
 else
