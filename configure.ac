@@ -141,15 +141,23 @@ AM_CONDITIONAL([BUILD_BUNDLED_LIBSTROPHE], [test "x$build_bundled_libstrophe" = 
 
 AC_C_CONST
 
-dnl Turn up the warnings.
-if test "$GCC" = "yes"
+dnl Let the compiler be a bit more picky. Please note that you cannot
+dnl specify these flags to the compiler before AC_CHECK_FUNCS, because
+dnl the test program will generate a compilation warning and hence fail
+dnl to detect the function ;-)
+dnl Lines borrowed from memcached.
+if test "$ICC" = "yes"
 then
-        CFLAGS="$CFLAGS -Wall -Werror -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls"
+   dnl ICC trying to be gcc.
+   CFLAGS="$CFLAGS -w2 -Wcheck -Wall -Werror"
+elif test "$GCC" = "yes"
+then
+  CFLAGS="$CFLAGS -Wall -Werror -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls"
+elif test "$SUNCC" = "yes"
+then
+  CFLAGS="$CFLAGS -errfmt=error -erroff=E_ATTRIBUTE_UNKNOWN"
 fi
-if test "$SUNCC" = "yes"
-then 
-        CFLAGS="$CFLAGS -errfmt=error -erroff=E_ATTRIBUTE_UNKNOWN"
-fi
+
 
 AC_CONFIG_FILES(Makefile tests/Makefile libconflate.pc)
 AC_OUTPUT
