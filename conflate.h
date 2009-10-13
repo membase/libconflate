@@ -24,7 +24,7 @@
 
 /* Deal with an ICC annoyance.  It tries hard to pretend to be GCC<
    but doesn't understand its attributes properly. */
-#ifdef __ICC
+#if defined (__ICC) || defined (__SUNPRO_C)
 # define __gcc_attribute__(x)
 #else
 # define __gcc_attribute__ __attribute__
