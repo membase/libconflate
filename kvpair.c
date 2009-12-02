@@ -30,7 +30,7 @@ void add_kvpair_value(kvpair_t* pair, const char* value)
     assert(pair);
     assert(value);
 
-    if (pair->allocated_values - pair->used_values >= 0) {
+    if (pair->allocated_values <= pair->used_values) {
         pair->allocated_values = pair->allocated_values << 1;
         if (pair->allocated_values == 0) {
             pair->allocated_values = 4;
