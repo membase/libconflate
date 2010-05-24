@@ -1,4 +1,7 @@
 /* Internal data structures that should be opaque to outside viewers */
+#ifndef CONFLATE_INTERNAL_H
+#define CONFLATE_INTERNAL_H 1
+
 #include <strophe.h>
 
 struct _conflate_handle {
@@ -14,4 +17,6 @@ struct _conflate_handle {
 };
 
 void conflate_init_commands(void);
+
+#endif /* CONFLATE_INTERNAL_H */
 

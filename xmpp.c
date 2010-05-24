@@ -35,6 +35,8 @@ struct command_def {
 
 struct command_def *commands = NULL;
 
+void* run_conflate(void *arg);
+
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
                                conflate_mgmt_cb_t cb)
 {
@@ -701,7 +703,7 @@ static void conflate_strophe_logger(void *const userdata,
     CONFLATE_LOG(handle, lvl, "%s", msg);
 }
 
-static void* run_conflate(void *arg) {
+void* run_conflate(void *arg) {
     conflate_handle_t* handle = (conflate_handle_t*)arg;
 
     /* Before connecting and all that, load the stored config */
@@ -751,58 +753,3 @@ static void* run_conflate(void *arg) {
     return NULL;
 }
 
-conflate_config_t* dup_conf(conflate_config_t c) {
-    conflate_config_t *rv = calloc(sizeof(conflate_config_t), 1);
-    assert(rv);
-
-    rv->jid = safe_strdup(c.jid);
-    rv->pass = safe_strdup(c.pass);
-    if (c.host) {
-        rv->host = safe_strdup(c.host);
-    }
-    rv->software = safe_strdup(c.software);
-    rv->version = safe_strdup(c.version);
-    rv->save_path = safe_strdup(c.save_path);
-    rv->userdata = c.userdata;
-    rv->log = c.log;
-    rv->new_config = c.new_config;
-
-    rv->initialization_marker = (void*)INITIALIZATION_MAGIC;
-
-    return rv;
-}
-
-void init_conflate(conflate_config_t *conf)
-{
-    assert(conf);
-    memset(conf, 0x00, sizeof(conflate_config_t));
-    conf->log = conflate_syslog_logger;
-    conf->initialization_marker = (void*)INITIALIZATION_MAGIC;
-
-    conflate_init_commands();
-}
-
-bool start_conflate(conflate_config_t conf) {
-    /* Don't start if we don't believe initialization has occurred. */
-    if (conf.initialization_marker != (void*)INITIALIZATION_MAGIC) {
-        assert(conf.initialization_marker == (void*)INITIALIZATION_MAGIC);
-        return false;
-    }
-
-    conflate_handle_t *handle = calloc(1, sizeof(conflate_handle_t));
-    assert(handle);
-
-    xmpp_initialize();
-
-    handle->alarms = init_alarmqueue();
-
-    handle->conf = dup_conf(conf);
-
-    if (pthread_create(&handle->thread, NULL, run_conflate, handle) == 0) {
-        return true;
-    } else {
-        perror("pthread_create");
-    }
-
-    return false;
-}

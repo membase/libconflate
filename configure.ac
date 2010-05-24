@@ -101,6 +101,8 @@ AC_SEARCH_LIBS(pthread_create, pthread,
                                [], AC_MSG_ERROR([Can't enable pthreads.]))
 AC_SEARCH_LIBS(sqlite3_open, sqlite3, [],
                              AC_MSG_ERROR([Can't find sqlite3]))
+AC_SEARCH_LIBS(curl_global_init, curl, [],
+                             AC_MSG_ERROR([Can't find curl]))
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 AC_HEADER_STDBOOL

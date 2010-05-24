@@ -20,8 +20,9 @@ examples_bot_CFLAGS = $(libstrophe_CFLAGS)
 examples_bot_LDADD = -L. -lconflate @PROFILER_LDFLAGS@
 
 libconflate_la_CFLAGS = @PROFILER_FLAGS@ $(libstrophe_CFLAGS)
-libconflate_la_SOURCES = conflate.h conflate_internal.h conflate_convenience.h alarm.h\
-	alarm.c kvpair.c util.c persist.c xmpp.c logging.c adhoc_commands.c
+libconflate_la_SOURCES = conflate.h conflate_internal.h conflate_convenience.h alarm.h rest.h\
+	alarm.c kvpair.c util.c persist.c xmpp.c logging.c adhoc_commands.c \
+    conflate.c rest.c
 libconflate_la_LIBADD = $(libstrophe_LIBS)
 
 MOSTLYCLEANFILES = *.gcov *.gcno *.gcda *.tcov
