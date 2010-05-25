@@ -30,7 +30,9 @@ void add_kvpair_value(kvpair_t* pair, const char* value)
     assert(pair);
     assert(value);
 
-    if (pair->allocated_values <= pair->used_values) {
+    /* The last item in the values list must be null as it acts a sentinal */
+    if (pair->allocated_values == 0 ||
+            (pair->used_values + 1) == pair->allocated_values) {
         pair->allocated_values = pair->allocated_values << 1;
         if (pair->allocated_values == 0) {
             pair->allocated_values = 4;
