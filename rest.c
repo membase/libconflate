@@ -105,8 +105,9 @@ static bool pattern_ends_with(const char *pattern, const char * target, size_t t
 
 static void process_new_config(conflate_handle_t *conf_handle) {
     //construct the new config from its components
-    char *values[1];
+    char *values[2];
     values[0] = assemble_complete_response(response_buffer_head);
+    values[1] = NULL;
     kvpair_t *kv = mk_kvpair(CONFIG_KEY, values);
 
     //execute the provided call back
