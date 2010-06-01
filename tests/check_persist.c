@@ -10,6 +10,8 @@
 
 #include "test_common.h"
 
+#ifdef CONFLATE_USE_SQLITE
+
 static conflate_handle_t *handle;
 static conflate_config_t conf;
 
@@ -129,14 +131,20 @@ static Suite* persist_suite(void)
     return s;
 }
 
+#endif // CONFLATE_USE_SQLITE
+
 int
 main (void)
 {
-    int number_failed;
+    int number_failed = 0;
+
+#ifdef CONFLATE_USE_SQLITE
     Suite *s = persist_suite ();
     SRunner *sr = srunner_create (s);
     srunner_run_all (sr, CK_NORMAL);
     number_failed = srunner_ntests_failed (sr);
     srunner_free (sr);
+#endif // CONFLATE_USE_SQLITE
+
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

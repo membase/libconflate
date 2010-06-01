@@ -3,11 +3,13 @@
 #include <string.h>
 #include <assert.h>
 
-#include <sqlite3.h>
-
 #include "conflate.h"
 #include "conflate_internal.h"
 #include "conflate_convenience.h"
+
+#ifndef CONFLATE_NO_SQLITE
+
+#include <sqlite3.h>
 
 #define HAS_KEYS    1
 #define HAS_VALUES  2
@@ -449,3 +451,36 @@ char *conflate_get_private(conflate_handle_t *handle,
 
     return rv;
 }
+
+#else // !CONFLATE_NO_SQLITE
+
+kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
+{
+    return NULL;
+}
+
+bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
+                  const char *filename)
+{
+    return true;
+}
+
+bool conflate_delete_private(conflate_handle_t *handle,
+                             const char *k, const char *filename)
+{
+    return true;
+}
+
+bool conflate_save_private(conflate_handle_t *handle,
+                           const char *k, const char *v, const char *filename)
+{
+    return true;
+}
+
+char *conflate_get_private(conflate_handle_t *handle,
+                           const char *k, const char *filename)
+{
+    return NULL;
+}
+
+#endif // !CONFLATE_NO_SQLITE

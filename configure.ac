@@ -99,8 +99,6 @@ AC_SUBST(PROFILER_FLAGS)
 
 AC_SEARCH_LIBS(pthread_create, pthread,
                                [], AC_MSG_ERROR([Can't enable pthreads.]))
-AC_SEARCH_LIBS(sqlite3_open, sqlite3, [],
-                             AC_MSG_ERROR([Can't find sqlite3]))
 AC_SEARCH_LIBS(curl_global_init, curl, [],
                              AC_MSG_ERROR([Can't find curl]))
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
@@ -108,10 +106,21 @@ PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 AC_HEADER_STDBOOL
 
 AC_ARG_WITH([rest],
-        [AS_HELP_STRING([--with-rest], [use REST instead of XMPP])])
+        [AS_HELP_STRING([--with-rest=no], [use REST instead of XMPP])])
+
+AC_ARG_WITH([sqlite],
+        [AS_HELP_STRING([--with-sqlite=no], [use sqlite to store configs locally])])
 
 AC_ARG_WITH([bundled-libstrophe],
-        [AS_HELP_STRING([--with-bundled-libstrophe], [force building with bundled libstrophe])])
+        [AS_HELP_STRING([--with-bundled-libstrophe=no], [force building with bundled libstrophe])])
+
+if test "x$with_sqlite" = "xyes"; then
+  CFLAGS="$CFLAGS -DCONFLATE_USE_SQLITE"
+  AC_SEARCH_LIBS(sqlite3_open, sqlite3, [],
+                               AC_MSG_ERROR([Can't locate sqlite3]))
+else
+  CFLAGS="$CFLAGS -DCONFLATE_NO_SQLITE"
+fi
 
 if test "x$with_rest" = "xyes"; then
   CFLAGS="$CFLAGS -DCONFLATE_USE_REST"
