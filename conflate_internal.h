@@ -2,7 +2,12 @@
 #ifndef CONFLATE_INTERNAL_H
 #define CONFLATE_INTERNAL_H 1
 
+#ifdef CONFLATE_USE_XMPP
 #include <strophe.h>
+#else
+#define xmpp_ctx_t void
+#define xmpp_conn_t void
+#endif
 
 struct _conflate_handle {
 
