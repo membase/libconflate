@@ -743,6 +743,10 @@ void* run_conflate(void *arg) {
 
 #else // !CONFLATE_USE_XMPP
 
+void conflate_init_form(conflate_form_result *r)
+{
+}
+
 void conflate_next_fieldset(conflate_form_result *r) {
     assert(0);
 }
