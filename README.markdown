@@ -8,7 +8,7 @@ First, you need to build and install libstrophe:
     cd libstrophe
     git submodule init
     git submodule update
-    ./bootstrap.sh
+    ./config/autorun.sh
     ./configure
     make
 
