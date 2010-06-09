@@ -99,8 +99,16 @@ AC_SUBST(PROFILER_FLAGS)
 
 AC_SEARCH_LIBS(pthread_create, pthread,
                                [], AC_MSG_ERROR([Can't enable pthreads.]))
-AC_SEARCH_LIBS(curl_global_init, curl, [],
-                             AC_MSG_ERROR([Can't find curl]))
+
+AC_ARG_WITH([curl],
+        [AS_HELP_STRING([--with-curl=yes], [search libs for curl])])
+
+if test "x$with_curl" != "xno"; then
+  AC_SEARCH_LIBS(curl_global_init, curl, [],
+                               AC_MSG_ERROR([Can't find curl]))
+else
+  AC_MSG_NOTICE([skipping search for curl library])
+fi
 
 AC_ARG_WITH([check],
         [AS_HELP_STRING([--with-check=yes], [look for check tool for unit tests])])
