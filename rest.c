@@ -135,6 +135,7 @@ static size_t handle_response(void *data, size_t s, size_t num, void *stream) {
 static void setup_handle(CURL *handle, char *user, char *pass, char * host,
                          char *uri, conflate_handle_t *chandle,
                          size_t (handle_response)(void *, size_t,size_t, void*)) {
+    // The host might actually be a full URL.
     size_t buff_size = strlen(host) + strlen (uri) + 1;
     char *url = (char *) malloc(buff_size);
     assert(url);
@@ -174,7 +175,7 @@ void* run_rest_conflate(void *arg) {
     CURL *curl_handle = curl_easy_init();
     assert(curl_handle);
     setup_handle(curl_handle, handle->conf->jid, handle->conf->pass,
-                 handle->conf->host, DEFAULT_BUCKET_STREAM, handle, handle_response);
+                 handle->conf->host, "", handle, handle_response);
 
     /* get initial config and notify call back */
     while (true) {
