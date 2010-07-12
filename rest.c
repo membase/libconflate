@@ -1,7 +1,7 @@
-
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <curl/curl.h>
 
@@ -177,9 +177,22 @@ void* run_rest_conflate(void *arg) {
     setup_handle(curl_handle, handle->conf->jid, handle->conf->pass,
                  handle->conf->host, "", handle, handle_response);
 
+    bool first = true;
+
     /* get initial config and notify call back */
     while (true) {
-        curl_easy_perform(curl_handle);
+        if (curl_easy_perform(curl_handle) == 0) {
+            first = false;
+        } else {
+            if (first) {
+                /* the first time, exit rather than retry */
+                printf("ERROR: could not contact REST server: %s\n", handle->conf->host);
+                exit(1);
+            }
+
+            /* otherwise, don't kill the server with tons of retries */
+            sleep(1);
+        }
     }
 
     free_response(response_buffer_head);
