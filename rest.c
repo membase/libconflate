@@ -66,6 +66,10 @@ static struct response_buffer *write_data_to_buffer(struct response_buffer *buff
 }
 
 static char *assemble_complete_response(struct response_buffer *response_head) {
+    if (response_head == NULL) {
+        return NULL;
+    }
+
     //figure out how big the message is
     struct response_buffer * cur_buffer = response_head;
     size_t response_size = 0;
@@ -76,7 +80,7 @@ static char *assemble_complete_response(struct response_buffer *response_head) {
     }
 
     //create buffer
-    response = malloc(response_size);
+    response = malloc(response_size + 1);
     assert(response);
 
     //populate buffer
@@ -87,6 +91,8 @@ static char *assemble_complete_response(struct response_buffer *response_head) {
         ptr += cur_buffer->bytes_used;
         cur_buffer = cur_buffer->next;
     }
+
+    response[response_size] = '\0';
 
     return response;
 }
@@ -108,6 +114,11 @@ static void process_new_config(conflate_handle_t *conf_handle) {
     char *values[2];
     values[0] = assemble_complete_response(response_buffer_head);
     values[1] = NULL;
+
+    if (values[0] == NULL) {
+        return;
+    }
+
     kvpair_t *kv = mk_kvpair(CONFIG_KEY, values);
 
     //execute the provided call back
@@ -183,16 +194,20 @@ void* run_rest_conflate(void *arg) {
     while (true) {
         if (curl_easy_perform(curl_handle) == 0) {
             first = false;
+
+            /* if the REST server didn't provide a streaming JSON response,
+               we'll reach here, and need to process the just-one-JSON response */
+            process_new_config(handle);
         } else {
             if (first) {
                 /* the first time, exit rather than retry */
                 printf("ERROR: could not contact REST server: %s\n", handle->conf->host);
                 exit(1);
             }
-
-            /* otherwise, don't kill the server with tons of retries */
-            sleep(1);
         }
+
+        /* otherwise, don't kill the server with tons of retries */
+        sleep(1);
     }
 
     free_response(response_buffer_head);
