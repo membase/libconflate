@@ -158,20 +158,29 @@ static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
     if (url != NULL) {
         snprintf(url,buff_size,"%s%s",uri,uri_suffix);
 
-        assert(curl_easy_setopt(handle,CURLOPT_WRITEDATA,chandle) == CURLE_OK);
-        assert(curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,handle_response) == CURLE_OK);
-        assert(curl_easy_setopt(handle,CURLOPT_URL,url) == CURLE_OK);
+        CURLcode c;
+
+        c = curl_easy_setopt(handle,CURLOPT_WRITEDATA,chandle);
+        assert(c == CURLE_OK);
+        c = curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,handle_response);
+        assert(c == CURLE_OK);
+        c = curl_easy_setopt(handle,CURLOPT_URL,url);
+        assert(c == CURLE_OK);
 
         if (user) {
             buff_size = strlen(user) + strlen(pass) + 2;
             char *userpasswd = (char *) malloc(buff_size);
             assert(userpasswd);
             snprintf(userpasswd,buff_size,"%s:%s",user,pass);
-            assert(curl_easy_setopt(handle,CURLOPT_HTTPAUTH,CURLAUTH_BASIC) == CURLE_OK);
-            assert(curl_easy_setopt(handle,CURLOPT_USERPWD,userpasswd) == CURLE_OK);
-            free (userpasswd);
+            c = curl_easy_setopt(handle,CURLOPT_HTTPAUTH,CURLAUTH_BASIC);
+            assert(c == CURLE_OK);
+            c = curl_easy_setopt(handle,CURLOPT_USERPWD,userpasswd);
+            assert(c == CURLE_OK);
+            free(userpasswd);
         }
-        assert(curl_easy_setopt(handle,CURLOPT_HTTPGET,1) == CURLE_OK);
+
+        c = curl_easy_setopt(handle,CURLOPT_HTTPGET,1);
+        assert(c == CURLE_OK);
 
         free(url);
     }
@@ -192,7 +201,11 @@ void* run_rest_conflate(void *arg) {
     }
 
     /* init curl */
-    assert(curl_global_init(curl_init_flags) == CURLE_OK);
+    CURLcode c;
+
+    c = curl_global_init(curl_init_flags);
+    assert(c == CURLE_OK);
+
     CURL *curl_handle = curl_easy_init();
     assert(curl_handle);
 
