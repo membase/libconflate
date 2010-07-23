@@ -20,6 +20,7 @@ struct response_buffer {
     size_t buffer_size;
     struct response_buffer *next;
 };
+
 struct response_buffer *response_buffer_head = NULL;
 struct response_buffer *cur_response_buffer = NULL;
 
@@ -36,14 +37,16 @@ static struct response_buffer *mk_response_buffer(size_t size) {
 }
 
 static void free_response(struct response_buffer *response) {
-    assert(response);
+    if (!response) {
+        return;
+    }
     if (!response->next) {
         free_response(response->next);
     }
     free(response);
 }
 
-static struct response_buffer *write_data_to_buffer(struct response_buffer *buffer, const char *data, size_t len ) {
+static struct response_buffer *write_data_to_buffer(struct response_buffer *buffer, const char *data, size_t len) {
     size_t bytes_written = 0;
     while (bytes_written < len) {
         size_t bytes_to_write = (len - bytes_written);
@@ -71,7 +74,7 @@ static char *assemble_complete_response(struct response_buffer *response_head) {
     }
 
     //figure out how big the message is
-    struct response_buffer * cur_buffer = response_head;
+    struct response_buffer *cur_buffer = response_head;
     size_t response_size = 0;
     char *response = NULL;
     while (cur_buffer) {
@@ -98,7 +101,6 @@ static char *assemble_complete_response(struct response_buffer *response_head) {
 }
 
 static bool pattern_ends_with(const char *pattern, const char * target, size_t target_size) {
-
 	assert(target);
 	assert(pattern);
 
@@ -115,6 +117,10 @@ static void process_new_config(conflate_handle_t *conf_handle) {
     values[0] = assemble_complete_response(response_buffer_head);
     values[1] = NULL;
 
+    free_response(response_buffer_head);
+    response_buffer_head = NULL;
+    cur_response_buffer = NULL;
+
     if (values[0] == NULL) {
         return;
     }
@@ -128,6 +134,7 @@ static void process_new_config(conflate_handle_t *conf_handle) {
     //clean up
     free_kvpair(kv);
     free(values[0]);
+
     response_buffer_head = mk_response_buffer(RESPONSE_BUFFER_SIZE);
     cur_response_buffer = response_buffer_head;
 }
@@ -143,29 +150,32 @@ static size_t handle_response(void *data, size_t s, size_t num, void *stream) {
     return size;
 }
 
-static void setup_handle(CURL *handle, char *user, char *pass, char * host,
-                         char *uri, conflate_handle_t *chandle,
-                         size_t (handle_response)(void *, size_t,size_t, void*)) {
-    // The host might actually be a full URL.
-    size_t buff_size = strlen(host) + strlen (uri) + 1;
+static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
+                         char *uri_suffix, conflate_handle_t *chandle,
+                         size_t (handle_response)(void *, size_t, size_t, void *)) {
+    size_t buff_size = strlen(uri) + strlen (uri_suffix) + 1;
     char *url = (char *) malloc(buff_size);
-    assert(url);
-    snprintf(url,buff_size,"%s%s",host,uri);
+    if (url != NULL) {
+        snprintf(url,buff_size,"%s%s",uri,uri_suffix);
 
-    assert(curl_easy_setopt(handle,CURLOPT_WRITEDATA,chandle) == CURLE_OK);
-    assert(curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,handle_response) == CURLE_OK);
-    assert(curl_easy_setopt(handle,CURLOPT_URL,url) == CURLE_OK);
-    if (user) {
-        buff_size = strlen(user) + strlen(pass) + 2;
-        char* userpasswd = (char *) malloc(buff_size);
-        assert(userpasswd);
-        snprintf(userpasswd,buff_size,"%s:%s",user,pass);
-        assert(curl_easy_setopt(handle,CURLOPT_HTTPAUTH, CURLAUTH_BASIC) == CURLE_OK);
-        assert(curl_easy_setopt(handle,CURLOPT_USERPWD,userpasswd) == CURLE_OK);
+        assert(curl_easy_setopt(handle,CURLOPT_WRITEDATA,chandle) == CURLE_OK);
+        assert(curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,handle_response) == CURLE_OK);
+        assert(curl_easy_setopt(handle,CURLOPT_URL,url) == CURLE_OK);
+
+        if (user) {
+            buff_size = strlen(user) + strlen(pass) + 2;
+            char *userpasswd = (char *) malloc(buff_size);
+            assert(userpasswd);
+            snprintf(userpasswd,buff_size,"%s:%s",user,pass);
+            assert(curl_easy_setopt(handle,CURLOPT_HTTPAUTH,CURLAUTH_BASIC) == CURLE_OK);
+            assert(curl_easy_setopt(handle,CURLOPT_USERPWD,userpasswd) == CURLE_OK);
+            free (userpasswd);
+        }
+        assert(curl_easy_setopt(handle,CURLOPT_HTTPGET,1) == CURLE_OK);
+
+        free(url);
     }
-    assert(curl_easy_setopt(handle,CURLOPT_HTTPGET,1) == CURLE_OK);
 }
-
 
 void* run_rest_conflate(void *arg) {
     conflate_handle_t* handle = (conflate_handle_t*)arg;
@@ -185,32 +195,46 @@ void* run_rest_conflate(void *arg) {
     assert(curl_global_init(curl_init_flags) == CURLE_OK);
     CURL *curl_handle = curl_easy_init();
     assert(curl_handle);
-    setup_handle(curl_handle, handle->conf->jid, handle->conf->pass,
-                 handle->conf->host, "", handle, handle_response);
 
-    bool first = true;
+    bool succeeding = true;
 
-    /* get initial config and notify call back */
-    while (true) {
-        if (curl_easy_perform(curl_handle) == 0) {
-            first = false;
+    while (succeeding) {
+        succeeding = false;
 
-            /* if the REST server didn't provide a streaming JSON response,
-               we'll reach here, and need to process the just-one-JSON response */
-            process_new_config(handle);
-        } else {
-            if (first) {
-                /* the first time, exit rather than retry */
-                printf("ERROR: could not contact REST server: %s\n", handle->conf->host);
-                exit(1);
+        char *urls = strdup(handle->conf->host); // Might be a '|' delimited list of url's.
+        char *next = urls;
+
+        while (next != NULL) {
+            char *url = strsep(&next, "|");
+
+            setup_handle(curl_handle,
+                         handle->conf->jid, // The auth user.
+                         handle->conf->pass, // The auth password.
+                         url, "", handle, handle_response);
+
+            if (curl_easy_perform(curl_handle) == 0) {
+                /* We reach here if the REST server didn't provide a
+                   streaming JSON response and so we need to process
+                   the just-one-JSON response */
+                process_new_config(handle);
+                succeeding = true;
+                next = NULL; // Restart at the beginning of the urls list.
             }
         }
 
-        /* otherwise, don't kill the server with tons of retries */
-        sleep(1);
+        sleep(1); // Don't overload the REST servers with tons of retries.
+
+        free(urls);
     }
 
     free_response(response_buffer_head);
+    response_buffer_head = NULL;
+    cur_response_buffer = NULL;
+
     curl_easy_cleanup(curl_handle);
+
+    printf("ERROR: could not contact REST server(s): %s\n", handle->conf->host);
+    exit(1);
+
     return NULL;
 }
