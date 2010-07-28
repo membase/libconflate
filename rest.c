@@ -27,9 +27,8 @@ struct response_buffer *response_buffer_head = NULL;
 struct response_buffer *cur_response_buffer = NULL;
 
 static struct response_buffer *mk_response_buffer(size_t size) {
-    struct response_buffer *r = (struct response_buffer *)malloc(sizeof(struct response_buffer));
+    struct response_buffer *r = (struct response_buffer *)calloc(1, sizeof(struct response_buffer));
     assert(r);
-    memset(r,0,sizeof(struct response_buffer));
     r->data = malloc(size);
     assert(r->data);
     r->bytes_used = 0;
@@ -42,8 +41,11 @@ static void free_response(struct response_buffer *response) {
     if (!response) {
         return;
     }
-    if (!response->next) {
+    if (response->next) {
         free_response(response->next);
+    }
+    if (response->data) {
+        free(response->data);
     }
     free(response);
 }
@@ -57,15 +59,16 @@ static struct response_buffer *write_data_to_buffer(struct response_buffer *buff
             struct response_buffer *new_buffer = mk_response_buffer(buffer->buffer_size);
             buffer->next = new_buffer;
             buffer = new_buffer;
+        } else {
+            if (bytes_to_write > space) {
+                bytes_to_write = space;
+            }
+            char *d = buffer->data;
+            d = &d[buffer->bytes_used];
+            memcpy(d,&data[bytes_written],bytes_to_write);
+            bytes_written += bytes_to_write;
+            buffer->bytes_used += bytes_to_write;
         }
-        if (bytes_to_write > space) {
-            bytes_to_write = space;
-        }
-        char *d = buffer->data;
-        d = &d[buffer->bytes_used];
-        memcpy(d,&data[bytes_written],bytes_to_write);
-        bytes_written += bytes_to_write;
-        buffer->bytes_used += bytes_to_write;
     }
     return buffer;
 }
@@ -143,8 +146,8 @@ static void process_new_config(conflate_handle_t *conf_handle) {
     cur_response_buffer = response_buffer_head;
 }
 
-static size_t handle_response(void *data, size_t s, size_t num, void *stream) {
-    conflate_handle_t *c_handle = (conflate_handle_t *)stream;
+static size_t handle_response(void *data, size_t s, size_t num, void *cb) {
+    conflate_handle_t *c_handle = (conflate_handle_t *)cb;
     size_t size = s * num;
     bool end_of_message = pattern_ends_with(END_OF_CONFIG,data,size);
     cur_response_buffer = write_data_to_buffer(cur_response_buffer, data, size);
