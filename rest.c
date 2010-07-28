@@ -14,6 +14,8 @@ long curl_init_flags = CURL_GLOBAL_ALL;
 curl_init_flags = curl_init_flags & CURL_GLOBAL_WIN32;
 #endif
 
+static int g_tot_process_new_configs = 0;
+
 struct response_buffer {
     char *data;
     size_t bytes_used;
@@ -112,6 +114,8 @@ static bool pattern_ends_with(const char *pattern, const char * target, size_t t
 }
 
 static void process_new_config(conflate_handle_t *conf_handle) {
+    g_tot_process_new_configs++;
+
     //construct the new config from its components
     char *values[2];
     values[0] = assemble_complete_response(response_buffer_head);
@@ -209,35 +213,52 @@ void* run_rest_conflate(void *arg) {
     CURL *curl_handle = curl_easy_init();
     assert(curl_handle);
 
-    bool succeeding = true;
+    bool always_retry = true;
 
-    while (succeeding) {
-        succeeding = false;
+    while (true) {
+        int start_tot_process_new_configs = g_tot_process_new_configs;
 
-        char *urls = strdup(handle->conf->host); // Might be a '|' delimited list of url's.
-        char *next = urls;
+        bool succeeding = true;
 
-        while (next != NULL) {
-            char *url = strsep(&next, "|");
+        while (succeeding) {
+            succeeding = false;
 
-            setup_handle(curl_handle,
-                         handle->conf->jid, // The auth user.
-                         handle->conf->pass, // The auth password.
-                         url, "", handle, handle_response);
+            char *urls = strdup(handle->conf->host); // Might be a '|' delimited list of url's.
+            char *next = urls;
 
-            if (curl_easy_perform(curl_handle) == 0) {
-                /* We reach here if the REST server didn't provide a
-                   streaming JSON response and so we need to process
-                   the just-one-JSON response */
-                process_new_config(handle);
-                succeeding = true;
-                next = NULL; // Restart at the beginning of the urls list.
+            while (next != NULL) {
+                char *url = strsep(&next, "|");
+
+                setup_handle(curl_handle,
+                             handle->conf->jid, // The auth user.
+                             handle->conf->pass, // The auth password.
+                             url, "", handle, handle_response);
+
+                if (curl_easy_perform(curl_handle) == 0) {
+                    /* We reach here if the REST server didn't provide a
+                       streaming JSON response and so we need to process
+                       the just-one-JSON response */
+                    process_new_config(handle);
+                    succeeding = true;
+                    next = NULL; // Restart at the beginning of the urls list.
+                }
             }
+
+            sleep(1); // Don't overload the REST servers with tons of retries.
+
+            free(urls);
         }
 
-        sleep(1); // Don't overload the REST servers with tons of retries.
+        if (start_tot_process_new_configs == g_tot_process_new_configs) {
+            fprintf(stderr, "ERROR: could not contact REST server(s): %s\n", handle->conf->host);
 
-        free(urls);
+            if (always_retry == false) {
+              // If we went through all our URL's and didn't see any new
+              // configs, then stop trying.
+              //
+              break;
+            }
+        }
     }
 
     free_response(response_buffer_head);
@@ -246,7 +267,6 @@ void* run_rest_conflate(void *arg) {
 
     curl_easy_cleanup(curl_handle);
 
-    printf("ERROR: could not contact REST server(s): %s\n", handle->conf->host);
     exit(1);
 
     return NULL;
