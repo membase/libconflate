@@ -122,7 +122,10 @@ fi
 AC_HEADER_STDBOOL
 
 AC_ARG_WITH([rest],
-        [AS_HELP_STRING([--with-rest=no], [use REST instead of XMPP])])
+  [AS_HELP_STRING([--without-rest],
+    [Use XMPP instead of REST (yes|no) @<:@default=no@:>@])],
+  [with_rest=$withval],
+  [with_rest=yes])
 
 AC_ARG_WITH([sqlite],
         [AS_HELP_STRING([--with-sqlite=no], [use sqlite to store configs locally])])
