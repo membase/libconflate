@@ -1,8 +1,8 @@
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
-#include <sysexits.h>
 
 #include "conflate.h"
 #include "alarm.h"
@@ -122,19 +122,19 @@ static enum conflate_mgmt_cb_result process_alarm_create(void *opaque,
                                                          kvpair_t *form,
                                                          conflate_form_result *r)
 {
-	if(add_alarm(handle->alarms, "test", "This is a test alarm!")) {
+        if(add_alarm(handle->alarms, "test", "This is a test alarm!")) {
         fprintf(stderr, "Created alarm!\n");
     } else {
         fprintf(stderr, "Error queueing an alarm.\n");
     }
-	return RV_OK;
+        return RV_OK;
 }
 
 int main(int argc, char **argv) {
 
     if (argc < 3) {
         fprintf(stderr, "Usage: bot <jid> <pass> [host]\n");
-        exit(EX_USAGE);
+        exit(EXIT_FAILURE);
     }
 
     /* Initialize callbacks for provided functionality.
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
     conflate_register_mgmt_cb("ping_test", "Perform a ping test",
                               process_ping_test);
 
-	conflate_register_mgmt_cb("alarm", "Create an alarm",
+    conflate_register_mgmt_cb("alarm", "Create an alarm",
                               process_alarm_create);
 
     /* Perform default configuration initialization. */
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
     /* Begin the connection. */
     if(!start_conflate(conf)) {
         fprintf(stderr, "Couldn't initialize libconflate.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* Typically, your application would go about its business here.
