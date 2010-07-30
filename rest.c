@@ -1,3 +1,4 @@
+#include "config.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,9 +11,6 @@
 #include "conflate_internal.h"
 
 long curl_init_flags = CURL_GLOBAL_ALL;
-#ifdef __WIN32__
-curl_init_flags = curl_init_flags & CURL_GLOBAL_WIN32;
-#endif
 
 static int g_tot_process_new_configs = 0;
 
@@ -192,6 +190,23 @@ static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
         free(url);
     }
 }
+
+#ifndef HAVE_STRSEP
+/*
+ * NOTE!!! we are only using "|" as the pattern, so this code will _NOT_
+ * work if you change that to include more than a single character!
+ */
+static char *strsep(char **stringp, char *pattern) {
+   char *ptr = *stringp;
+   *stringp = strchr(*stringp, pattern[0]);
+   if (*stringp != NULL) {
+      **stringp = '\0';
+      *stringp = (*stringp) + 1;
+   }
+
+   return ptr;
+}
+#endif
 
 void* run_rest_conflate(void *arg) {
     conflate_handle_t* handle = (conflate_handle_t*)arg;

@@ -173,11 +173,13 @@ AM_CONDITIONAL([BUILD_BUNDLED_LIBSTROPHE], [test "x$build_bundled_libstrophe" = 
 AC_C_CONST
 
 AC_CHECK_HEADERS_ONCE([syslog.h])
+AC_CHECK_FUNCS_ONCE(strsep)
 
 AH_BOTTOM([
 #ifdef WIN32
 #include <windows.h>
 #define pause(a) while (1) { Sleep(100000); }
+#define sleep(a) Sleep(a * 1000)
 #endif
 ])
 
