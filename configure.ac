@@ -172,6 +172,8 @@ AM_CONDITIONAL([BUILD_BUNDLED_LIBSTROPHE], [test "x$build_bundled_libstrophe" = 
 
 AC_C_CONST
 
+AC_CHECK_HEADERS_ONCE([syslog.h])
+
 dnl Let the compiler be a bit more picky. Please note that you cannot
 dnl specify these flags to the compiler before AC_CHECK_FUNCS, because
 dnl the test program will generate a compilation warning and hence fail

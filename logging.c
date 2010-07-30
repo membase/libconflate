@@ -1,5 +1,8 @@
+#include "config.h"
 #include <string.h>
 #include <stdarg.h>
+
+#ifdef HAVE_SYSLOG_H
 
 /* Need __USE_BSD for vsyslog on linux */
 #ifndef __USE_BSD
@@ -7,6 +10,7 @@
 #endif
 
 #include <syslog.h>
+#endif
 
 #include "conflate.h"
 #include "conflate_internal.h"
@@ -27,6 +31,7 @@ static char* lvl_name(enum conflate_log_level lvl)
     return rv;
 }
 
+#ifdef HAVE_SYSLOG_H
 static int prio_map(enum conflate_log_level lvl)
 {
     int rv = LOG_EMERG;
@@ -53,6 +58,7 @@ void conflate_syslog_logger(void *userdata, enum conflate_log_level lvl,
     vsyslog(prio_map(lvl), msg, ap);
     va_end(ap);
 }
+#endif
 
 void conflate_stderr_logger(void *userdata, enum conflate_log_level lvl,
                             const char *msg, ...)

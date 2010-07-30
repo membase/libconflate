@@ -1,3 +1,4 @@
+#include "config.h"
 #include <alarm.h>
 #include <assert.h>
 #include <stdio.h>
@@ -40,7 +41,11 @@ void init_conflate(conflate_config_t *conf)
 {
     assert(conf);
     memset(conf, 0x00, sizeof(conflate_config_t));
+#ifdef HAVE_SYSLOG_H
     conf->log = conflate_syslog_logger;
+#else
+    conf->log = conflate_stderr_logger;
+#endif
     conf->initialization_marker = (void*)INITIALIZATION_MAGIC;
 }
 
