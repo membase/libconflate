@@ -46,25 +46,15 @@ AC_DEFUN([DETECT_SUNCC],
 [
     SUNCC="no"
     AC_MSG_CHECKING([for Sun cc in use])
-    AC_RUN_IFELSE(
-      [AC_LANG_PROGRAM([], [dnl
-#ifdef __SUNPRO_C
-   return 0;
-#else
-   return 1;
-#endif
-      ])
-    ],[
-       AC_MSG_RESULT([yes])
-       [$1]
-       SUNCC="yes"
-    ], [
-       AC_MSG_RESULT([no])
-       [$2]
-    ])
+    AC_EGREP_CPP([^__SUNPRO_C], [__SUNPRO_C],
+         AC_MSG_RESULT([no])
+         [$2],
+         AC_MSG_RESULT([yes])
+         [$1]
+         SUNCC="yes")
 ])
 
-DETECT_SUNCC([CFLAGS="-mt $CFLAGS"], [])
+AS_IF(test "$GCC" != "yes", DETECT_SUNCC([CFLAGS="-mt $CFLAGS"], []))
 
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
