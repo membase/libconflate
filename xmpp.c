@@ -394,7 +394,7 @@ static xmpp_stanza_t* n_handler(const char *cmd,
     enum conflate_mgmt_cb_result rv = cb(handle->conf->userdata, handle,
                                          cmd, direct, form, &result);
 
-    CONFLATE_LOG(handle, DEBUG, "Result of %s:  %s", cmd, cb_name(rv));
+    CONFLATE_LOG(handle, LOG_LVL_DEBUG, "Result of %s:  %s", cmd, cb_name(rv));
 
     switch (rv) {
     case RV_ERROR:
@@ -456,7 +456,8 @@ static int command_handler(xmpp_conn_t * const conn,
     cmd = xmpp_stanza_get_attribute(req, "node");
     assert(cmd);
 
-    CONFLATE_LOG(((conflate_handle_t *)userdata), INFO, "Command:  %s", cmd);
+    CONFLATE_LOG(((conflate_handle_t *)userdata), LOG_LVL_INFO,
+                 "Command:  %s", cmd);
 
     reply = command_dispatch(conn, stanza, userdata, cmd, req, true);
 
@@ -595,7 +596,7 @@ static int message_handler(xmpp_conn_t * const conn,
     xmpp_stanza_t* event = NULL, *items = NULL, *item = NULL,
         *command = NULL, *reply = NULL;
     conflate_handle_t *handle = (conflate_handle_t*)userdata;
-    CONFLATE_LOG(handle, DEBUG, "Got a message from %s",
+    CONFLATE_LOG(handle, LOG_LVL_DEBUG, "Got a message from %s",
                  xmpp_stanza_get_attribute(stanza, "from"));
 
     event = xmpp_stanza_get_child_by_name(stanza, "event");
@@ -608,7 +609,7 @@ static int message_handler(xmpp_conn_t * const conn,
         command = xmpp_stanza_get_child_by_name(item, "command");
         assert(command);
 
-        CONFLATE_LOG(handle, INFO, "Pubsub comand:  %s",
+        CONFLATE_LOG(handle, LOG_LVL_INFO, "Pubsub comand:  %s",
                      xmpp_stanza_get_attribute(command, "command"));
 
         reply = command_dispatch(conn, stanza, userdata,
@@ -619,7 +620,7 @@ static int message_handler(xmpp_conn_t * const conn,
             xmpp_stanza_release(reply);
         }
     } else {
-        CONFLATE_LOG(handle, INFO, "Received pubsub event with no items.");
+        CONFLATE_LOG(handle, LOG_LVL_INFO, "Received pubsub event with no items.");
     }
 
     return 1;
@@ -633,7 +634,7 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
 
     if (status == XMPP_CONN_CONNECT) {
         xmpp_stanza_t* pres = NULL, *priority = NULL, *pri_text = NULL;
-        CONFLATE_LOG(handle, INFO, "Connected.");
+        CONFLATE_LOG(handle, LOG_LVL_INFO, "Connected.");
         xmpp_handler_add(conn, version_handler, "jabber:iq:version", "iq", NULL, handle);
         xmpp_handler_add(conn, command_handler, "http://jabber.org/protocol/commands",
                          "iq", NULL, handle);
@@ -665,11 +666,11 @@ static void conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t statu
         if (!conflate_save_private(handle, STORED_JID_KEY,
                                    xmpp_conn_get_bound_jid(conn),
                                    handle->conf->save_path)) {
-            CONFLATE_LOG(handle, WARN, "Failed to save the bound jid");
+            CONFLATE_LOG(handle, LOG_LVL_WARN, "Failed to save the bound jid");
         }
     }
     else {
-        CONFLATE_LOG(handle, INFO, "disconnected.");
+        CONFLATE_LOG(handle, LOG_LVL_INFO, "disconnected.");
         xmpp_stop(handle->ctx);
     }
 }
@@ -679,12 +680,12 @@ static void conflate_strophe_logger(void *const userdata,
                                     const char *const area,
                                     const char *const msg)
 {
-    enum conflate_log_level lvl = ERROR;
+   enum conflate_log_level lvl = LOG_LVL_ERROR;
     switch(level) {
-    case XMPP_LEVEL_DEBUG: lvl = DEBUG; break;
-    case XMPP_LEVEL_INFO: lvl = INFO; break;
-    case XMPP_LEVEL_WARN: lvl = WARN; break;
-    case XMPP_LEVEL_ERROR: lvl = ERROR; break;
+    case XMPP_LEVEL_DEBUG: lvl = LOG_LVL_DEBUG; break;
+    case XMPP_LEVEL_INFO: lvl = LOG_LVL_INFO; break;
+    case XMPP_LEVEL_WARN: lvl = LOG_LVL_WARN; break;
+    case XMPP_LEVEL_ERROR: lvl = LOG_LVL_ERROR; break;
     }
 
     conflate_handle_t *handle = (conflate_handle_t*)userdata;
@@ -715,11 +716,12 @@ void* run_conflate(void *arg) {
         char *db_jid = conflate_get_private(handle, STORED_JID_KEY,
                                             handle->conf->save_path);
         if (db_jid) {
-            CONFLATE_LOG(handle, DEBUG, "Using jid from db: %s", db_jid);
+            CONFLATE_LOG(handle, LOG_LVL_DEBUG, "Using jid from db: %s",
+                         db_jid);
             xmpp_conn_set_jid(handle->conn, db_jid);
             free(db_jid);
         } else {
-            CONFLATE_LOG(handle, DEBUG, "Using provided jid:  %s",
+            CONFLATE_LOG(handle, LOG_LVL_DEBUG, "Using provided jid:  %s",
                          handle->conf->jid);
             xmpp_conn_set_jid(handle->conn, handle->conf->jid);
         }
@@ -729,15 +731,15 @@ void* run_conflate(void *arg) {
         xmpp_connect_client(handle->conn, handle->conf->host, 0,
                             conn_handler, handle);
         xmpp_run(handle->ctx);
-        CONFLATE_LOG(handle, INFO, "xmpp_run exited");
+        CONFLATE_LOG(handle, LOG_LVL_INFO, "xmpp_run exited");
 
         xmpp_conn_release(handle->conn);
         xmpp_ctx_free(handle->ctx);
 
         sleep(5);
-        CONFLATE_LOG(handle, INFO, "reconnecting");
+        CONFLATE_LOG(handle, LOG_LVL_INFO, "reconnecting");
     }
-    CONFLATE_LOG(handle, FATAL, "Exited an infinite loop.");
+    CONFLATE_LOG(handle, LOG_LVL_FATAL, "Exited an infinite loop.");
     return NULL;
 }
 

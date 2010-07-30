@@ -290,15 +290,23 @@ void conflate_register_mgmt_cb(const char *cmd, const char *desc,
  * @{
  */
 
+#ifdef ENABLE_LIBCONFLATE_DEPRECATED_LOGGING
+#define DEBUG LOG_LVL_DEBUG
+#define INFO LOG_LVL_INFO
+#define WARN LOG_LVL_WARN
+#define ERROR LOG_LVL_ERROR
+#define FATAL LOG_LVL_FATAL
+#endif
+
 /**
  * Log levels.
  */
 enum conflate_log_level {
-    DEBUG, /**< Various debug messages (for example xmpp stanzas) */
-    INFO,  /**< Info messages that might be helpful */
-    WARN,  /**< Warnings of stuff going bad */
-    ERROR, /**< Noteworthy error conditions */
-    FATAL  /**< The rapture is upon us */
+    LOG_LVL_DEBUG, /**< Various debug messages (for example xmpp stanzas) */
+    LOG_LVL_INFO,  /**< Info messages that might be helpful */
+    LOG_LVL_WARN,  /**< Warnings of stuff going bad */
+    LOG_LVL_ERROR, /**< Noteworthy error conditions */
+    LOG_LVL_FATAL  /**< The rapture is upon us */
 };
 
 /**

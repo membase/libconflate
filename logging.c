@@ -21,11 +21,11 @@ static char* lvl_name(enum conflate_log_level lvl)
     char *rv = NULL;
 
     switch(lvl) {
-    case FATAL: rv = "FATAL"; break;
-    case ERROR: rv = "ERROR"; break;
-    case WARN: rv = "WARN"; break;
-    case INFO: rv = "INFO"; break;
-    case DEBUG: rv = "DEBUG"; break;
+    case LOG_LVL_FATAL: rv = "FATAL"; break;
+    case LOG_LVL_ERROR: rv = "ERROR"; break;
+    case LOG_LVL_WARN: rv = "WARN"; break;
+    case LOG_LVL_INFO: rv = "INFO"; break;
+    case LOG_LVL_DEBUG: rv = "DEBUG"; break;
     }
 
     return rv;
@@ -37,11 +37,11 @@ static int prio_map(enum conflate_log_level lvl)
     int rv = LOG_EMERG;
 
     switch(lvl) {
-    case FATAL: rv = LOG_CRIT; break;
-    case ERROR: rv = LOG_ERR; break;
-    case WARN: rv = LOG_WARNING; break;
-    case INFO: rv = LOG_INFO; break;
-    case DEBUG: rv = LOG_DEBUG; break;
+    case LOG_LVL_FATAL: rv = LOG_CRIT; break;
+    case LOG_LVL_ERROR: rv = LOG_ERR; break;
+    case LOG_LVL_WARN: rv = LOG_WARNING; break;
+    case LOG_LVL_INFO: rv = LOG_INFO; break;
+    case LOG_LVL_DEBUG: rv = LOG_DEBUG; break;
     }
 
     return rv;
