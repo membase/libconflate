@@ -59,32 +59,26 @@ AS_IF(test "$GCC" != "yes", DETECT_SUNCC([CFLAGS="-mt $CFLAGS"], []))
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
 
-AC_SUBST(PROFILER_LDFLAGS)
-
 AC_ARG_ENABLE(coverage,
-  [AS_HELP_STRING([--enable-coverage],[Enable code coverage])])
+   [AS_HELP_STRING([--enable-coverage],
+                   [Enable code coverage @<:@default=off@:>@])],
+   [ac_cv_enable_coverage="$enableval"],
+   [ac_cv_enable_coverage="no"])
 
-if test "x$enable_coverage" == "xyes"; then
-   if test "$ICC" = "yes"
-   then
-      :
-      dnl ICC trying to be gcc, but not well
-   elif test "$GCC" = "yes"
-   then
+AS_IF(test "x$enable_coverage" = "xyes", [
+      AS_IF([ test "$ICC" = "yes" -o "$SUNCC" = "yes"],
+            [ AC_MSG_ERROR([coverage only supported for gcc])])
       AC_PATH_PROG([PROFILER], [gcov], "no", [$PATH])
-      if test "x$PROFILER" != "xno"; then
-         PROFILER_FLAGS="-fprofile-arcs -ftest-coverage"
-         PROFILER_LDFLAGS="-lgcov"
-      fi
-   elif test "$SUNCC" = "yes"
-   then
-      AC_PATH_PROG([PROFILER], [tcov], "no", [$PATH])
-      if test "x$PROFILER" != "xno"; then
-         PROFILER_FLAGS=-xprofile=tcov
-      fi
-   fi
-fi
-
+      AS_IF([test "x$PROFILER" = "xno"],
+            [ AC_MSG_ERROR([Can't do code coverage without gcov])])
+      AC_CHECK_LIB(gcov, main,
+                   [
+                      PROFILER_FLAGS="-fprofile-arcs -ftest-coverage"
+                      PROFILER_LDFLAGS="-lgcov"
+                   ], [
+                      AC_MSG_ERROR([Can't do code coverage without libgcov])])
+     ])
+AC_SUBST(PROFILER_LDFLAGS)
 AC_SUBST(PROFILER_FLAGS)
 
 AC_SEARCH_LIBS(pthread_create, pthread,
