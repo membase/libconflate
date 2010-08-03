@@ -17,6 +17,16 @@ extern "C" {
 #define ALARM_MSG_MAXLEN 255
 #define ALARM_NAME_MAXLEN 25
 
+/* Deal with an ICC annoyance.  It tries hard to pretend to be GCC<
+   but doesn't understand its attributes properly. */
+#ifndef __libconflate_gcc_attribute__
+#if defined (__ICC) || defined (__SUNPRO_C)
+# define __libconflate_gcc_attribute__(x)
+#else
+# define __libconflate_gcc_attribute__ __attribute__
+#endif
+#endif
+
 /**
  * \addtogroup Alarm
  * @{
@@ -90,7 +100,7 @@ alarm_t get_alarm(alarm_queue_t *queue);
  * @return true iff the alarm was enqueued
  */
 bool add_alarm(alarm_queue_t *queue, const char *name, const char *msg)
-    __attribute__ ((warn_unused_result));
+    __libconflate_gcc_attribute__ ((warn_unused_result));
 
 /**
  * Create and initialize an alarm queue.

@@ -27,10 +27,12 @@ extern "C" {
 
 /* Deal with an ICC annoyance.  It tries hard to pretend to be GCC<
    but doesn't understand its attributes properly. */
+#ifndef __libconflate_gcc_attribute__
 #if defined (__ICC) || defined (__SUNPRO_C)
-# define __gcc_attribute__(x)
+# define __libconflate_gcc_attribute__(x)
 #else
-# define __gcc_attribute__ __attribute__
+# define __libconflate_gcc_attribute__ __attribute__
+#endif
 #endif
 
 /* Forward declaration */
@@ -100,7 +102,7 @@ typedef bool (*kvpair_visitor_t)(void *opaque,
  * @return a newly allocated kvpair_t
  */
 kvpair_t* mk_kvpair(const char* k, char** v)
-    __attribute__ ((warn_unused_result, nonnull (1)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (1)));
 
 /**
  * Add a value to a kvpair_t.
@@ -109,7 +111,7 @@ kvpair_t* mk_kvpair(const char* k, char** v)
  * @param value the new value
  */
 void add_kvpair_value(kvpair_t* kvpair, const char* value)
-    __attribute__ ((nonnull (1, 2)));
+    __libconflate_gcc_attribute__ ((nonnull (1, 2)));
 
 /**
  * Find a kvpair with the given key.
@@ -120,7 +122,7 @@ void add_kvpair_value(kvpair_t* kvpair, const char* value)
  * @return the pair with the given key, or NULL if no such pair is found
  */
 kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
-    __attribute__ ((warn_unused_result, nonnull (2)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (2)));
 
 /**
  * Find a simple value from a kvpair list.
@@ -135,7 +137,7 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
  * @return a pointer to the first value found, or NULL if none was found
  */
 char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
-    __attribute__ ((warn_unused_result, nonnull (2)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (2)));
 
 /**
  * Copy a chain of kvpairs.
@@ -145,7 +147,7 @@ char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
  * @return a complete deep copy of the kvpair structure
  */
 kvpair_t *dup_kvpair(kvpair_t *pair)
-    __attribute__ ((warn_unused_result, nonnull (1)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (1)));
 
 /**
  * Walk a kvpair.
@@ -155,7 +157,7 @@ kvpair_t *dup_kvpair(kvpair_t *pair)
  * @param visitor the visitor to call for each kvpair_t
  */
 void walk_kvpair(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)
-    __attribute__ ((nonnull(1, 3)));
+    __libconflate_gcc_attribute__ ((nonnull(1, 3)));
 
 /**
  * Free a chain of kvpairs.
@@ -196,7 +198,7 @@ typedef struct _conflate_form_result conflate_form_result;
  * @param v a form value (may not be NULL)
  */
 void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
-    __attribute__ ((nonnull (1, 2, 3)));
+    __libconflate_gcc_attribute__ ((nonnull (1, 2, 3)));
 
 /**
  * Add a multi-valued key to a response form.
@@ -207,7 +209,7 @@ void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
  */
 void conflate_add_field_multi(conflate_form_result *r, const char *k,
                               const char **v)
-    __attribute__ ((nonnull (1, 2, 3)));
+    __libconflate_gcc_attribute__ ((nonnull (1, 2, 3)));
 
 /**
  * Create a response container for a multi-set response.
@@ -218,7 +220,7 @@ void conflate_add_field_multi(conflate_form_result *r, const char *k,
  * @param r the form as handed to the callback
  */
 void conflate_next_fieldset(conflate_form_result *r)
-    __attribute__ ((nonnull (1)));
+    __libconflate_gcc_attribute__ ((nonnull (1)));
 
 /**
  * Initialize the result form if it's not already initialized.
@@ -282,7 +284,7 @@ typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
  */
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
                                conflate_mgmt_cb_t cb)
-    __attribute__ ((nonnull (1, 2, 3)));
+    __libconflate_gcc_attribute__ ((nonnull (1, 2, 3)));
 
 /**
  * @}
@@ -396,7 +398,7 @@ typedef struct {
      * @param msg the message to log
      */
     void (*log)(void *udata, enum conflate_log_level level, const char *msg, ...)
-        __gcc_attribute__ ((format (printf, 3, 4)));
+        __libconflate_gcc_attribute__ ((format (printf, 3, 4)));
 
     /**
      * Callback issued when a new configuration is to be activated.
@@ -430,7 +432,7 @@ typedef struct {
  *
  * @param conf configuration to be initialized
  */
-void init_conflate(conflate_config_t *conf) __attribute__ ((nonnull (1)));
+void init_conflate(conflate_config_t *conf) __libconflate_gcc_attribute__ ((nonnull (1)));
 
 /**
  * The main entry point for starting a conflate agent.
@@ -439,7 +441,7 @@ void init_conflate(conflate_config_t *conf) __attribute__ ((nonnull (1)));
  *
  * @return true if libconflate was able to properly initialize itself
  */
-bool start_conflate(conflate_config_t conf) __attribute__ ((warn_unused_result));
+bool start_conflate(conflate_config_t conf) __libconflate_gcc_attribute__ ((warn_unused_result));
 
 /**
  * @}
@@ -472,7 +474,7 @@ conflate_config_t* dup_conf(conflate_config_t c);
  * @return the config, or NULL if the config could not be read for any reason
  */
 kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
-    __attribute__ ((warn_unused_result, nonnull(1, 2)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2)));
 
 /**
  * Save a config at the given path.
@@ -484,7 +486,7 @@ kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
  * @return false if the configuration could not be saved for any reason
  */
 bool save_kvpairs(conflate_handle_t *handle, kvpair_t* pairs, const char *filename)
-    __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 
 /**
  * Save some instance-private data.
@@ -498,7 +500,7 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* pairs, const char *filena
  */
 bool conflate_save_private(conflate_handle_t *handle,
                            const char *k, const char *v, const char *filename)
-    __attribute__ ((warn_unused_result, nonnull(1, 2, 3, 4)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3, 4)));
 
 /**
  * Delete some saved instance-private data.
@@ -511,7 +513,7 @@ bool conflate_save_private(conflate_handle_t *handle,
  */
 bool conflate_delete_private(conflate_handle_t *handle,
                              const char *k, const char *filename)
-    __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 
 /**
  * Get some saved instance-private data.
@@ -524,7 +526,7 @@ bool conflate_delete_private(conflate_handle_t *handle,
  */
 char *conflate_get_private(conflate_handle_t *handle,
                            const char *k, const char *filename)
-    __attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
+    __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 
 /**
  * @}
