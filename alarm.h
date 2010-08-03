@@ -5,6 +5,10 @@
 #ifndef LIBCONFLATE_ALARM_H
 #define LIBCONFLATE_ALARM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ALARM_INITIALIZER() { 1,1,1,1,0,0,"something"}
 #define ALARM_QUEUE_INIT(queue) { queue, 0, 0, 0, PTHREAD_MUTEX_INITIALIZER, \
             PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER }
@@ -101,6 +105,10 @@ alarm_queue_t *init_alarmqueue(void);
  * @param queue the alarm queue to tear down
  */
 void destroy_alarmqueue(alarm_queue_t *queue);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

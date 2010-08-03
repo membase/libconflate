@@ -5,6 +5,9 @@
 #include <sys/types.h>
 #include <pthread.h>
 
+#ifdef __cpluscplus
+extern "C" {
+#endif
 
 /*! \mainpage libconflate
  *
@@ -526,5 +529,8 @@ char *conflate_get_private(conflate_handle_t *handle,
 /**
  * @}
  */
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CONFLATE_H */
