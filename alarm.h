@@ -2,8 +2,8 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-#ifndef _ALARM_H
-#define _ALARM_H
+#ifndef LIBCONFLATE_ALARM_H
+#define LIBCONFLATE_ALARM_H
 
 #define ALARM_INITIALIZER() { 1,1,1,1,0,0,"something"}
 #define ALARM_QUEUE_INIT(queue) { queue, 0, 0, 0, PTHREAD_MUTEX_INITIALIZER, \

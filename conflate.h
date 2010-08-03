@@ -1,5 +1,5 @@
-#ifndef CONFLATE_H
-#define CONFLATE_H 1
+#ifndef LIBCONFLATE_CONFLATE_H
+#define LIBCONFLATE_CONFLATE_H 1
 
 #include <stdbool.h>
 #include <sys/types.h>
