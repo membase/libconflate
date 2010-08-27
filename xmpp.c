@@ -764,6 +764,7 @@ void conflate_add_field_multi(conflate_form_result *r, const char *k,
 
 void* run_conflate(void *arg) {
     assert(0);
+    return NULL;
 }
 
 #endif // !CONFLATE_USE_XMPP
