@@ -57,7 +57,7 @@ static int set_table_mask(void* arg, int n, char **vals, char **cols)
     } else if(strcmp(vals[0], "private") == 0) {
         udata->found |= HAS_PRIVATE;
     } else {
-        CONFLATE_LOG(udata->handle, WARN, "Unknown table:  %s", vals[0]);
+        CONFLATE_LOG(udata->handle, LOG_LVL_WARN, "Unknown table:  %s", vals[0]);
     }
 
     return SQLITE_OK;
@@ -83,7 +83,7 @@ static bool db_do(conflate_handle_t *handle, sqlite3 *db, const char* query)
     bool rv = true;
 
     if (sqlite3_exec(db, query, NULL, NULL, &errmsg) != SQLITE_OK) {
-        CONFLATE_LOG(handle, ERROR, "DB Error:  %s\n%s", errmsg, query);
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "DB Error:  %s\n%s", errmsg, query);
         sqlite3_free(errmsg);
         rv = false;
     }
@@ -102,12 +102,12 @@ static bool maybe_create_table(conflate_handle_t *handle,
     char* table_name = get_table_name(flag);
 
     if (flag & flags) {
-        CONFLATE_LOG(handle, DEBUG, "Table %s already exists", table_name);
+        CONFLATE_LOG(handle, LOG_LVL_DEBUG, "Table %s already exists", table_name);
     } else {
         if (db_do(handle, db, query)) {
-            CONFLATE_LOG(handle, INFO, "Created table:  %s", table_name);
+            CONFLATE_LOG(handle, LOG_LVL_INFO, "Created table:  %s", table_name);
         } else {
-            CONFLATE_LOG(handle, WARN, "DB error creating table:  %s", table_name);
+            CONFLATE_LOG(handle, LOG_LVL_WARN, "DB error creating table:  %s", table_name);
             rv = false;
         }
     }
@@ -128,7 +128,7 @@ static bool initialize_db(conflate_handle_t *handle, sqlite3 *db)
     struct table_mask_userdata udata = { 0, handle };
 
     if (sqlite3_exec(db, query, set_table_mask, &udata, &errmsg) != SQLITE_OK) {
-        CONFLATE_LOG(handle, ERROR, "DB error:  %s", errmsg);
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "DB error:  %s", errmsg);
         sqlite3_free(errmsg);
     } else {
         rv &= maybe_create_table(handle, db, HAS_KEYS, udata.found, CREATE_KEYS);
@@ -150,7 +150,7 @@ static int open_and_initialize_db(conflate_handle_t *handle,
     }
 
     if (!initialize_db(handle, *db)) {
-        CONFLATE_LOG(handle, ERROR, "Error initializing tables");
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "Error initializing tables");
         return SQLITE_ERROR;
     }
 
@@ -164,7 +164,7 @@ static int run_mod_steps(conflate_handle_t *handle, sqlite3 *db,
     while ((rc = sqlite3_step(statement)) != SQLITE_DONE) {
         steps_run++;
         assert(steps_run < MAX_STEPS);
-        CONFLATE_LOG(handle, DEBUG, "statement step result: %d", rc);
+        CONFLATE_LOG(handle, LOG_LVL_DEBUG, "statement step result: %d", rc);
     }
     return sqlite3_changes(db);
 }
@@ -250,7 +250,7 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
 
  finished:
     if (sqlite3_errcode(db) != SQLITE_OK) {
-        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "DB error %d:  %s",
                      sqlite3_errcode(db), sqlite3_errmsg(db));
     }
 
@@ -298,10 +298,10 @@ kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
 
  finished:
     if (sqlite3_errcode(db) != SQLITE_OK) {
-        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "DB error %d:  %s",
                      sqlite3_errcode(db), sqlite3_errmsg(db));
         if (errmsg) {
-            CONFLATE_LOG(handle, ERROR, "  %s", errmsg);
+            CONFLATE_LOG(handle, LOG_LVL_ERROR, "  %s", errmsg);
             sqlite3_free(errmsg);
         }
     }
@@ -338,7 +338,7 @@ bool conflate_save_private(conflate_handle_t *handle,
  finished:
     err = sqlite3_errcode(db);
     if (err != SQLITE_OK && err != SQLITE_DONE) {
-        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "DB error %d:  %s",
                      sqlite3_errcode(db), sqlite3_errmsg(db));
     }
 
@@ -373,13 +373,13 @@ bool conflate_delete_private(conflate_handle_t *handle,
     sqlite3_bind_text(del, 1, k, strlen(k), SQLITE_TRANSIENT);
 
     deleted = run_mod_steps(handle, db, del);
-    CONFLATE_LOG(handle, DEBUG, "Removed %d records", deleted);
+    CONFLATE_LOG(handle, LOG_LVL_DEBUG, "Removed %d records", deleted);
     rv = deleted >= 0;
 
  finished:
     err = sqlite3_errcode(db);
     if (err != SQLITE_OK && err != SQLITE_DONE) {
-        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "DB error %d:  %s",
                      sqlite3_errcode(db), sqlite3_errmsg(db));
     }
 
@@ -416,12 +416,12 @@ char *conflate_get_private(conflate_handle_t *handle,
     while (!done) {
         switch(sqlite3_step(get)) {
         case SQLITE_BUSY:
-            CONFLATE_LOG(handle, INFO, "DB was busy, retrying...\n");
+            CONFLATE_LOG(handle, LOG_LVL_INFO, "DB was busy, retrying...\n");
             break;
         case SQLITE_ROW:
             assert(rv == NULL);
             rv = safe_strdup((char*)sqlite3_column_text(get, 0));
-            CONFLATE_LOG(handle, DEBUG, "Retrieved value for ``%s'':  ``%s''",
+            CONFLATE_LOG(handle, LOG_LVL_DEBUG, "Retrieved value for ``%s'':  ``%s''",
                          k, rv);
             break;
         case SQLITE_DONE:
@@ -435,10 +435,10 @@ char *conflate_get_private(conflate_handle_t *handle,
  finished:
     err = sqlite3_errcode(db);
     if (err != SQLITE_OK && err != SQLITE_DONE) {
-        CONFLATE_LOG(handle, ERROR, "DB error %d:  %s",
+        CONFLATE_LOG(handle, LOG_LVL_ERROR, "DB error %d:  %s",
                      sqlite3_errcode(db), sqlite3_errmsg(db));
         if (errmsg) {
-            CONFLATE_LOG(handle, ERROR, "  %s", errmsg);
+            CONFLATE_LOG(handle, LOG_LVL_ERROR, "  %s", errmsg);
             sqlite3_free(errmsg);
         }
     }
