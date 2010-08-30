@@ -11,19 +11,29 @@ pkgconfig_DATA = libconflate.pc
 
 BUILT_SOURCES=
 
-SUBDIRS= $(MAYBE_LIBSTROPHE) . tests
-DIST_SUBDIRS = $(MAYBE_LIBSTROPHE) . tests
+SUBDIRS= . tests
+DIST_SUBDIRS = . tests
 
 examples_bot_DEPENDENCIES = libconflate.la
 examples_bot_SOURCES = examples/bot.c
-examples_bot_CFLAGS = $(libstrophe_CFLAGS)
-examples_bot_LDADD = -L. -lconflate @PROFILER_LDFLAGS@
+examples_bot_LDADD = libconflate.la $(GCOV_LIBS)
 
-libconflate_la_CFLAGS = @PROFILER_FLAGS@ $(libstrophe_CFLAGS)
-libconflate_la_SOURCES = conflate.h conflate_internal.h conflate_convenience.h alarm.h rest.h\
-	alarm.c kvpair.c util.c persist.c xmpp.c logging.c adhoc_commands.c \
-    conflate.c rest.c
-libconflate_la_LIBADD = $(libstrophe_LIBS)
+libconflate_la_SOURCES = adhoc_commands.c \
+                         alarm.c \
+                         alarm.h \
+                         conflate.c \
+                         conflate.h \
+                         conflate_convenience.h \
+                         conflate_internal.h \
+                         kvpair.c \
+                         logging.c \
+                         persist.c \
+                         rest.c \
+                         rest.h \
+                         util.c \
+                         xmpp.c
+
+libconflate_la_LIBADD = $(LIBCONFLATE_LINKFLAGS) $(LTLIBCURL)
 
 MOSTLYCLEANFILES = *.gcov *.gcno *.gcda *.tcov
 

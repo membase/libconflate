@@ -50,6 +50,7 @@ static int prio_map(enum conflate_log_level lvl)
 void conflate_syslog_logger(void *userdata, enum conflate_log_level lvl,
                             const char *msg, ...)
 {
+    (void)userdata;
     char fmt[strlen(msg) + 16];
     snprintf(fmt, sizeof(fmt), "%s: %s\n", lvl_name(lvl), msg);
 
@@ -63,6 +64,7 @@ void conflate_syslog_logger(void *userdata, enum conflate_log_level lvl,
 void conflate_stderr_logger(void *userdata, enum conflate_log_level lvl,
                             const char *msg, ...)
 {
+    (void)userdata;
     char fmt[strlen(msg) + 16];
     snprintf(fmt, sizeof(fmt), "%s: %s\n", lvl_name(lvl), msg);
 

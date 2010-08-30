@@ -30,7 +30,7 @@ AC_DEFUN([PANDORA_WARNINGS],[
   AC_REQUIRE([PANDORA_BUILDING_FROM_VC])
   m4_if(PW_WARN_ALWAYS_ON, [yes],
     [ac_cv_warnings_as_errors=yes],
-    AS_IF([test "$ac_cv_building_from_vc" = "yes"],
+    AS_IF([test "$pandora_building_from_vc" = "yes"],
           [ac_cv_warnings_as_errors=yes],
           [ac_cv_warnings_as_errors=no]))
 
@@ -50,6 +50,7 @@ AC_DEFUN([PANDORA_WARNINGS],[
 
     AS_IF([test "$ac_profiling" = "yes"],[
       CC_PROFILING="-pg"
+      GCOV_LIBS="-pg -lgcov"
       save_LIBS="${LIBS}"
       LIBS=""
       AC_CHECK_LIB(c_p, read)
@@ -61,7 +62,12 @@ AC_DEFUN([PANDORA_WARNINGS],[
     ])
 
     AS_IF([test "$ac_coverage" = "yes"],
-          [CC_COVERAGE="-fprofile-arcs -ftest-coverage"])
+          [
+            CC_COVERAGE="--coverage"
+            GCOV_LIBS="-lgcov"
+          ])
+
+
 	 
     AS_IF([test "$ac_cv_warnings_as_errors" = "yes"],
           [W_FAIL="-Werror"])
@@ -129,9 +135,9 @@ uint16_t x= htons(80);
 
     AS_IF([test "$INTELCC" = "yes"],[
       m4_if(PW_LESS_WARNINGS,[no],[
-        BASE_WARNINGS="-w1 -Wall -Werror -Wcheck -Wformat -Wp64 -Woverloaded-virtual -Wcast-qual"
+        BASE_WARNINGS="-w1 -Werror -Wcheck -Wformat -Wp64 -Woverloaded-virtual -Wcast-qual"
       ],[
-        BASE_WARNINGS="-w1 -Wall -Wcheck -Wformat -Wp64 -Woverloaded-virtual -Wcast-qual -diag-disable 981"
+        BASE_WARNINGS="-w1 -Wcheck -Wformat -Wp64 -Woverloaded-virtual -Wcast-qual -diag-disable 981"
       ])
       CC_WARNINGS="${BASE_WARNINGS}"
       CXX_WARNINGS="${BASE_WARNINGS}"
@@ -139,7 +145,9 @@ uint16_t x= htons(80);
       m4_if(PW_LESS_WARNINGS,[no],[
         BASE_WARNINGS_FULL="-Wformat=2 ${W_CONVERSION} -Wstrict-aliasing"
         CC_WARNINGS_FULL="-Wswitch-default -Wswitch-enum -Wwrite-strings"
-        #CXX_WARNINGS_FULL="-Weffc++ -Wold-style-cast"
+        CXX_WARNINGS_FULL="-Weffc++ -Wold-style-cast"
+        NO_OLD_STYLE_CAST="-Wno-old-style-cast"
+        NO_EFF_CXX="-Wno-effc++"
       ],[
         BASE_WARNINGS_FULL="-Wformat ${NO_STRICT_ALIASING}"
       ])
@@ -217,8 +225,8 @@ template <> void C<int>::foo();
             AC_INCLUDES_DEFAULT])],
             [ac_cv_safe_to_use_Wredundant_decls_=yes],
             [ac_cv_safe_to_use_Wredundant_decls_=no])
-          CXXFLAGS="${save_CXXFLAGS}"
-          AC_LANG_POP()])
+         CXXFLAGS="${save_CXXFLAGS}"
+         AC_LANG_POP()])
       AS_IF([test "$ac_cv_safe_to_use_Wredundant_decls_" = "yes"],
             [CXX_WARNINGS="${CXX_WARNINGS} -Wredundant-decls"],
             [CXX_WARNINGS="${CXX_WARNINGS} -Wno-redundant-decls"])
@@ -323,8 +331,8 @@ inline const EnumDescriptor* GetEnumDescriptor<Table_TableOptions_RowType>() {
       CXX_WARNINGS_FULL="-erroff=attrskipunsup,doubunder,reftotemp,inllargeuse,truncwarn1,signextwarn,inllargeint"
     ])
 
-    CC_WARNINGS="-v -errtags=yes ${W_FAIL} ${CC_WARNINGS_FULL}"
-    CXX_WARNINGS="+w +w2 -xwe -xport64 -errtags=yes ${CXX_WARNINGS_FULL} ${W_FAIL}"
+    CC_WARNINGS="-v -errtags=yes ${W_FAIL} ${CC_WARNINGS_FULL} ${CFLAG_VISIBILITY}"
+    CXX_WARNINGS="+w +w2 -xwe -xport64 -errtags=yes ${CXX_WARNINGS_FULL} ${W_FAIL} ${CFLAG_VISIBILITY}"
     PROTOSKIP_WARNINGS="-erroff=attrskipunsup,doubunder,reftotemp,wbadinitl,identexpected,inllargeuse,truncwarn1,signextwarn,partinit,notused,badargtype2w,wbadinit"
     NO_UNREACHED="-erroff=E_STATEMENT_NOT_REACHED"
     NO_WERROR="-errwarn=%none"
@@ -336,8 +344,11 @@ inline const EnumDescriptor* GetEnumDescriptor<Table_TableOptions_RowType>() {
   AC_SUBST(NO_UNREACHED)
   AC_SUBST(NO_SHADOW)
   AC_SUBST(NO_STRICT_ALIASING)
+  AC_SUBST(NO_EFF_CXX)
+  AC_SUBST(NO_OLD_STYLE_CAST)
   AC_SUBST(PROTOSKIP_WARNINGS)
   AC_SUBST(INNOBASE_SKIP_WARNINGS)
   AC_SUBST(NO_WERROR)
+  AC_SUBST([GCOV_LIBS])
 
 ])

@@ -157,7 +157,7 @@ static size_t handle_response(void *data, size_t s, size_t num, void *cb) {
 
 static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
                          char *uri_suffix, conflate_handle_t *chandle,
-                         size_t (handle_response)(void *, size_t, size_t, void *)) {
+                         size_t (response_handler)(void *, size_t, size_t, void *)) {
     size_t buff_size = strlen(uri) + strlen (uri_suffix) + 1;
     char *url = (char *) malloc(buff_size);
     if (url != NULL) {
@@ -165,9 +165,9 @@ static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
 
         CURLcode c;
 
-        c = curl_easy_setopt(handle,CURLOPT_WRITEDATA,chandle);
+        c = curl_easy_setopt(handle, CURLOPT_WRITEDATA, chandle);
         assert(c == CURLE_OK);
-        c = curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,handle_response);
+        c = curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,response_handler);
         assert(c == CURLE_OK);
         c = curl_easy_setopt(handle,CURLOPT_URL,url);
         assert(c == CURLE_OK);

@@ -21,6 +21,7 @@
  */
 static bool config_visitor(void *opaque, const char *key, const char **values)
 {
+    (void)opaque;
     printf("\t%s\n", key);
 
     for (int i = 0; values[i]; i++) {
@@ -51,6 +52,10 @@ static enum conflate_mgmt_cb_result process_stats(void *opaque,
                                                   kvpair_t *form,
                                                   conflate_form_result *r)
 {
+    (void)opaque;
+    (void)handle;
+    (void)cmd;
+
     /* Only direct stat requests are handled. */
     assert(direct);
 
@@ -75,6 +80,11 @@ static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
                                                         kvpair_t *form,
                                                         conflate_form_result *r)
 {
+    (void)opaque;
+    (void)handle;
+    (void)cmd;
+    (void)direct;
+    (void)r;
     char *subtype = get_simple_kvpair_val(form, "-subtype-");
 
     fprintf(stderr, "Handling stats reset with subtype:  %s\n",
@@ -93,6 +103,11 @@ static enum conflate_mgmt_cb_result process_ping_test(void *opaque,
                                                       kvpair_t *form,
                                                       conflate_form_result *r)
 {
+    (void)opaque;
+    (void)handle;
+    (void)cmd;
+    (void)direct;
+
     kvpair_t *servers_p = find_kvpair(form, "servers");
     if (!servers_p) {
         return RV_BADARG;
@@ -122,7 +137,14 @@ static enum conflate_mgmt_cb_result process_alarm_create(void *opaque,
                                                          kvpair_t *form,
                                                          conflate_form_result *r)
 {
-        if(add_alarm(handle->alarms, "test", "This is a test alarm!")) {
+    (void)opaque;
+    (void)handle;
+    (void)cmd;
+    (void)direct;
+    (void)form;
+    (void)r;
+
+    if(add_alarm(handle->alarms, "test", "This is a test alarm!")) {
         fprintf(stderr, "Created alarm!\n");
     } else {
         fprintf(stderr, "Error queueing an alarm.\n");

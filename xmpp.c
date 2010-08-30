@@ -747,22 +747,31 @@ void* run_conflate(void *arg) {
 
 void conflate_init_form(conflate_form_result *r)
 {
+    (void)r;
 }
 
 void conflate_next_fieldset(conflate_form_result *r) {
+    (void)r;
     assert(0);
 }
 
 void conflate_add_field(conflate_form_result *r, const char *k, const char *v) {
+    (void)r;
+    (void)k;
+    (void)v;
     assert(0);
 }
 
 void conflate_add_field_multi(conflate_form_result *r, const char *k,
                               const char **v) {
+    (void)r;
+    (void)k;
+    (void)v;
     assert(0);
 }
 
 void* run_conflate(void *arg) {
+    (void)arg;
     assert(0);
     return NULL;
 }

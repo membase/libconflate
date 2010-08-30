@@ -17,6 +17,10 @@ static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
                                                        kvpair_t *conf,
                                                        conflate_form_result *r)
 {
+   (void)opaque;
+   (void)cmd;
+   (void)r;
+
     /* If we have "config_is_private" set to "yes" we should only
        process this if it's direct (i.e. ignore pubsub) */
     if (!direct) {
@@ -52,6 +56,10 @@ static enum conflate_mgmt_cb_result process_set_private(void *opaque,
                                                         kvpair_t *form,
                                                         conflate_form_result *r)
 {
+   (void)opaque;
+   (void)cmd;
+   (void)r;
+
     /* Only direct stat requests are handled. */
     assert(direct);
     enum conflate_mgmt_cb_result rv = RV_ERROR;
@@ -78,6 +86,9 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
                                                         kvpair_t *form,
                                                         conflate_form_result *r)
 {
+   (void)opaque;
+   (void)cmd;
+
     /* Only direct stat requests are handled. */
     assert(direct);
     enum conflate_mgmt_cb_result rv = RV_ERROR;
@@ -109,6 +120,10 @@ static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
                                                            kvpair_t *form,
                                                            conflate_form_result *r)
 {
+   (void)opaque;
+   (void)cmd;
+   (void)r;
+
     /* Only direct stat requests are handled. */
     assert(direct);
     enum conflate_mgmt_cb_result rv = RV_ERROR;

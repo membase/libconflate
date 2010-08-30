@@ -47,6 +47,7 @@ struct table_mask_userdata {
 
 static int set_table_mask(void* arg, int n, char **vals, char **cols)
 {
+    (void)cols;
     struct table_mask_userdata *udata = (struct table_mask_userdata*)arg;
     assert(n == 1);
 
@@ -267,6 +268,8 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
 
 static int append_kvpair_from_db(void* arg, int n, char **vals, char **cols)
 {
+    (void)n;
+    (void)cols;
     kvpair_t** pairs = (kvpair_t**)arg;
     kvpair_t* pair = find_kvpair(*pairs, vals[0]);
 
@@ -456,30 +459,45 @@ char *conflate_get_private(conflate_handle_t *handle,
 
 kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
 {
+    (void)handle;
+    (void)filename;
     return NULL;
 }
 
 bool save_kvpairs(conflate_handle_t *handle, kvpair_t* kvpair,
                   const char *filename)
 {
+    (void)handle;
+    (void)kvpair;
+    (void)filename;
     return true;
 }
 
 bool conflate_delete_private(conflate_handle_t *handle,
                              const char *k, const char *filename)
 {
+    (void)handle;
+    (void)k;
+    (void)filename;
     return true;
 }
 
 bool conflate_save_private(conflate_handle_t *handle,
                            const char *k, const char *v, const char *filename)
 {
+    (void)handle;
+    (void)k;
+    (void)v;
+    (void)filename;
     return true;
 }
 
 char *conflate_get_private(conflate_handle_t *handle,
                            const char *k, const char *filename)
 {
+    (void)handle;
+    (void)k;
+    (void)filename;
     return NULL;
 }
 
