@@ -64,6 +64,7 @@ AH_BOTTOM([
 #define __CURL_TYPECHECK_GCC_H 1
 
 #ifdef WIN32
+#include <winsock2.h>
 #include <windows.h>
 #define pause(a) while (1) { Sleep(100000); }
 #define sleep(a) Sleep(a * 1000)
