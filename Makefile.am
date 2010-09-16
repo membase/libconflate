@@ -2,7 +2,6 @@ ACLOCAL_AMFLAGS=-I m4
 SHELL=/bin/sh
 lib_LTLIBRARIES = libconflate.la
 pkginclude_HEADERS = conflate.h alarm.h
-noinst_PROGRAMS = examples/bot
 
 EXTRA_DIST=LICENSE.txt README.markdown Doxyfile libconflate.pc.in
 
@@ -14,9 +13,13 @@ BUILT_SOURCES=
 SUBDIRS= . tests
 DIST_SUBDIRS = . tests
 
-examples_bot_DEPENDENCIES = libconflate.la
-examples_bot_SOURCES = examples/bot.c
-examples_bot_LDADD = libconflate.la $(GCOV_LIBS)
+# This breaks on windows o/s.
+#
+# noinst_PROGRAMS = examples/bot
+#
+# examples_bot_DEPENDENCIES = libconflate.la
+# examples_bot_SOURCES = examples/bot.c
+# examples_bot_LDADD = libconflate.la $(GCOV_LIBS)
 
 libconflate_la_SOURCES = adhoc_commands.c \
                          alarm.c \
