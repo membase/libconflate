@@ -25,7 +25,8 @@ struct response_buffer *response_buffer_head = NULL;
 struct response_buffer *cur_response_buffer = NULL;
 
 static struct response_buffer *mk_response_buffer(size_t size) {
-    struct response_buffer *r = (struct response_buffer *)calloc(1, sizeof(struct response_buffer));
+    struct response_buffer *r =
+      (struct response_buffer *) calloc(1, sizeof(struct response_buffer));
     assert(r);
     r->data = malloc(size);
     assert(r->data);
@@ -48,7 +49,8 @@ static void free_response(struct response_buffer *response) {
     free(response);
 }
 
-static struct response_buffer *write_data_to_buffer(struct response_buffer *buffer, const char *data, size_t len) {
+static struct response_buffer *write_data_to_buffer(struct response_buffer *buffer,
+                                                    const char *data, size_t len) {
     size_t bytes_written = 0;
     while (bytes_written < len) {
         size_t bytes_to_write = (len - bytes_written);
@@ -63,7 +65,7 @@ static struct response_buffer *write_data_to_buffer(struct response_buffer *buff
             }
             char *d = buffer->data;
             d = &d[buffer->bytes_used];
-            memcpy(d,&data[bytes_written],bytes_to_write);
+            memcpy(d,&data[bytes_written], bytes_to_write);
             bytes_written += bytes_to_write;
             buffer->bytes_used += bytes_to_write;
         }
@@ -103,7 +105,7 @@ static char *assemble_complete_response(struct response_buffer *response_head) {
     return response;
 }
 
-static bool pattern_ends_with(const char *pattern, const char * target, size_t target_size) {
+static bool pattern_ends_with(const char *pattern, const char *target, size_t target_size) {
 	assert(target);
 	assert(pattern);
 
@@ -127,13 +129,14 @@ static void process_new_config(conflate_handle_t *conf_handle) {
     cur_response_buffer = NULL;
 
     if (values[0] == NULL) {
+        fprintf(stderr, "ERROR: invalid response from REST server\n");
         return;
     }
 
     kvpair_t *kv = mk_kvpair(CONFIG_KEY, values);
 
     //execute the provided call back
-    void (*call_back)(void*, kvpair_t*) = conf_handle->conf->new_config;
+    void (*call_back)(void *, kvpair_t *) = conf_handle->conf->new_config;
     call_back(conf_handle->conf->userdata, kv);
 
     //clean up
@@ -145,9 +148,9 @@ static void process_new_config(conflate_handle_t *conf_handle) {
 }
 
 static size_t handle_response(void *data, size_t s, size_t num, void *cb) {
-    conflate_handle_t *c_handle = (conflate_handle_t *)cb;
+    conflate_handle_t *c_handle = (conflate_handle_t *) cb;
     size_t size = s * num;
-    bool end_of_message = pattern_ends_with(END_OF_CONFIG,data,size);
+    bool end_of_message = pattern_ends_with(END_OF_CONFIG, data, size);
     cur_response_buffer = write_data_to_buffer(cur_response_buffer, data, size);
     if (end_of_message) {
         process_new_config(c_handle);
@@ -161,30 +164,30 @@ static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
     size_t buff_size = strlen(uri) + strlen (uri_suffix) + 1;
     char *url = (char *) malloc(buff_size);
     if (url != NULL) {
-        snprintf(url,buff_size,"%s%s",uri,uri_suffix);
+        snprintf(url, buff_size, "%s%s", uri, uri_suffix);
 
         CURLcode c;
 
         c = curl_easy_setopt(handle, CURLOPT_WRITEDATA, chandle);
         assert(c == CURLE_OK);
-        c = curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,response_handler);
+        c = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, response_handler);
         assert(c == CURLE_OK);
-        c = curl_easy_setopt(handle,CURLOPT_URL,url);
+        c = curl_easy_setopt(handle, CURLOPT_URL, url);
         assert(c == CURLE_OK);
 
         if (user) {
             buff_size = strlen(user) + strlen(pass) + 2;
             char *userpasswd = (char *) malloc(buff_size);
             assert(userpasswd);
-            snprintf(userpasswd,buff_size,"%s:%s",user,pass);
-            c = curl_easy_setopt(handle,CURLOPT_HTTPAUTH,CURLAUTH_BASIC);
+            snprintf(userpasswd, buff_size, "%s:%s", user, pass);
+            c = curl_easy_setopt(handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             assert(c == CURLE_OK);
-            c = curl_easy_setopt(handle,CURLOPT_USERPWD,userpasswd);
+            c = curl_easy_setopt(handle, CURLOPT_USERPWD, userpasswd);
             assert(c == CURLE_OK);
             free(userpasswd);
         }
 
-        c = curl_easy_setopt(handle,CURLOPT_HTTPGET,1);
+        c = curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
         assert(c == CURLE_OK);
 
         free(url);
@@ -208,15 +211,15 @@ static char *strsep(char **stringp, char *pattern) {
 }
 #endif
 
-void* run_rest_conflate(void *arg) {
-    conflate_handle_t* handle = (conflate_handle_t*)arg;
+void *run_rest_conflate(void *arg) {
+    conflate_handle_t *handle = (conflate_handle_t *) arg;
 
     /* prep the buffers used to hold the config */
     response_buffer_head = mk_response_buffer(RESPONSE_BUFFER_SIZE);
     cur_response_buffer = response_buffer_head;
 
     /* Before connecting and all that, load the stored config */
-    kvpair_t* conf = load_kvpairs(handle, handle->conf->save_path);
+    kvpair_t *conf = load_kvpairs(handle, handle->conf->save_path);
     if (conf) {
         handle->conf->new_config(handle->conf->userdata, conf);
         free_kvpair(conf);
