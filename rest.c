@@ -177,13 +177,10 @@ int setup_curl_sock(void *clientp,
   return 0;
 }
 
-static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
-                         char *uri_suffix, conflate_handle_t *chandle,
+static void setup_handle(CURL *handle, char *url, char *userpass,
+                         conflate_handle_t *chandle,
                          size_t (response_handler)(void *, size_t, size_t, void *)) {
-    size_t buff_size = strlen(uri) + strlen (uri_suffix) + 1;
-    char *url = (char *) malloc(buff_size);
     if (url != NULL) {
-        snprintf(url, buff_size, "%s%s", uri, uri_suffix);
 
         CURLcode c;
 
@@ -196,22 +193,15 @@ static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
         c = curl_easy_setopt(handle, CURLOPT_URL, url);
         assert(c == CURLE_OK);
 
-        if (user) {
-            buff_size = strlen(user) + strlen(pass) + 2;
-            char *userpasswd = (char *) malloc(buff_size);
-            assert(userpasswd);
-            snprintf(userpasswd, buff_size, "%s:%s", user, pass);
+        if (userpass != NULL) {
             c = curl_easy_setopt(handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             assert(c == CURLE_OK);
-            c = curl_easy_setopt(handle, CURLOPT_USERPWD, userpasswd);
+            c = curl_easy_setopt(handle, CURLOPT_USERPWD, userpass);
             assert(c == CURLE_OK);
-            free(userpasswd);
         }
 
         c = curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
         assert(c == CURLE_OK);
-
-        free(url);
     }
 }
 
@@ -234,6 +224,7 @@ static char *strsep(char **stringp, char *pattern) {
 
 void *run_rest_conflate(void *arg) {
     conflate_handle_t *handle = (conflate_handle_t *) arg;
+    char curl_error_string[CURL_ERROR_SIZE];
 
     /* prep the buffers used to hold the config */
     response_buffer_head = mk_response_buffer(RESPONSE_BUFFER_SIZE);
@@ -255,6 +246,8 @@ void *run_rest_conflate(void *arg) {
     CURL *curl_handle = curl_easy_init();
     assert(curl_handle);
 
+    curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, &curl_error_string);
+
     bool always_retry = true;
 
     while (true) {
@@ -268,13 +261,22 @@ void *run_rest_conflate(void *arg) {
             char *urls = strdup(handle->conf->host); // Might be a '|' delimited list of url's.
             char *next = urls;
 
+            char *userpass = NULL;
+            if (handle->conf->jid && strlen(handle->conf->jid)) {
+                size_t buff_size = strlen(handle->conf->jid) + strlen(handle->conf->pass) + 2;
+                userpass = (char *)malloc(buff_size);
+                assert(userpass);
+                snprintf(userpass, buff_size, "%s:%s", handle->conf->jid, handle->conf->pass);
+                userpass[buff_size - 1] = '\0';
+            }
+
             while (next != NULL) {
                 char *url = strsep(&next, "|");
 
                 setup_handle(curl_handle,
-                             handle->conf->jid, // The auth user.
-                             handle->conf->pass, // The auth password.
-                             url, "", handle, handle_response);
+                             url, // The full URL.
+                             userpass, // The auth user and password.
+                             handle, handle_response);
 
                 if (curl_easy_perform(curl_handle) == 0) {
                     /* We reach here if the REST server didn't provide a
@@ -283,12 +285,15 @@ void *run_rest_conflate(void *arg) {
                     process_new_config(handle);
                     succeeding = true;
                     next = NULL; // Restart at the beginning of the urls list.
+                } else {
+                    fprintf(stderr, "WARNING: curl error: %s\n", curl_error_string);
                 }
             }
 
             sleep(1); // Don't overload the REST servers with tons of retries.
 
             free(urls);
+            free(userpass);
         }
 
         if (start_tot_process_new_configs == g_tot_process_new_configs) {
