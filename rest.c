@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+
+#ifdef WIN32
+#include <winsock2.h>
+#else
+#include <sys/socket.h>
+#endif
+
 #include <string.h>
 #include <curl/curl.h>
 
@@ -158,6 +166,17 @@ static size_t handle_response(void *data, size_t s, size_t num, void *cb) {
     return size;
 }
 
+int setup_curl_sock(void *clientp,
+                    curl_socket_t curlfd,
+                    curlsocktype purpose) {
+  (void) clientp;
+  (void) purpose;
+  int       optval = 1;
+  socklen_t optlen = sizeof(optval);
+  setsockopt(curlfd, SOL_SOCKET, SO_KEEPALIVE, (void *) &optval, optlen);
+  return 0;
+}
+
 static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
                          char *uri_suffix, conflate_handle_t *chandle,
                          size_t (response_handler)(void *, size_t, size_t, void *)) {
@@ -168,6 +187,8 @@ static void setup_handle(CURL *handle, char *user, char *pass, char *uri,
 
         CURLcode c;
 
+        c = curl_easy_setopt(handle, CURLOPT_SOCKOPTFUNCTION, setup_curl_sock);
+        assert(c == CURLE_OK);
         c = curl_easy_setopt(handle, CURLOPT_WRITEDATA, chandle);
         assert(c == CURLE_OK);
         c = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, response_handler);
