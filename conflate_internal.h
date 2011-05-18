@@ -19,6 +19,8 @@ struct _conflate_handle {
 	alarm_queue_t *alarms;
 
     pthread_t thread;
+
+    char *url; // Current URL for debuggability.
 };
 
 void conflate_init_commands(void);

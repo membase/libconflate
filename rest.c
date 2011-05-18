@@ -143,6 +143,13 @@ static void process_new_config(conflate_handle_t *conf_handle) {
 
     kvpair_t *kv = mk_kvpair(CONFIG_KEY, values);
 
+    if (conf_handle->url != NULL) {
+        char *url[2];
+        url[0] = conf_handle->url;
+        url[1] = NULL;
+        kv->next = mk_kvpair("url", url);
+    }
+
     //execute the provided call back
     void (*call_back)(void *, kvpair_t *) = conf_handle->conf->new_config;
     call_back(conf_handle->conf->userdata, kv);
@@ -272,6 +279,8 @@ void *run_rest_conflate(void *arg) {
 
             while (next != NULL) {
                 char *url = strsep(&next, "|");
+
+                handle->url = url;
 
                 setup_handle(curl_handle,
                              url, // The full URL.
