@@ -34,12 +34,14 @@ static bool config_visitor(void *opaque, const char *key, const char **values)
 /*
  * Example callback to handle a newly receive configuration.
  */
-static void display_config(void* userdata, kvpair_t* conf)
+static conflate_result display_config(void* userdata, kvpair_t* conf)
 {
     printf("Hey.  I received a new config (userdata: %s):\n",
            (char*)userdata);
 
     walk_kvpair(conf, NULL, config_visitor);
+
+    return CONFLATE_SUCCESS;
 }
 
 /*

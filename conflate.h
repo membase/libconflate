@@ -367,14 +367,25 @@ void conflate_stderr_logger(void *, enum conflate_log_level,
  */
 
 /**
+ * Conflate result codes.
+ */
+typedef enum {
+    CONFLATE_SUCCESS,
+    CONFLATE_ERROR,
+    CONFLATE_ERROR_BAD_SOURCE
+} conflate_result;
+
+/**
  * Configuration for a conflatee.
  */
 typedef struct {
 
     /** The XMPP JID (typically excludes a resource definition) */
     char *jid;
+
     /** The XMPP Password */
     char *pass;
+
     /**
      * The XMPP server address (may be NULL).
      *
@@ -428,8 +439,10 @@ typedef struct {
      *
      * The new config *may* be the same as the previous config.  It's
      * up to the client to detect and decide what to do in this case.
+     *
+     * The callback should return CONFLATE_SUCCESS on success.
      */
-    void (*new_config)(void*, kvpair_t*);
+    conflate_result (*new_config)(void*, kvpair_t*);
 
     /** \private */
     void *initialization_marker;

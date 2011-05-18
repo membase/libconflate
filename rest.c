@@ -124,7 +124,7 @@ static bool pattern_ends_with(const char *pattern, const char *target, size_t ta
 	return memcmp(&target[target_size - pattern_size], pattern, pattern_size) == 0;
 }
 
-static void process_new_config(conflate_handle_t *conf_handle) {
+static conflate_result process_new_config(conflate_handle_t *conf_handle) {
     g_tot_process_new_configs++;
 
     //construct the new config from its components
@@ -138,7 +138,7 @@ static void process_new_config(conflate_handle_t *conf_handle) {
 
     if (values[0] == NULL) {
         fprintf(stderr, "ERROR: invalid response from REST server\n");
-        return;
+        return CONFLATE_ERROR;
     }
 
     kvpair_t *kv = mk_kvpair(CONFIG_KEY, values);
@@ -151,8 +151,9 @@ static void process_new_config(conflate_handle_t *conf_handle) {
     }
 
     //execute the provided call back
-    void (*call_back)(void *, kvpair_t *) = conf_handle->conf->new_config;
-    call_back(conf_handle->conf->userdata, kv);
+    conflate_result (*call_back)(void *, kvpair_t *) = conf_handle->conf->new_config;
+
+    conflate_result r = call_back(conf_handle->conf->userdata, kv);
 
     //clean up
     free_kvpair(kv);
@@ -160,6 +161,8 @@ static void process_new_config(conflate_handle_t *conf_handle) {
 
     response_buffer_head = mk_response_buffer(RESPONSE_BUFFER_SIZE);
     cur_response_buffer = response_buffer_head;
+
+    return r;
 }
 
 static size_t handle_response(void *data, size_t s, size_t num, void *cb) {
@@ -271,7 +274,7 @@ void *run_rest_conflate(void *arg) {
             char *userpass = NULL;
             if (handle->conf->jid && strlen(handle->conf->jid)) {
                 size_t buff_size = strlen(handle->conf->jid) + strlen(handle->conf->pass) + 2;
-                userpass = (char *)malloc(buff_size);
+                userpass = (char *) malloc(buff_size);
                 assert(userpass);
                 snprintf(userpass, buff_size, "%s:%s", handle->conf->jid, handle->conf->pass);
                 userpass[buff_size - 1] = '\0';
@@ -291,11 +294,21 @@ void *run_rest_conflate(void *arg) {
                     /* We reach here if the REST server didn't provide a
                        streaming JSON response and so we need to process
                        the just-one-JSON response */
-                    process_new_config(handle);
-                    succeeding = true;
-                    next = NULL; // Restart at the beginning of the urls list.
+                    conflate_result r = process_new_config(handle);
+                    if (r == CONFLATE_SUCCESS ||
+                        r == CONFLATE_ERROR) {
+                      // Restart at the beginning of the urls list
+                      // on either a success or a 'local' error.
+                      // In contrast, if the callback returned a
+                      // value of CONFLATE_ERROR_BAD_SOURCE, then
+                      // we should try the next url on the list.
+                      //
+                      succeeding = true;
+                      next = NULL;
+                    }
                 } else {
-                    fprintf(stderr, "WARNING: curl error: %s\n", curl_error_string);
+                    fprintf(stderr, "WARNING: curl error: %s from: %s\n",
+                            curl_error_string, url);
                 }
             }
 

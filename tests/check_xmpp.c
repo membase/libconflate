@@ -6,8 +6,10 @@
 
 #include <conflate.h>
 
-static void conf_cb(__attribute__((unused))void* userdata, kvpair_t* __attribute__((unused))conf)
+static conflate_result conf_cb(__attribute__((unused))void* userdata,
+                                kvpair_t* __attribute__((unused))conf)
 {
+    return CONFLATE_SUCCESS;
 }
 
 static void log_cb(__attribute__((unused))void *userdata,
