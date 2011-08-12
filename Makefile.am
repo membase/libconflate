@@ -1,5 +1,4 @@
 ACLOCAL_AMFLAGS=-I m4
-SHELL=/bin/sh
 lib_LTLIBRARIES = libconflate.la
 pkginclude_HEADERS = conflate.h alarm.h
 
