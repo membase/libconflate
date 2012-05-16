@@ -6,6 +6,7 @@ AC_CONFIG_AUX_DIR(config)
 AM_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_DISABLE_STATIC
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 ac_cv_func_malloc_0_nonnull=yes
 ac_cv_func_realloc_0_nonnull=yes
 PANDORA_CANONICAL_TARGET(less-warnings, force-gcc42)
