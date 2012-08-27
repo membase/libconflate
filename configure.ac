@@ -1,6 +1,6 @@
 AC_PREREQ(2.59)
 m4_include([m4/version.m4])
-AC_INIT(libconflate, VERSION_NUMBER, dustin@spy.noet)
+AC_INIT(libconflate, VERSION_NUMBER, support@couchbase.com)
 AC_CONFIG_SRCDIR([conflate.h])
 AC_CONFIG_AUX_DIR(config)
 AM_CONFIG_HEADER([config.h])
