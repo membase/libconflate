@@ -3,7 +3,7 @@ m4_include([m4/version.m4])
 AC_INIT(libconflate, VERSION_NUMBER, support@couchbase.com)
 AC_CONFIG_SRCDIR([conflate.h])
 AC_CONFIG_AUX_DIR(config)
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_DISABLE_STATIC
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
