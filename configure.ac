@@ -15,12 +15,6 @@ PANDORA_REQUIRE_LIBCURL
 
 AC_HEADER_STDBOOL
 
-AC_ARG_WITH([rest],
-  [AS_HELP_STRING([--without-rest],
-    [Use XMPP instead of REST (yes|no) @<:@default=no@:>@])],
-  [with_rest=$withval],
-  [with_rest=yes])
-
 AC_CHECK_FUNCS_ONCE(strsep)
 
 AH_BOTTOM([
@@ -37,5 +31,5 @@ AH_BOTTOM([
 #endif
 ])
 
-AC_CONFIG_FILES(Makefile tests/Makefile libconflate.pc)
+AC_CONFIG_FILES(Makefile libconflate.pc)
 AC_OUTPUT
