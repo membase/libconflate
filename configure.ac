@@ -30,7 +30,6 @@ AC_ARG_WITH([rest],
   [with_rest=$withval],
   [with_rest=yes])
 
-AC_CHECK_HEADERS_ONCE([syslog.h])
 AC_CHECK_FUNCS_ONCE(strsep)
 
 AH_BOTTOM([
