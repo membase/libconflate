@@ -68,10 +68,11 @@ static struct response_buffer *write_data_to_buffer(struct response_buffer *buff
             buffer->next = new_buffer;
             buffer = new_buffer;
         } else {
+            char *d;
             if (bytes_to_write > space) {
                 bytes_to_write = space;
             }
-            char *d = buffer->data;
+            d = buffer->data;
             d = &d[buffer->bytes_used];
             memcpy(d,&data[bytes_written], bytes_to_write);
             bytes_written += bytes_to_write;
@@ -82,26 +83,28 @@ static struct response_buffer *write_data_to_buffer(struct response_buffer *buff
 }
 
 static char *assemble_complete_response(struct response_buffer *response_head) {
+    struct response_buffer *cur_buffer = response_head;
+    size_t response_size = 0;
+    char *response = NULL;
+    char *ptr;
+
     if (response_head == NULL) {
         return NULL;
     }
 
-    //figure out how big the message is
-    struct response_buffer *cur_buffer = response_head;
-    size_t response_size = 0;
-    char *response = NULL;
+    /* figure out how big the message is */
     while (cur_buffer) {
         response_size += cur_buffer->bytes_used;
         cur_buffer = cur_buffer->next;
     }
 
-    //create buffer
+    /* create buffer */
     response = malloc(response_size + 1);
     assert(response);
 
-    //populate buffer
+    /* populate buffer */
     cur_buffer = response_head;
-    char *ptr = response;
+    ptr = response;
     while (cur_buffer) {
         memcpy(ptr, cur_buffer->data, cur_buffer->bytes_used);
         ptr += cur_buffer->bytes_used;
@@ -114,21 +117,26 @@ static char *assemble_complete_response(struct response_buffer *response_head) {
 }
 
 static bool pattern_ends_with(const char *pattern, const char *target, size_t target_size) {
-	assert(target);
-	assert(pattern);
+    size_t pattern_size;
+    assert(target);
+    assert(pattern);
 
-	size_t pattern_size = strlen(pattern);
-	if (target_size < pattern_size) {
-		return false;
-	}
-	return memcmp(&target[target_size - pattern_size], pattern, pattern_size) == 0;
+    pattern_size = strlen(pattern);
+    if (target_size < pattern_size) {
+        return false;
+    }
+    return memcmp(&target[target_size - pattern_size], pattern, pattern_size) == 0;
 }
 
 static conflate_result process_new_config(conflate_handle_t *conf_handle) {
+    char *values[2];
+    kvpair_t *kv;
+    conflate_result (*call_back)(void *, kvpair_t *);
+    conflate_result r;
+
     g_tot_process_new_configs++;
 
-    //construct the new config from its components
-    char *values[2];
+    /* construct the new config from its components */
     values[0] = assemble_complete_response(response_buffer_head);
     values[1] = NULL;
 
@@ -141,7 +149,7 @@ static conflate_result process_new_config(conflate_handle_t *conf_handle) {
         return CONFLATE_ERROR;
     }
 
-    kvpair_t *kv = mk_kvpair(CONFIG_KEY, values);
+    kv = mk_kvpair(CONFIG_KEY, values);
 
     if (conf_handle->url != NULL) {
         char *url[2];
@@ -150,12 +158,11 @@ static conflate_result process_new_config(conflate_handle_t *conf_handle) {
         kv->next = mk_kvpair("url", url);
     }
 
-    //execute the provided call back
-    conflate_result (*call_back)(void *, kvpair_t *) = conf_handle->conf->new_config;
+    /* execute the provided call back */
+    call_back = conf_handle->conf->new_config;
+    r = call_back(conf_handle->conf->userdata, kv);
 
-    conflate_result r = call_back(conf_handle->conf->userdata, kv);
-
-    //clean up
+    /* clean up */
     free_kvpair(kv);
     free(values[0]);
 
@@ -176,14 +183,14 @@ static size_t handle_response(void *data, size_t s, size_t num, void *cb) {
     return size;
 }
 
-int setup_curl_sock(void *clientp,
-                    curl_socket_t curlfd,
-                    curlsocktype purpose) {
-  (void) clientp;
-  (void) purpose;
+static int setup_curl_sock(void *clientp,
+                           curl_socket_t curlfd,
+                           curlsocktype purpose) {
   int       optval = 1;
   socklen_t optlen = sizeof(optval);
   setsockopt(curlfd, SOL_SOCKET, SO_KEEPALIVE, (void *) &optval, optlen);
+  (void) clientp;
+  (void) purpose;
   return 0;
 }
 
@@ -235,43 +242,43 @@ static char *strsep(char **stringp, char *pattern) {
 void *run_rest_conflate(void *arg) {
     conflate_handle_t *handle = (conflate_handle_t *) arg;
     char curl_error_string[CURL_ERROR_SIZE];
+    kvpair_t *conf;
+    CURLcode c;
+    CURL *curl_handle;
+    bool always_retry = true;
+
+
 
     /* prep the buffers used to hold the config */
     response_buffer_head = mk_response_buffer(RESPONSE_BUFFER_SIZE);
     cur_response_buffer = response_buffer_head;
 
     /* Before connecting and all that, load the stored config */
-    kvpair_t *conf = load_kvpairs(handle, handle->conf->save_path);
+    conf = load_kvpairs(handle, handle->conf->save_path);
     if (conf) {
         handle->conf->new_config(handle->conf->userdata, conf);
         free_kvpair(conf);
     }
 
     /* init curl */
-    CURLcode c;
-
     c = curl_global_init(curl_init_flags);
     assert(c == CURLE_OK);
 
-    CURL *curl_handle = curl_easy_init();
+    curl_handle = curl_easy_init();
     assert(curl_handle);
 
     curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, &curl_error_string);
 
-    bool always_retry = true;
-
     while (true) {
         int start_tot_process_new_configs = g_tot_process_new_configs;
-
         bool succeeding = true;
 
         while (succeeding) {
+            char *urls = strdup(handle->conf->host);  /* Might be a '|' delimited list of url's. */
+            char *next = urls;
+            char *userpass = NULL;
             succeeding = false;
 
-            char *urls = strdup(handle->conf->host); // Might be a '|' delimited list of url's.
-            char *next = urls;
-
-            char *userpass = NULL;
             if (handle->conf->jid && strlen(handle->conf->jid)) {
                 size_t buff_size = strlen(handle->conf->jid) + strlen(handle->conf->pass) + 2;
                 userpass = (char *) malloc(buff_size);
@@ -286,8 +293,8 @@ void *run_rest_conflate(void *arg) {
                 handle->url = url;
 
                 setup_handle(curl_handle,
-                             url, // The full URL.
-                             userpass, // The auth user and password.
+                             url,  /* The full URL. */
+                             userpass, /* The auth user and password. */
                              handle, handle_response);
 
                 if (curl_easy_perform(curl_handle) == 0) {
@@ -297,12 +304,11 @@ void *run_rest_conflate(void *arg) {
                     conflate_result r = process_new_config(handle);
                     if (r == CONFLATE_SUCCESS ||
                         r == CONFLATE_ERROR) {
-                      // Restart at the beginning of the urls list
-                      // on either a success or a 'local' error.
-                      // In contrast, if the callback returned a
-                      // value of CONFLATE_ERROR_BAD_SOURCE, then
-                      // we should try the next url on the list.
-                      //
+                      /* Restart at the beginning of the urls list */
+                      /* on either a success or a 'local' error. */
+                      /* In contrast, if the callback returned a */
+                      /* value of CONFLATE_ERROR_BAD_SOURCE, then */
+                      /* we should try the next url on the list. */
                       succeeding = true;
                       next = NULL;
                     }
@@ -312,7 +318,7 @@ void *run_rest_conflate(void *arg) {
                 }
             }
 
-            sleep(1); // Don't overload the REST servers with tons of retries.
+            sleep(1);  /* Don't overload the REST servers with tons of retries. */
 
             free(urls);
             free(userpass);
@@ -322,9 +328,9 @@ void *run_rest_conflate(void *arg) {
             fprintf(stderr, "ERROR: could not contact REST server(s): %s\n", handle->conf->host);
 
             if (always_retry == false) {
-              // If we went through all our URL's and didn't see any new
-              // configs, then stop trying.
-              //
+              /* If we went through all our URL's and didn't see any new */
+              /* configs, then stop trying. */
+
               break;
             }
         }

@@ -20,10 +20,9 @@ struct _conflate_handle {
 
     pthread_t thread;
 
-    char *url; // Current URL for debuggability.
+    char *url; /* Current URL for debuggability. */
 };
 
 void conflate_init_commands(void);
 
 #endif /* CONFLATE_INTERNAL_H */
-

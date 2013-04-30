@@ -8,10 +8,10 @@
 /* read alarm from queue, if there is none simply return an empty alert with ->open = 0 */
 alarm_t get_alarm(alarm_queue_t *queue)
 {
+    alarm_t alarm;
     assert(queue);
 
     pthread_mutex_lock(&(queue->mutex));
-    alarm_t alarm;
     if(queue->size == 0) {
         alarm.open = false;
         alarm.msg[0] = 0x00;
@@ -28,10 +28,10 @@ alarm_t get_alarm(alarm_queue_t *queue)
 /* add an alarm to the queue */
 bool add_alarm(alarm_queue_t *queue, const char *name, const char *msg)
 {
+    bool rv = false;
     assert(queue);
     assert(name);
     assert(msg);
-    bool rv = false;
 
     pthread_mutex_lock(&(queue->mutex));
     if (queue->size < ALARM_QUEUE_SIZE) {

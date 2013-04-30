@@ -259,7 +259,7 @@ void conflate_init_form(conflate_form_result *r);
 enum conflate_mgmt_cb_result {
     RV_OK,     /**< Invocation worked as expected */
     RV_ERROR,  /**< Invocation failed. */
-    RV_BADARG, /**< Bad/incomplete arguments */
+    RV_BADARG  /**< Bad/incomplete arguments */
 };
 
 /**

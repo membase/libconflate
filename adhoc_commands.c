@@ -57,16 +57,17 @@ static enum conflate_mgmt_cb_result process_set_private(void *opaque,
                                                         kvpair_t *form,
                                                         conflate_form_result *r)
 {
-   (void)opaque;
-   (void)cmd;
-   (void)r;
-
-    /* Only direct stat requests are handled. */
-    assert(direct);
     enum conflate_mgmt_cb_result rv = RV_ERROR;
 
     char *key = get_simple_kvpair_val(form, "key");
     char *value = get_simple_kvpair_val(form, "value");
+
+    (void)opaque;
+    (void)cmd;
+    (void)r;
+
+    /* Only direct stat requests are handled. */
+    assert(direct);
 
     if (key && value) {
         if (conflate_save_private(handle, key, value,
@@ -87,20 +88,19 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
                                                         kvpair_t *form,
                                                         conflate_form_result *r)
 {
-   (void)opaque;
-   (void)cmd;
+    enum conflate_mgmt_cb_result rv = RV_ERROR;
+    char *key = get_simple_kvpair_val(form, "key");
+    (void)opaque;
+    (void)cmd;
 
     /* Only direct stat requests are handled. */
     assert(direct);
-    enum conflate_mgmt_cb_result rv = RV_ERROR;
-
-    char *key = get_simple_kvpair_val(form, "key");
 
     if (key) {
         /* Initialize the form so there's always one there */
+        char *value;
         conflate_init_form(r);
-        char *value = conflate_get_private(handle, key,
-                                           handle->conf->save_path);
+        value = conflate_get_private(handle, key, handle->conf->save_path);
         if (value) {
             conflate_add_field(r, key, value);
             free(value);
@@ -121,19 +121,17 @@ static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
                                                            kvpair_t *form,
                                                            conflate_form_result *r)
 {
-   (void)opaque;
-   (void)cmd;
-   (void)r;
+    enum conflate_mgmt_cb_result rv = RV_ERROR;
+    char *key = get_simple_kvpair_val(form, "key");
+    (void)opaque;
+    (void)cmd;
+    (void)r;
 
     /* Only direct stat requests are handled. */
     assert(direct);
-    enum conflate_mgmt_cb_result rv = RV_ERROR;
-
-    char *key = get_simple_kvpair_val(form, "key");
 
     if (key) {
-        if (conflate_delete_private(handle, key,
-                                    handle->conf->save_path)) {
+        if (conflate_delete_private(handle, key, handle->conf->save_path)) {
             rv = RV_OK;
         }
     } else {
