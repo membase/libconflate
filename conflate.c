@@ -1,4 +1,3 @@
-#include <alarm.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,8 +62,6 @@ bool start_conflate(conflate_config_t conf) {
         run_func = &run_conflate;
         conflate_init_commands();
     }
-
-    handle->alarms = init_alarmqueue();
 
     handle->conf = dup_conf(conf);
 

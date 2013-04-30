@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "conflate.h"
 #include "conflate_internal.h"
