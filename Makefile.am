@@ -35,7 +35,7 @@ libconflate_la_SOURCES = adhoc_commands.c \
                          util.c \
                          xmpp.c
 
-libconflate_la_LIBADD = $(LIBCONFLATE_LINKFLAGS) $(LTLIBCURL)
+libconflate_la_LIBADD = $(LTLIBCURL)
 
 MOSTLYCLEANFILES = *.gcov *.gcno *.gcda *.tcov
 

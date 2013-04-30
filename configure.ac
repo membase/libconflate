@@ -12,7 +12,6 @@ ac_cv_func_realloc_0_nonnull=yes
 PANDORA_CANONICAL_TARGET(less-warnings, force-gcc42)
 PANDORA_REQUIRE_PTHREAD
 PANDORA_REQUIRE_LIBCURL
-PANDORA_HAVE_LIBSTROPHE
 
 AC_HEADER_STDBOOL
 
@@ -30,16 +29,6 @@ AC_ARG_WITH([rest],
     [Use XMPP instead of REST (yes|no) @<:@default=no@:>@])],
   [with_rest=$withval],
   [with_rest=yes])
-
-AS_IF([test "x$with_rest" = "xyes"],
-      [AM_CFLAGS="$AM_CFLAGS -DCONFLATE_USE_REST"],
-      [AS_IF([test "x${ac_cv_libstrophe}" != "xyes"],
-              AC_MSG_ERROR([libstrophe is required for ${PACKAGE}]))
-       AM_CFLAGS="$AM_CFLAGS -DCONFLATE_USE_XMPP"
-       LIBCONFLATE_LINKFLAGS="$LIBCONFLATE_LINKFLAGS $LTLIBSTROPHE"
-      ])
-
-AC_SUBST(LIBCONFLATE_LINKFLAGS)
 
 AC_CHECK_HEADERS_ONCE([syslog.h])
 AC_CHECK_FUNCS_ONCE(strsep)
