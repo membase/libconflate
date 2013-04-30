@@ -2,11 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <check.h>
+/* #include <check.h> */
 
 #include <conflate.h>
 
 #include "test_common.h"
+
+void fail_if_impl(bool val, const char *msg, const char *file, int line) {
+    if (val) {
+        fprintf(stderr, "%s at %s:%d\n", msg, file, line);
+        exit(1);
+    }
+}
 
 void check_pair_equality(kvpair_t *one, kvpair_t *two)
 {

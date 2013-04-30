@@ -15,15 +15,6 @@ PANDORA_REQUIRE_LIBCURL
 
 AC_HEADER_STDBOOL
 
-AC_ARG_WITH([check],
-        [AS_HELP_STRING([--with-check=yes], [look for check tool for unit tests])])
-
-if test "x$with_check" = "xno"; then
-  AC_MSG_NOTICE([skipping check unit-test dependency])
-else
-  PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
-fi
-
 AC_ARG_WITH([rest],
   [AS_HELP_STRING([--without-rest],
     [Use XMPP instead of REST (yes|no) @<:@default=no@:>@])],
