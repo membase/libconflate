@@ -5,7 +5,6 @@
 
 #include "conflate.h"
 #include "conflate_internal.h"
-#include "conflate_convenience.h"
 
 kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
 {

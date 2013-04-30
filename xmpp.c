@@ -6,7 +6,6 @@
 
 #include "conflate.h"
 #include "conflate_internal.h"
-#include "conflate_convenience.h"
 
 /** \private */
 struct command_def {
