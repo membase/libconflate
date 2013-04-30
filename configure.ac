@@ -12,7 +12,6 @@ ac_cv_func_realloc_0_nonnull=yes
 PANDORA_CANONICAL_TARGET(less-warnings, force-gcc42)
 PANDORA_REQUIRE_PTHREAD
 PANDORA_REQUIRE_LIBCURL
-PANDORA_HAVE_LIBSQLITE3
 PANDORA_HAVE_LIBSTROPHE
 
 AC_HEADER_STDBOOL
@@ -31,19 +30,6 @@ AC_ARG_WITH([rest],
     [Use XMPP instead of REST (yes|no) @<:@default=no@:>@])],
   [with_rest=$withval],
   [with_rest=yes])
-
-AC_ARG_WITH([sqlite],
-  [AS_HELP_STRING([--with-sqlite], [Use sqlite to store configs locally @<:@default=no@:>@])],
-  [with_sqlite=$withval],
-  [with_sqlite=no])
-
-AS_IF([test "x$with_sqlite" = "xyes" ],
-      [ AS_IF([test "x${ac_cv_libsqlite3}" != "xyes"],
-               AC_MSG_ERROR([libsqlite3 is required for ${PACKAGE}]))
-       AM_CFLAGS="$AM_CFLAGS -DCONFLATE_USE_SQLITE"
-       LIBCONFLATE_LINKFLAGS="$LTLIBSQLITE3"
-      ],
-      [AM_CFLAGS="$AM_CFLAGS -DCONFLATE_NO_SQLITE"])
 
 AS_IF([test "x$with_rest" = "xyes"],
       [AM_CFLAGS="$AM_CFLAGS -DCONFLATE_USE_REST"],
