@@ -46,7 +46,7 @@ void init_conflate(conflate_config_t *conf)
 }
 
 bool start_conflate(conflate_config_t conf) {
-
+    conflate_handle_t *handle;
     void *(*run_func)(void*) = NULL;
 
     /* Don't start if we don't believe initialization has occurred. */
@@ -55,7 +55,7 @@ bool start_conflate(conflate_config_t conf) {
         return false;
     }
 
-    conflate_handle_t *handle = calloc(1, sizeof(conflate_handle_t));
+    handle = calloc(1, sizeof(conflate_handle_t));
     assert(handle);
 
     if (strncmp(HTTP_PREFIX, conf.host, strlen(HTTP_PREFIX))) {

@@ -81,10 +81,11 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
 
 char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
 {
-    assert(key);
     char *rv = NULL;
+    kvpair_t *found;
+    assert(key);
+    found = find_kvpair(pair, key);
 
-    kvpair_t *found = find_kvpair(pair, key);
     if (found) {
         rv = found->values[0];
     }
@@ -94,8 +95,9 @@ char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
 
 kvpair_t *dup_kvpair(kvpair_t *pair)
 {
+    kvpair_t *copy;
     assert(pair);
-    kvpair_t *copy = mk_kvpair(pair->key, pair->values);
+    copy = mk_kvpair(pair->key, pair->values);
     if (pair->next) {
         copy->next = dup_kvpair(pair->next);
     }

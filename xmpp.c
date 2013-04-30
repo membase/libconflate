@@ -50,7 +50,7 @@ void* run_conflate(void *arg) {
     return NULL;
 }
 
-// ------------------------------------------------------------------------
+/* ------------------------------------------------------------------------ */
 
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
                                conflate_mgmt_cb_t cb)

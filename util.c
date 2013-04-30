@@ -6,7 +6,6 @@
 #include "conflate.h"
 
 char* safe_strdup(const char* in) {
-    assert(in);
     int len = strlen(in);
     char *rv = calloc(len + 1, sizeof(char));
     assert(rv);

@@ -23,12 +23,12 @@ static char* lvl_name(enum conflate_log_level lvl)
 void conflate_stderr_logger(void *userdata, enum conflate_log_level lvl,
                             const char *msg, ...)
 {
-    (void)userdata;
-    char fmt[strlen(msg) + 16];
-    snprintf(fmt, sizeof(fmt), "%s: %s\n", lvl_name(lvl), msg);
-
+    char fmt[512];
     va_list ap;
+
+    snprintf(fmt, sizeof(fmt), "%s: %s\n", lvl_name(lvl), msg);
     va_start(ap, msg);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
+    (void)userdata;
 }
