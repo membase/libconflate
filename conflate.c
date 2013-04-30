@@ -1,4 +1,3 @@
-#include "config.h"
 #include <alarm.h>
 #include <assert.h>
 #include <stdio.h>

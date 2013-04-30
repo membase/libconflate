@@ -1,4 +1,3 @@
-#include "config.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -222,7 +221,7 @@ static void setup_handle(CURL *handle, char *url, char *userpass,
     }
 }
 
-#ifndef HAVE_STRSEP
+#ifdef WIN32
 /*
  * NOTE!!! we are only using "|" as the pattern, so this code will _NOT_
  * work if you change that to include more than a single character!
