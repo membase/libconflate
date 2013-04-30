@@ -6,7 +6,6 @@
 
 #include "conflate.h"
 #include "conflate_internal.h"
-#include "conflate_convenience.h"
 
 bool commands_initialized = false;
 
@@ -28,19 +27,21 @@ static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
                                           handle->conf->save_path);
 
         if (priv && strcmp(priv, "yes") == 0) {
-            CONFLATE_LOG(handle, LOG_LVL_INFO,
-                         "Currently using a private config, ignoring update.");
+            handle->conf->log(handle->conf->userdata, LOG_LVL_INFO,
+                              "Currently using a private config, ignoring update.");
             return RV_OK;
         }
         free(priv);
     }
 
-    CONFLATE_LOG(handle, LOG_LVL_INFO, "Processing a serverlist");
+    handle->conf->log(handle->conf->userdata, LOG_LVL_INFO,
+                      "Processing a serverlist");
 
     /* Persist the config lists */
     if (!save_kvpairs(handle, conf, handle->conf->save_path)) {
-        CONFLATE_LOG(handle, LOG_LVL_ERROR, "Can not save config to %s",
-                     handle->conf->save_path);
+        handle->conf->log(handle->conf->userdata, LOG_LVL_ERROR,
+                          "Can not save config to %s",
+                          handle->conf->save_path);
     }
 
     /* Send the config to the callback */

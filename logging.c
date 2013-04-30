@@ -4,7 +4,6 @@
 
 #include "conflate.h"
 #include "conflate_internal.h"
-#include "conflate_convenience.h"
 
 static char* lvl_name(enum conflate_log_level lvl)
 {
