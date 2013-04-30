@@ -5,8 +5,8 @@
 
 #include <pthread.h>
 
-#include <check.h>
 #include <alarm.h>
+#include "test_common.h"
 
 static alarm_queue_t *alarmqueue = NULL;
 
@@ -20,7 +20,7 @@ static void handle_teardown(void) {
     alarmqueue = NULL;
 }
 
-START_TEST(test_simple_alarm)
+static void test_simple_alarm(void)
 {
     alarm_t in_alarm;
 
@@ -50,9 +50,8 @@ START_TEST(test_simple_alarm)
     in_alarm = get_alarm(alarmqueue);
     fail_unless(in_alarm.open == 0, "Shouldn't have recieved open alarm.");
 }
-END_TEST
 
-START_TEST(test_giant_alarm)
+static void test_giant_alarm(void)
 {
     char *msg="This is a really large message that exceeds the 256 or "
         "so bytes allocated for messages to see what happens when a "
@@ -76,9 +75,8 @@ START_TEST(test_giant_alarm)
     fail_unless(strncmp(msg, in_alarm.msg, ALARM_MSG_MAXLEN) == 0,
                 "Alarm message didn't match.");
 }
-END_TEST
 
-START_TEST(test_giant_name)
+static void test_giant_name(void)
 {
     const char *name = "this name should exceed the max length";
     fail_unless(strlen(name) > ALARM_NAME_MAXLEN,
@@ -97,9 +95,8 @@ START_TEST(test_giant_name)
     fail_unless(strcmp("some message", in_alarm.msg) == 0,
                 "Alarm message didn't match.");
 }
-END_TEST
 
-START_TEST(test_full_queue)
+static void test_full_queue(void)
 {
     for (int i = 0; i < ALARM_QUEUE_SIZE; i++) {
         fail_unless(add_alarm(alarmqueue, "add", "Test alarm message."),
@@ -108,31 +105,25 @@ START_TEST(test_full_queue)
     fail_if(add_alarm(alarmqueue, "fail", "Test failing alarm."),
             "Should have failed to add another alarm.");
 }
-END_TEST
-
-static Suite* alarm_suite(void)
-{
-    Suite *s = suite_create("alarm");
-    TCase *tc = tcase_create("Core");
-
-    tcase_add_checked_fixture(tc, handle_setup, handle_teardown);
-
-    tcase_add_test(tc, test_simple_alarm);
-    tcase_add_test(tc, test_giant_alarm);
-    tcase_add_test(tc, test_giant_name);
-    tcase_add_test(tc, test_full_queue);
-
-    suite_add_tcase(s, tc);
-    return s;
-}
 
 int main(void)
 {
-    int number_failed;
-    Suite *s = alarm_suite();
-    SRunner *sr = srunner_create(s);
-    srunner_run_all(sr, CK_NORMAL);
-    number_failed = srunner_ntests_failed(sr);
-    srunner_free(sr);
-    return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+    typedef void (*testcase)(void);
+    testcase tc[] = {
+        test_simple_alarm,
+        test_giant_alarm,
+        test_giant_name,
+        test_full_queue,
+        NULL
+    };
+
+    int ii = 0;
+
+    while (tc[ii] != 0) {
+        handle_setup();
+        tc[ii++]();
+        handle_teardown();
+    }
+
+    return EXIT_SUCCESS;
 }

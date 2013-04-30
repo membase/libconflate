@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <check.h>
-
 #include <conflate.h>
 
 #include "test_common.h"
@@ -18,7 +16,7 @@ static void teardown(void) {
     free_kvpair(pair);
 }
 
-START_TEST (test_mk_pair_with_arg)
+static void test_mk_pair_with_arg(void)
 {
     char* args[] = {"arg1", "arg2", NULL};
     pair = mk_kvpair("some_key", args);
@@ -32,9 +30,8 @@ START_TEST (test_mk_pair_with_arg)
                 "Allocated values can't be smaller than used values.");
     fail_unless(pair->next == NULL, "Next pointer is non-null.");
 }
-END_TEST
 
-START_TEST (test_mk_pair_without_arg)
+static void test_mk_pair_without_arg(void)
 {
     pair = mk_kvpair("some_key", NULL);
 
@@ -46,9 +43,8 @@ START_TEST (test_mk_pair_without_arg)
     fail_unless(pair->values[0] == NULL, "First value isn't null.");
     fail_unless(pair->next == NULL, "Next pointer is non-null.");
 }
-END_TEST
 
-START_TEST (test_add_value_to_empty_values)
+static void test_add_value_to_empty_values(void)
 {
     pair = mk_kvpair("some_key", NULL);
 
@@ -68,9 +64,8 @@ START_TEST (test_add_value_to_empty_values)
     fail_unless(pair->used_values == 2, "Value at 2");
     fail_unless(strcmp(pair->values[1], "newvalue2") == 0, "Unexpected value at 1");
 }
-END_TEST
 
-START_TEST (test_add_value_to_existing_values)
+static void test_add_value_to_existing_values(void)
 {
     char* args[] = {"arg1", "arg2", NULL};
     pair = mk_kvpair("some_key", args);
@@ -92,22 +87,19 @@ START_TEST (test_add_value_to_existing_values)
     fail_unless(strcmp(pair->values[2], "newvalue1") == 0, "Unexpected value at 2");
     fail_unless(strcmp(pair->values[3], "newvalue2") == 0, "Unexpected value at 3");
 }
-END_TEST
 
-START_TEST (test_find_from_null)
+static void test_find_from_null(void)
 {
     fail_unless(find_kvpair(NULL, "some_key") == NULL, "Couldn't find from NULL.");
 }
-END_TEST
 
-START_TEST (test_find_first_item)
+static void test_find_first_item(void)
 {
     pair = mk_kvpair("some_key", NULL);
     fail_unless(find_kvpair(pair, "some_key") == pair, "Identity search failed.");
 }
-END_TEST
 
-START_TEST (test_find_second_item)
+static void test_find_second_item(void)
 {
     kvpair_t *pair1 = mk_kvpair("some_key", NULL);
     pair = mk_kvpair("some_other_key", NULL);
@@ -115,9 +107,8 @@ START_TEST (test_find_second_item)
 
     fail_unless(find_kvpair(pair, "some_key") == pair1, "Depth search failed.");
 }
-END_TEST
 
-START_TEST (test_find_missing_item)
+static void test_find_missing_item(void)
 {
     kvpair_t *pair1 = mk_kvpair("some_key", NULL);
     pair = mk_kvpair("some_other_key", NULL);
@@ -125,25 +116,22 @@ START_TEST (test_find_missing_item)
 
     fail_unless(find_kvpair(pair, "missing_key") == NULL, "Negative search failed.");
 }
-END_TEST
 
-START_TEST (test_simple_find_from_null)
+static void test_simple_find_from_null(void)
 {
     fail_unless(get_simple_kvpair_val(NULL, "some_key") == NULL,
                 "Couldn't find from NULL.");
 }
-END_TEST
 
-START_TEST (test_simple_find_first_item)
+static void test_simple_find_first_item(void)
 {
     char *val[2] = { "someval", NULL };
     pair = mk_kvpair("some_key", val);
     fail_unless(strcmp(get_simple_kvpair_val(pair, "some_key"),
                        "someval") == 0, "Identity search failed.");
 }
-END_TEST
 
-START_TEST (test_simple_find_second_item)
+static void test_simple_find_second_item(void)
 {
     char *val[2] = { "someval", NULL };
     kvpair_t *pair1 = mk_kvpair("some_key", val );
@@ -153,9 +141,8 @@ START_TEST (test_simple_find_second_item)
     fail_unless(strcmp(get_simple_kvpair_val(pair, "some_key"),
                        "someval") == 0, "Depth search failed.");
 }
-END_TEST
 
-START_TEST (test_simple_find_missing_item)
+static void test_simple_find_missing_item(void)
 {
     kvpair_t *pair1 = mk_kvpair("some_key", NULL);
     pair = mk_kvpair("some_other_key", NULL);
@@ -164,9 +151,8 @@ START_TEST (test_simple_find_missing_item)
     fail_unless(get_simple_kvpair_val(pair, "missing_key") == NULL,
                 "Negative search failed.");
 }
-END_TEST
 
-START_TEST (test_copy_pair)
+static void test_copy_pair(void)
 {
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
@@ -184,7 +170,6 @@ START_TEST (test_copy_pair)
 
     free_kvpair(copy);
 }
-END_TEST
 
 static bool walk_incr_count_true(void *opaque,
                                  __attribute__((unused))const char *key,
@@ -202,7 +187,7 @@ static bool walk_incr_count_false(void *opaque,
     return false;
 }
 
-START_TEST (test_walk_true)
+static void test_walk_true(void)
 {
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
@@ -215,9 +200,8 @@ START_TEST (test_walk_true)
 
     fail_unless(count == 2, "Count was not two");
 }
-END_TEST
 
-START_TEST (test_walk_false)
+static void test_walk_false(void)
 {
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
@@ -231,45 +215,35 @@ START_TEST (test_walk_false)
     printf("Count was %d\n", count);
     fail_unless(count == 1, "Count was not one");
 }
-END_TEST
 
-static Suite* kvpair_suite (void)
+int main(void)
 {
-    Suite *s = suite_create ("kvpair");
+    typedef void (*testcase)(void);
+    testcase tc[] = {
+        test_mk_pair_with_arg,
+        test_mk_pair_without_arg,
+        test_add_value_to_existing_values,
+        test_add_value_to_empty_values,
+        test_find_from_null,
+        test_find_first_item,
+        test_find_second_item,
+        test_find_missing_item,
+        test_simple_find_from_null,
+        test_simple_find_first_item,
+        test_simple_find_second_item,
+        test_simple_find_missing_item,
+        test_copy_pair,
+        test_walk_true,
+        test_walk_false,
+        NULL
+    };
+    int ii = 0;
 
-    /* Core test case */
-    TCase *tc_core = tcase_create ("Core");
+    while (tc[ii] != 0) {
+        setup();
+        tc[ii++]();
+        teardown();
+    }
 
-    tcase_add_checked_fixture(tc_core, setup, teardown);
-
-    tcase_add_test(tc_core, test_mk_pair_with_arg);
-    tcase_add_test(tc_core, test_mk_pair_without_arg);
-    tcase_add_test(tc_core, test_add_value_to_existing_values);
-    tcase_add_test(tc_core, test_add_value_to_empty_values);
-    tcase_add_test(tc_core, test_find_from_null);
-    tcase_add_test(tc_core, test_find_first_item);
-    tcase_add_test(tc_core, test_find_second_item);
-    tcase_add_test(tc_core, test_find_missing_item);
-    tcase_add_test(tc_core, test_simple_find_from_null);
-    tcase_add_test(tc_core, test_simple_find_first_item);
-    tcase_add_test(tc_core, test_simple_find_second_item);
-    tcase_add_test(tc_core, test_simple_find_missing_item);
-    tcase_add_test(tc_core, test_copy_pair);
-    tcase_add_test(tc_core, test_walk_true);
-    tcase_add_test(tc_core, test_walk_false);
-    suite_add_tcase (s, tc_core);
-
-    return s;
-}
-
-int
-main (void)
-{
-    int number_failed;
-    Suite *s = kvpair_suite ();
-    SRunner *sr = srunner_create (s);
-    srunner_run_all (sr, CK_NORMAL);
-    number_failed = srunner_ntests_failed (sr);
-    srunner_free (sr);
-    return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }

@@ -37,11 +37,8 @@ libconflate_la_SOURCES = adhoc_commands.c \
 
 libconflate_la_LIBADD = $(LTLIBCURL)
 
-MOSTLYCLEANFILES = *.gcov *.gcno *.gcda *.tcov
-
 .PHONY: docs
 docs:
 	(cat Doxyfile ; echo "PROJECT_NUMBER=`git describe`") | doxygen -
 
 test: check
-	@for f in *.gcda; do gcov $$f; done | egrep -v ':creating'
