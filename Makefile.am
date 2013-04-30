@@ -2,23 +2,10 @@ ACLOCAL_AMFLAGS=-I m4
 lib_LTLIBRARIES = libconflate.la
 pkginclude_HEADERS = conflate.h alarm.h
 
-EXTRA_DIST=LICENSE.txt README.markdown Doxyfile libconflate.pc.in
+EXTRA_DIST=LICENSE.txt README.markdown libconflate.pc.in
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libconflate.pc
-
-BUILT_SOURCES=
-
-SUBDIRS= . tests
-DIST_SUBDIRS = . tests
-
-# This breaks on windows o/s.
-#
-# noinst_PROGRAMS = examples/bot
-#
-# examples_bot_DEPENDENCIES = libconflate.la
-# examples_bot_SOURCES = examples/bot.c
-# examples_bot_LDADD = libconflate.la $(GCOV_LIBS)
 
 libconflate_la_SOURCES = adhoc_commands.c \
                          alarm.c \
@@ -37,8 +24,17 @@ libconflate_la_SOURCES = adhoc_commands.c \
 
 libconflate_la_LIBADD = $(LTLIBCURL)
 
-.PHONY: docs
-docs:
-	(cat Doxyfile ; echo "PROJECT_NUMBER=`git describe`") | doxygen -
-
 test: check
+
+TESTS = tests/check_kvpair tests/check_alarm
+check_PROGRAMS = $(TESTS)
+
+tests_check_kvpair_SOURCES = tests/check_kvpair.c tests/test_common.c \
+                             $(top_builddir)/conflate.h tests/test_common.h
+tests_check_kvpair_DEPENDENCIES = libconflate.la
+tests_check_kvpair_LDADD = libconflate.la
+
+tests_check_alarm_SOURCES = tests/check_alarm.c tests/test_common.c \
+                            $(top_builddir)/alarm.h tests/test_common.h
+tests_check_alarm_DEPENDENCIES = libconflate.la
+tests_check_alarm_LDADD = libconflate.la
