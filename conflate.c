@@ -67,10 +67,6 @@ bool start_conflate(conflate_config_t conf) {
     } else {
         run_func = &run_conflate;
         conflate_init_commands();
-
-#ifdef CONFLATE_USE_XMPP
-        xmpp_initialize();
-#endif
     }
 
     handle->alarms = init_alarmqueue();
