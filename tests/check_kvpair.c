@@ -157,10 +157,11 @@ static void test_copy_pair(void)
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
     kvpair_t *pair1 = mk_kvpair("some_key", args1);
+    kvpair_t *copy;
     pair = mk_kvpair("some_other_key", args2);
     pair->next = pair1;
 
-    kvpair_t *copy = dup_kvpair(pair);
+    copy = dup_kvpair(pair);
     fail_if(copy == NULL, "Copy failed.");
     fail_if(copy == pair, "Copy something not an identity.");
 
@@ -172,18 +173,22 @@ static void test_copy_pair(void)
 }
 
 static bool walk_incr_count_true(void *opaque,
-                                 __attribute__((unused))const char *key,
-                                 __attribute__((unused))const char **values)
+                                 const char *key,
+                                 const char **values)
 {
     (*(int*)opaque)++;
+    (void)key;
+    (void)values;
     return true;
 }
 
 static bool walk_incr_count_false(void *opaque,
-                                  __attribute__((unused))const char *key,
-                                  __attribute__((unused))const char **values)
+                                  const char *key,
+                                  const char **values)
 {
     (*(int*)opaque)++;
+    (void)key;
+    (void)values;
     return false;
 }
 
@@ -192,10 +197,11 @@ static void test_walk_true(void)
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
     kvpair_t *pair1 = mk_kvpair("some_key", args1);
+    int count = 0;
+
     pair = mk_kvpair("some_other_key", args2);
     pair->next = pair1;
 
-    int count = 0;
     walk_kvpair(pair, &count, walk_incr_count_true);
 
     fail_unless(count == 2, "Count was not two");
@@ -203,13 +209,13 @@ static void test_walk_true(void)
 
 static void test_walk_false(void)
 {
+    int count = 0;
     char *args1[] = {"arg1", "arg2", NULL};
     char *args2[] = {"other", NULL};
     kvpair_t *pair1 = mk_kvpair("some_key", args1);
     pair = mk_kvpair("some_other_key", args2);
     pair->next = pair1;
 
-    int count = 0;
     walk_kvpair(pair, &count, walk_incr_count_false);
 
     printf("Count was %d\n", count);

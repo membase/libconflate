@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include "conflate.h"
 #include "conflate_internal.h"
 #include "rest.h"
@@ -11,7 +10,7 @@
 #define INITIALIZATION_MAGIC 142285011
 #define HTTP_PREFIX "HTTP:"
 
-void *run_conflate(void *);
+void run_conflate(void *);
 
 
 conflate_config_t* dup_conf(conflate_config_t c) {
@@ -45,7 +44,7 @@ void init_conflate(conflate_config_t *conf)
 
 bool start_conflate(conflate_config_t conf) {
     conflate_handle_t *handle;
-    void *(*run_func)(void*) = NULL;
+    void (*run_func)(void*) = NULL;
 
     /* Don't start if we don't believe initialization has occurred. */
     if (conf.initialization_marker != (void*)INITIALIZATION_MAGIC) {
@@ -65,10 +64,10 @@ bool start_conflate(conflate_config_t conf) {
 
     handle->conf = dup_conf(conf);
 
-    if (pthread_create(&handle->thread, NULL, run_func, handle) == 0) {
+    if (cb_create_thread(&handle->thread, run_func, handle, 1) == 0) {
         return true;
     } else {
-        perror("pthread_create");
+        perror("Failed to create thread");
     }
 
     return false;

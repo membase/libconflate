@@ -1,14 +1,28 @@
-PROJECT(libconflate C)
-
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${CMAKE_CURRENT_SOURCE_DIR}/../platform/include
+                           ${DEPS_INCLUDE_DIR}
+                           ${INSTALL_ROOT}/include)
+
+INCLUDE_DIRECTORIES(AFTER ${CURL_INCLUDE_DIRS})
 
 ADD_LIBRARY(conflate SHARED
             adhoc_commands.c conflate.c kvpair.c logging.c
             persist.c rest.c util.c xmpp.c)
 
-TARGET_LINK_LIBRARIES(conflate curl)
+ADD_EXECUTABLE(tests_check_kvpair tests/check_kvpair.c tests/test_common.c)
+
+IF(WIN32)
+    INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/win32)
+    ADD_DEFINITIONS(-Dsnprintf=_snprintf)
+ELSE(WIN32)
+set(ZLIB z)
+ENDIF(WIN32)
+
+TARGET_LINK_LIBRARIES(conflate ${CURL_LIBRARIES} platform ${ZLIB})
+SET_TARGET_PROPERTIES(conflate PROPERTIES SOVERSION 1.0.0)
+SET_TARGET_PROPERTIES(conflate PROPERTIES COMPILE_FLAGS -DBUILDING_LIBCONFLATE=1)
 
 INSTALL (FILES conflate.h DESTINATION include/libconflate)
 
@@ -18,11 +32,7 @@ INSTALL(TARGETS conflate
   ARCHIVE DESTINATION lib
 )
 
-#
-# The tests. These are automatically executed as part of the build!
-#
-ADD_EXECUTABLE(tests/check_kvpair tests/check_kvpair.c tests/test_common.c)
-TARGET_LINK_LIBRARIES(tests/check_kvpair conflate)
+TARGET_LINK_LIBRARIES(tests_check_kvpair conflate)
 
-ADD_CUSTOM_COMMAND(TARGET tests/check_kvpair POST_BUILD COMMAND
-                   tests/check_kvpair)
+ENABLE_TESTING()
+ADD_TEST(libconflate-test-suite tests_check_kvpair)

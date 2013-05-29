@@ -2,6 +2,8 @@
 #ifndef CONFLATE_INTERNAL_H
 #define CONFLATE_INTERNAL_H 1
 
+#include <platform/platform.h>
+
 #ifdef CONFLATE_USE_XMPP
 #include <strophe.h>
 #else
@@ -16,7 +18,7 @@ struct _conflate_handle {
 
     conflate_config_t *conf;
 
-    pthread_t thread;
+    cb_thread_t thread;
 
     char *url; /* Current URL for debuggability. */
 };

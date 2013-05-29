@@ -1,9 +1,15 @@
 #ifndef LIBCONFLATE_CONFLATE_H
 #define LIBCONFLATE_CONFLATE_H 1
 
+#ifdef WIN32
+#include <windows.h>
+typedef BOOL bool;
+#define false FALSE
+#define true TRUE
+#else
 #include <stdbool.h>
+#endif
 #include <sys/types.h>
-#include <pthread.h>
 
 #ifdef __cpluscplus
 extern "C" {
@@ -28,17 +34,34 @@ extern "C" {
 /* Deal with an ICC annoyance.  It tries hard to pretend to be GCC<
    but doesn't understand its attributes properly. */
 #ifndef __libconflate_gcc_attribute__
-#if defined (__ICC) || defined (__SUNPRO_C)
-# define __libconflate_gcc_attribute__(x)
-#else
+#if __GNUC__ && !(defined (__ICC) || defined (__SUNPRO_C))
 # define __libconflate_gcc_attribute__ __attribute__
+#else
+# define __libconflate_gcc_attribute__(x)
 #endif
 #endif
 
-#if ((defined (__SUNPRO_C) || defined(__SUNPRO_CC)) || defined __GNUC__)
-#define EXPORT_FUNCTION __attribute__ ((visibility("default")))
+#ifdef BUILDING_LIBCONFLATE
+
+#if defined (__SUNPRO_C) && (__SUNPRO_C >= 0x550)
+#define LIBCONFLATE_PUBLIC_API __global
+#elif defined __GNUC__
+#define LIBCONFLATE_PUBLIC_API __attribute__ ((visibility("default")))
+#elif defined(_MSC_VER)
+#define LIBCONFLATE_PUBLIC_API extern __declspec(dllexport)
 #else
-#define EXPORT_FUNCTION
+/* unknown compiler */
+#define LIBCONFLATE_PUBLIC_API
+#endif
+
+#else
+
+#if defined(_MSC_VER)
+#define LIBCONFLATE_PUBLIC_API extern __declspec(dllimport)
+#else
+#define LIBCONFLATE_PUBLIC_API
+#endif
+
 #endif
 
 /* Forward declaration */
@@ -104,7 +127,7 @@ typedef bool (*kvpair_visitor_t)(void *opaque,
  * @param v (optional) the list of values for this key.
  * @return a newly allocated kvpair_t
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 kvpair_t* mk_kvpair(const char* k, char** v)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (1)));
 
@@ -114,7 +137,7 @@ kvpair_t* mk_kvpair(const char* k, char** v)
  * @param kvpair the current kvpair that needs a new value
  * @param value the new value
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void add_kvpair_value(kvpair_t* kvpair, const char* value)
     __libconflate_gcc_attribute__ ((nonnull (1, 2)));
 
@@ -126,7 +149,7 @@ void add_kvpair_value(kvpair_t* kvpair, const char* value)
  *
  * @return the pair with the given key, or NULL if no such pair is found
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (2)));
 
@@ -142,7 +165,7 @@ kvpair_t* find_kvpair(kvpair_t* pair, const char* key)
  * @param key the key to find
  * @return a pointer to the first value found, or NULL if none was found
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (2)));
 
@@ -153,7 +176,7 @@ char *get_simple_kvpair_val(kvpair_t *pair, const char *key)
  *
  * @return a complete deep copy of the kvpair structure
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 kvpair_t *dup_kvpair(kvpair_t *pair)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull (1)));
 
@@ -164,7 +187,7 @@ kvpair_t *dup_kvpair(kvpair_t *pair)
  * @param opaque a value to be transparently passed to the visitor
  * @param visitor the visitor to call for each kvpair_t
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void walk_kvpair(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)
     __libconflate_gcc_attribute__ ((nonnull(1, 3)));
 
@@ -173,7 +196,7 @@ void walk_kvpair(kvpair_t *pair, void *opaque, kvpair_visitor_t visitor)
  *
  * @param pair the pair to free (recursively)
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void free_kvpair(kvpair_t* pair);
 
 /**
@@ -207,7 +230,7 @@ typedef struct _conflate_form_result conflate_form_result;
  * @param k a form key (may not be NULL)
  * @param v a form value (may not be NULL)
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
     __libconflate_gcc_attribute__ ((nonnull (1, 2, 3)));
 
@@ -218,7 +241,7 @@ void conflate_add_field(conflate_form_result *r, const char *k, const char *v)
  * @param k the form key (may not be NULL)
  * @param v the response values (may not be NULL -- NULL terminated)
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void conflate_add_field_multi(conflate_form_result *r, const char *k,
                               const char **v)
     __libconflate_gcc_attribute__ ((nonnull (1, 2, 3)));
@@ -231,7 +254,7 @@ void conflate_add_field_multi(conflate_form_result *r, const char *k,
  *
  * @param r the form as handed to the callback
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void conflate_next_fieldset(conflate_form_result *r)
     __libconflate_gcc_attribute__ ((nonnull (1)));
 
@@ -246,7 +269,7 @@ void conflate_next_fieldset(conflate_form_result *r)
  * If conflate_init_form is called and no fields are added, an
  * \e empty form will be returned.
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void conflate_init_form(conflate_form_result *r);
 
 /**
@@ -296,7 +319,7 @@ typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
  * @param desc short description of the command
  * @param cb the callback to issue when this command is invoked
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
                                conflate_mgmt_cb_t cb)
     __libconflate_gcc_attribute__ ((nonnull (1, 2, 3)));
@@ -334,7 +357,7 @@ enum conflate_log_level {
  *
  * This is the default logger.
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void conflate_syslog_logger(void *, enum conflate_log_level,
                             const char *, ...);
 
@@ -345,7 +368,7 @@ void conflate_syslog_logger(void *, enum conflate_log_level,
  * any sort of level filter, but useful for running apps on console
  * with verbosity.
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void conflate_stderr_logger(void *, enum conflate_log_level,
                             const char *, ...);
 
@@ -462,7 +485,7 @@ typedef struct {
  *
  * @param conf configuration to be initialized
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void init_conflate(conflate_config_t *conf) __libconflate_gcc_attribute__ ((nonnull (1)));
 
 /**
@@ -472,7 +495,7 @@ void init_conflate(conflate_config_t *conf) __libconflate_gcc_attribute__ ((nonn
  *
  * @return true if libconflate was able to properly initialize itself
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 bool start_conflate(conflate_config_t conf) __libconflate_gcc_attribute__ ((warn_unused_result));
 
 /**
@@ -480,9 +503,9 @@ bool start_conflate(conflate_config_t conf) __libconflate_gcc_attribute__ ((warn
  */
 
 /* Misc */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 char* safe_strdup(const char*);
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 void free_string_list(char **);
 
 /**
@@ -492,7 +515,7 @@ void free_string_list(char **);
  *
  * @return a deep copy of the configuration
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 conflate_config_t* dup_conf(conflate_config_t c);
 
 /**
@@ -508,7 +531,7 @@ conflate_config_t* dup_conf(conflate_config_t c);
  *
  * @return the config, or NULL if the config could not be read for any reason
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2)));
 
@@ -521,7 +544,7 @@ kvpair_t* load_kvpairs(conflate_handle_t *handle, const char *filename)
  *
  * @return false if the configuration could not be saved for any reason
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 bool save_kvpairs(conflate_handle_t *handle, kvpair_t* pairs, const char *filename)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
 
@@ -535,7 +558,7 @@ bool save_kvpairs(conflate_handle_t *handle, kvpair_t* pairs, const char *filena
  *
  * @return false if the data could not be saved for any reason
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 bool conflate_save_private(conflate_handle_t *handle,
                            const char *k, const char *v, const char *filename)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3, 4)));
@@ -549,7 +572,7 @@ bool conflate_save_private(conflate_handle_t *handle,
  *
  * @return false if the data could not be deleted for any reason
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 bool conflate_delete_private(conflate_handle_t *handle,
                              const char *k, const char *filename)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3)));
@@ -563,7 +586,7 @@ bool conflate_delete_private(conflate_handle_t *handle,
  *
  * @return an allocated value or NULL if one could not be retrieved
  */
-EXPORT_FUNCTION
+LIBCONFLATE_PUBLIC_API
 char *conflate_get_private(conflate_handle_t *handle,
                            const char *k, const char *filename)
     __libconflate_gcc_attribute__ ((warn_unused_result, nonnull(1, 2, 3)));

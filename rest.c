@@ -1,12 +1,15 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
 
 #ifdef WIN32
 #include <winsock2.h>
+typedef unsigned int socklen_t;
+#pragma warning (disable:4996)
+#define sleep(a) Sleep(a * 1000)
 #else
+#include <unistd.h>
 #include <sys/socket.h>
 #endif
 
@@ -238,7 +241,7 @@ static char *strsep(char **stringp, char *pattern) {
 }
 #endif
 
-void *run_rest_conflate(void *arg) {
+void run_rest_conflate(void *arg) {
     conflate_handle_t *handle = (conflate_handle_t *) arg;
     char curl_error_string[CURL_ERROR_SIZE];
     kvpair_t *conf;
@@ -342,6 +345,4 @@ void *run_rest_conflate(void *arg) {
     curl_easy_cleanup(curl_handle);
 
     exit(1);
-
-    return NULL;
 }
