@@ -1,8 +1,8 @@
 #ifndef LIBCONFLATE_CONFLATE_H
 #define LIBCONFLATE_CONFLATE_H 1
 
+#include <platform/platform.h>
 #ifdef _MSC_VER
-#include <windows.h>
 typedef BOOL bool;
 #define false FALSE
 #define true TRUE
