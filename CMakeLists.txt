@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/../platform/include
                            ${DEPS_INCLUDE_DIR}
-                           ${INSTALL_ROOT}/include)
+                           ${CMAKE_INSTALL_PREFIX}/include)
 
 INCLUDE_DIRECTORIES(AFTER ${CURL_INCLUDE_DIRS})
 
