@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "conflate.h"
+#include <libconflate/conflate.h>
 #include "conflate_internal.h"
 #include "rest.h"
 

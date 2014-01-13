@@ -1,7 +1,7 @@
 #ifndef TEST_COMMON_H
 #define TEST_COMMON_H 1
 
-#include <conflate.h>
+#include <libconflate/conflate.h>
 
 void fail_if_impl(bool val, const char *msg, const char *file, int line);
 

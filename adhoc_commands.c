@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "conflate.h"
+#include <libconflate/conflate.h>
 #include "conflate_internal.h"
 
 bool commands_initialized = false;

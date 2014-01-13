@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "conflate.h"
+#include <libconflate/conflate.h>
 
 char* safe_strdup(const char* in) {
     int len = strlen(in);

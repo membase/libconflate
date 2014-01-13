@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "conflate.h"
+#include <libconflate/conflate.h>
 #include "conflate_internal.h"
 
 static char* lvl_name(enum conflate_log_level lvl)

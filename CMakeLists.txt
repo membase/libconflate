@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/../platform/include
+                           ${CMAKE_CURRENT_SOURCE_DIR}/include
                            ${DEPS_INCLUDE_DIR}
                            ${CMAKE_INSTALL_PREFIX}/include)
 
@@ -24,7 +25,7 @@ TARGET_LINK_LIBRARIES(conflate ${CURL_LIBRARIES} platform ${ZLIB})
 SET_TARGET_PROPERTIES(conflate PROPERTIES SOVERSION 1.0.0)
 SET_TARGET_PROPERTIES(conflate PROPERTIES COMPILE_FLAGS -DBUILDING_LIBCONFLATE=1)
 
-INSTALL (FILES conflate.h DESTINATION include/libconflate)
+INSTALL (FILES include/libconflate/conflate.h DESTINATION include/libconflate)
 
 INSTALL(TARGETS conflate
   RUNTIME DESTINATION bin

@@ -16,7 +16,7 @@ typedef unsigned int socklen_t;
 #include <string.h>
 #include <curl/curl.h>
 
-#include "conflate.h"
+#include <libconflate/conflate.h>
 #include "rest.h"
 #include "conflate_internal.h"
 

@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* #include <check.h> */
-
-#include <conflate.h>
-
 #include "test_common.h"
 
 void fail_if_impl(bool val, const char *msg, const char *file, int line) {
