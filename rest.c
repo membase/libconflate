@@ -5,8 +5,8 @@
 
 #ifdef WIN32
 #include <winsock2.h>
-typedef unsigned int socklen_t;
-#pragma warning (disable:4996)
+#include <ws2tcpip.h>
+#define strdup _strdup
 #define sleep(a) Sleep(a * 1000)
 #else
 #include <unistd.h>
