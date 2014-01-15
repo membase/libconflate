@@ -2,13 +2,7 @@
 #define LIBCONFLATE_CONFLATE_H 1
 
 #include <platform/platform.h>
-#ifdef _MSC_VER
-typedef BOOL bool;
-#define false FALSE
-#define true TRUE
-#else
 #include <stdbool.h>
-#endif
 #include <sys/types.h>
 
 #ifdef __cpluscplus
