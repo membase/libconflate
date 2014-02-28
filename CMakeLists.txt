@@ -21,8 +21,6 @@ ADD_LIBRARY(conflate SHARED
             src/xmpp.c)
 
 IF(WIN32)
-    INCLUDE_DIRECTORIES(AFTER ${CMAKE_CURRENT_SOURCE_DIR}/win32)
-    INCLUDE_DIRECTORIES(AFTER ${CMAKE_SOURCE_DIR}/platform/include/win32)
     ADD_DEFINITIONS(-Dsnprintf=_snprintf)
 ELSE(WIN32)
     SET(ZLIB z)
