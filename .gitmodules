@@ -1,3 +1,0 @@
-[submodule "libstrophe"]
-	path = libstrophe
-	url = git://github.com/dustin/libstrophe.git
