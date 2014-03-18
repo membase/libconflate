@@ -9,16 +9,16 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}
 INCLUDE_DIRECTORIES(AFTER ${CURL_INCLUDE_DIRS})
 
 ADD_LIBRARY(conflate SHARED
-            src/adhoc_commands.c
-            src/conflate.c
-            src/conflate_internal.h
-            src/kvpair.c
-            src/logging.c
-            src/persist.c
-            src/rest.c
-            src/rest.h
-            src/util.c
-            src/xmpp.c)
+            conflate/adhoc_commands.c
+            conflate/conflate.c
+            conflate/conflate_internal.h
+            conflate/kvpair.c
+            conflate/logging.c
+            conflate/persist.c
+            conflate/rest.c
+            conflate/rest.h
+            conflate/util.c
+            conflate/xmpp.c)
 
 IF(WIN32)
     ADD_DEFINITIONS(-Dsnprintf=_snprintf)
@@ -43,8 +43,8 @@ INSTALL(TARGETS conflate
 
 ADD_EXECUTABLE(tests_check_kvpair
                include/libconflate/conflate.h
-               tests/check_kvpair.c
-               tests/test_common.c
-               tests/test_common.h)
+               tests/conflate/check_kvpair.c
+               tests/conflate/test_common.c
+               tests/conflate/test_common.h)
 TARGET_LINK_LIBRARIES(tests_check_kvpair conflate)
 ADD_TEST(libconflate-test-suite tests_check_kvpair)
